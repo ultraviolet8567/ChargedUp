@@ -11,6 +11,7 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
+    private final Arms arms = new Arms();
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
 
     public RobotContainer() {
@@ -33,6 +34,8 @@ public class RobotContainer {
         // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
         new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new Cone(intake));
         new JoystickButton(driverJoystick, XboxController.Button.kB.value).onTrue(new Cube(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new TurnElbow(arms));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new TurnShoulder(arms));
     }
 
     public Command getAutonomousCommand() {
