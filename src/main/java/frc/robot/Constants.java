@@ -146,4 +146,18 @@ public final class Constants {
         XBOX,
         LOGITECH
     }
+
+    // fx = camera horizontal focal length (pixels)
+    public static final Double fx = 384.922;
+    // fy = camera vertical focal length (pixels)
+    public static final Double fy = 384.922;
+    // cx = camera horizontal focal center (pixels)
+    public static final Double cx = 318.720;
+    // cy = camera vertical focal center (pixels)
+    public static final Double cy = 238.373;
+
+    // size of AprilTag
+    public static final Double tagSize = Units.inchesToMeters(8);
+    // size of AprilTag image on Sid's computer with the pdf open in firefox at 100% zoom
+    public static final Double testTagSize = Units.inchesToMeters(4 + (9/16));
 }

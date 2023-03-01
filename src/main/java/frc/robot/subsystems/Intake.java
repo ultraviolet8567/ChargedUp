@@ -11,8 +11,8 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         // TODO: find ID
-        intake = new CANSparkMax(98, MotorType.kBrushless);
-        intakeSpeed = 4.0;
+        // intake = new CANSparkMax(98, MotorType.kBrushless);
+        // intakeSpeed = 4.0;
     }
 
     @Override
@@ -21,16 +21,17 @@ public class Intake extends SubsystemBase {
     }
 
     public void pickupCone(double intakeSpeed) {
-        intake.set(intakeSpeed);
+        // intake.set(intakeSpeed);
     }
 
     public void pickupCube(double intakeSpeed) {
         //TODO: Find out which motor is negative
-        intake.set(-1 * intakeSpeed);
+        // intake.set(-1 * intakeSpeed);
     }
 
     public double getSpd() {
-        return intakeSpeed;
+        // return intakeSpeed;
+        return 0.0;
     }
 
 }

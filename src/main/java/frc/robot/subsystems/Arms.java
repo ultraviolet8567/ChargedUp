@@ -13,18 +13,18 @@ public class Arms extends SubsystemBase {
     RelativeEncoder shoulderEnc;
 
     public Arms() {
-        shoulder = new CANSparkMax(14, MotorType.kBrushless);
-        elbow = new CANSparkMax(17, MotorType.kBrushless);
-        shoulderEnc = shoulder.getEncoder();
+        // shoulder = new CANSparkMax(14, MotorType.kBrushless);
+        // elbow = new CANSparkMax(17, MotorType.kBrushless);
+        // shoulderEnc = shoulder.getEncoder();
         
     }
 
    public void ShoulderSpeed() {
-        shoulder.set(4.0);
+        // shoulder.set(4.0);
     }
     
     public void elbowMotor() {
-        elbow.set(4.0);
+        // elbow.set(4.0);
     }
 
     public double shoulderDeg() {
