@@ -1,38 +1,54 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.CAN;
 
 public class Arms extends SubsystemBase {
     
     CANSparkMax shoulder;
     CANSparkMax elbow;
-    RelativeEncoder shoulderEnc;
+    RelativeEncoder shoulderEncoder;
+    RelativeEncoder elbowEncoder;
 
     public Arms() {
-        // shoulder = new CANSparkMax(14, MotorType.kBrushless);
-        // elbow = new CANSparkMax(17, MotorType.kBrushless);
-        // shoulderEnc = shoulder.getEncoder();
-        
+        shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
+        elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
     }
 
-   public void ShoulderSpeed() {
-        // shoulder.set(4.0);
+    public void runShoulderForward() {
+        shoulder.set(Constants.shoulderSpeed);
     }
     
-    public void elbowMotor() {
-        // elbow.set(4.0);
+    public void runElbowForward() {
+        elbow.set(Constants.elbowSpeed);
     }
 
+    public void runShoulderBackward() {
+        shoulder.set(-Constants.shoulderSpeed);
+    }
+    
+    public void runElbowBackward() {
+        elbow.set(-Constants.elbowSpeed);
+    }
+
+    // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double shoulderDeg() {
-        double degrees = (24.0 * shoulderEnc.getPosition() / 5.0);    
-        return degrees;
+        // return 24.0 * shoulderEncoder.getPosition() / 5.0;
+        return 0.0;
     }
 
-    public void Stop() {
+    // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
+    public double elbowDeg() {
+        // return 24.0 * elbowEncoder.getPosition() / 5.0; 
+        return 0.0;
+    }
+
+    public void stop() {
         shoulder.stopMotor();
         elbow.stopMotor();
     }

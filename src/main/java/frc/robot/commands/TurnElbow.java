@@ -6,15 +6,15 @@ import frc.robot.subsystems.Arms;
 public class TurnElbow extends CommandBase {
   private Arms arms;
   
-  public TurnElbow(Arms subsystem) {
-    arms = subsystem;
+  public TurnElbow(Arms arms) {
+    this.arms = arms;
     addRequirements(arms);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arms.elbowMotor();
+    arms.runElbowForward();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
