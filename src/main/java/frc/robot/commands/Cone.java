@@ -12,7 +12,7 @@ public class Cone extends CommandBase {
 
     @Override 
     public void initialize() {
-        intake.pickupCone(intake.getSpd());
+        intake.pickupCone();
     }
 
 }

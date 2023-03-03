@@ -6,25 +6,32 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.Constants;
+
 public class Arms extends SubsystemBase {
     
     CANSparkMax shoulder;
     CANSparkMax elbow;
     RelativeEncoder shoulderEnc;
+    RelativeEncoder elbowEnc;
 
     public Arms() {
-        // shoulder = new CANSparkMax(14, MotorType.kBrushless);
-        // elbow = new CANSparkMax(17, MotorType.kBrushless);
-        // shoulderEnc = shoulder.getEncoder();
-        
+        shoulder = new CANSparkMax(14, MotorType.kBrushless);
+        elbow = new CANSparkMax(17, MotorType.kBrushless);
+        shoulderEnc = shoulder.getEncoder();
+        elbowEnc = elbow.getEncoder();
     }
 
-   public void ShoulderSpeed() {
-        // shoulder.set(4.0);
+    @Override
+    public void periodic() { 
+    }
+
+   public void turnShoulder() {
+        shoulder.set(Constants.armSpeed);
     }
     
-    public void elbowMotor() {
-        // elbow.set(4.0);
+    public void turnElbow() {
+        elbow.set(Constants.armSpeed);
     }
 
     public double shoulderDeg() {
@@ -32,7 +39,7 @@ public class Arms extends SubsystemBase {
         return degrees;
     }
 
-    public void Stop() {
+    public void stop() {
         shoulder.stopMotor();
         elbow.stopMotor();
     }

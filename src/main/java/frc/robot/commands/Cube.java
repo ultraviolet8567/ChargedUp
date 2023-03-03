@@ -13,6 +13,6 @@ public class Cube extends CommandBase {
     @Override 
     
     public void initialize() {
-        intake.pickupCube(intake.getSpd()); 
+        intake.pickupCube(); 
     }
 }

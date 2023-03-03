@@ -23,6 +23,9 @@ public final class Constants {
     public static final Mode currentMode = Mode.REAL;
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
+
+    public static final double intakeSpeed = 2.0;
+    public static final double armSpeed = 1.0;
     
     public static final class ModuleConstants {
         // Have to calculate using specs for the MK4i
