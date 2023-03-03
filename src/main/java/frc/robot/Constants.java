@@ -23,7 +23,27 @@ public final class Constants {
     public static final Mode currentMode = Mode.REAL;
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
+
+    public static final double intakeSpeed = 2.0;
+    public static final double shoulderSpeed = 1.0;
+    public static final double elbowSpeed = 1.0;
     
+    public static final class CAN {
+        public static final int kIntakePort = 2;
+        public static final int kShoulderPort = 0;
+        public static final int kElbowPort = 1;
+
+        public static final int kFrontLeftDriveMotorPort = 11;
+        public static final int kFrontRightDriveMotorPort = 12;
+        public static final int kBackLeftDriveMotorPort = 13;
+        public static final int kBackRightDriveMotorPort = 14;
+
+        public static final int kFrontLeftTurningMotorPort = 21;
+        public static final int kFrontRightTurningMotorPort = 22;
+        public static final int kBackLeftTurningMotorPort = 23;
+        public static final int kBackRightTurningMotorPort = 24;
+    }
+
     public static final class ModuleConstants {
         // Have to calculate using specs for the MK4i
         public static final double kWheelDiameterMeters = Units.inchesToMeters(3.75);
@@ -51,17 +71,6 @@ public final class Constants {
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)); // Back right (-/-)
-
-        // Edit to use the right CAN ports
-        public static final int kFrontLeftDriveMotorPort = 11;
-        public static final int kFrontRightDriveMotorPort = 12;
-        public static final int kBackLeftDriveMotorPort = 13;
-        public static final int kBackRightDriveMotorPort = 14;
-
-        public static final int kFrontLeftTurningMotorPort = 21;
-        public static final int kFrontRightTurningMotorPort = 22;
-        public static final int kBackLeftTurningMotorPort = 23;
-        public static final int kBackRightTurningMotorPort = 24;
 
         // Edit depending on specs of MK4i
         public static final boolean kFrontLeftTurningEncoderReversed = true;
