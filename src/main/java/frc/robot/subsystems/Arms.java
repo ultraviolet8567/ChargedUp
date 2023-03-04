@@ -55,4 +55,12 @@ public class Arms extends SubsystemBase {
         shoulder.stopMotor();
         elbow.stopMotor();
     }
+
+    public void stopShoulder() {
+        shoulder.stopMotor();
+    }
+
+    public void stopElbow() {
+        elbow.stopMotor();
+    }
 }
