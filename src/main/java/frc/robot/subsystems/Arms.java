@@ -20,6 +20,9 @@ public class Arms extends SubsystemBase {
         elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
     }
 
+    @Override
+    public void periodic() {}
+
     public void runShoulderForward() {
         shoulder.set(Constants.shoulderSpeed);
     }
