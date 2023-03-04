@@ -2,21 +2,21 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
+import frc.robot.RobotContainer;
 
 public class IntakeCC extends CommandBase {
     private Intake intake;
     private String gamePiece;
     
-    public IntakeCC(Intake intake, String gamePiece) {
+    public IntakeCC(Intake intake) {
         this.intake = intake;
-        this.gamePiece = gamePiece;
     }
 
     @Override 
     public void initialize() {
-        if (gamePiece == "cone") {
+        if (RobotContainer.gamePiece() == "cone") {
             intake.pickupCone();
-        } else if (gamePiece == "cube") {
+        } else if (RobotContainer.gamePiece() == "cube") {
             intake.pickupCube();
         }
     }

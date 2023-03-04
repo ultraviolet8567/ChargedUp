@@ -1,12 +1,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Arms;
 
-public class TurnElbow extends CommandBase {
+public class ManipulateArms extends CommandBase {
   private Arms arms;
   
-  public TurnElbow(Arms arms) {
+  public ManipulateArms(Arms arms) {
     this.arms = arms;
     addRequirements(arms);
   }
@@ -14,7 +15,19 @@ public class TurnElbow extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arms.runElbowForward();
+    if (RobotContainer.joint() == "shoulder") {
+      if (RobotContainer.direction() == "forward") {
+        arms.runShoulderForward();
+      } else if (RobotContainer.direction() == "backward") {
+        arms.runShoulderBackward();
+      }
+    } else if (RobotContainer.joint() == "elbow") {
+      if (RobotContainer.direction() == "forward") {
+        arms.runElbowForward();
+      } else if (RobotContainer.direction() == "backward") {
+        arms.runElbowBackward();
+      }
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

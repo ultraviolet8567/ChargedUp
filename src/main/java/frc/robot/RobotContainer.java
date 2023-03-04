@@ -16,14 +16,11 @@ public class RobotContainer {
     private final Intake intake = new Intake();
     private final Arms arms = new Arms();
     private final Vision vision = new Vision();
+    
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-    private XboxController xbox = new XboxController(0);
+    private static XboxController xbox = new XboxController(0);
 
     public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
-
-    public static String gamePiece = "";
-    public static String direction = "";
-    public static String joint = "";
 
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
@@ -34,13 +31,34 @@ public class RobotContainer {
             () -> Constants.fieldOriented));
             // () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonId)));
 
-        if (xbox.getAButton()) {
-            gamePiece = "cone";
-        } else if (xbox.getBButton()) {
-            gamePiece = "cube";
-        }
-
         configureButtonBindings();
+    }
+
+    public static String gamePiece() {
+        if (xbox.getAButton()) {
+            return "cone";
+        } else if (!xbox.getBButton()) {
+            return "cube";
+        }
+        return "";
+    }
+
+    public static String direction() {
+        if (xbox.getRightBumperPressed()) {
+            return "forward";
+        } else if (xbox.getLeftBumperPressed()) {
+            return "backward";
+        }
+        return "";
+    }
+
+    public static String joint() {
+        if (xbox.getXButton()) {
+            return "shoulder";
+        } else if (xbox.getYButton()) {
+            return "elbow";
+        }
+        return "";
     }
 
     public void configureButtonBindings() {
@@ -49,10 +67,10 @@ public class RobotContainer {
         // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Stop(swerve));
 
         // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
-        new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new IntakeCC(intake, gamePiece));
-        new JoystickButton(driverJoystick, XboxController.Button.kB.value).onTrue(new IntakeCC(intake, gamePiece));
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new TurnElbow(arms));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new TurnShoulder(arms));
+        new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new IntakeCC(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kB.value).onTrue(new IntakeCC(intake));
+
+        new JoystickButton(driverJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms));
     }
 
     public Command getAutonomousCommand() {

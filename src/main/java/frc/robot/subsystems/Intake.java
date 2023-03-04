@@ -14,7 +14,7 @@ public class Intake extends SubsystemBase {
     }
 
     @Override
-    public void periodic() { }
+    public void periodic() {}
 
     public void pickupCone() {
         intake.set(Constants.intakeSpeed);
