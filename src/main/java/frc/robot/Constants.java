@@ -30,18 +30,18 @@ public final class Constants {
     
     public static final class CAN {
         public static final int kIntakePort = 2;
-        public static final int kShoulderPort = 0;
-        public static final int kElbowPort = 1;
+        public static final int kShoulderPort = 4;
+        public static final int kElbowPort = 3;
 
-        public static final int kFrontLeftDriveMotorPort = 11;
-        public static final int kFrontRightDriveMotorPort = 12;
-        public static final int kBackLeftDriveMotorPort = 13;
-        public static final int kBackRightDriveMotorPort = 14;
+        public static final int kFrontLeftDriveMotorPort = 12;
+        public static final int kFrontRightDriveMotorPort = 22;
+        public static final int kBackLeftDriveMotorPort = 14;
+        public static final int kBackRightDriveMotorPort = 24;
 
-        public static final int kFrontLeftTurningMotorPort = 21;
-        public static final int kFrontRightTurningMotorPort = 22;
-        public static final int kBackLeftTurningMotorPort = 23;
-        public static final int kBackRightTurningMotorPort = 24;
+        public static final int kFrontLeftTurningMotorPort = 11;
+        public static final int kFrontRightTurningMotorPort = 21;
+        public static final int kBackLeftTurningMotorPort = 13;
+        public static final int kBackRightTurningMotorPort = 23;
     }
 
     public static final class ModuleConstants {
