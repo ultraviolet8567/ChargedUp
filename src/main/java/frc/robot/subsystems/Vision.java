@@ -11,8 +11,10 @@ import edu.wpi.first.apriltag.*;
 import edu.wpi.first.apriltag.AprilTagDetector.Config;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.UsbCameraInfo;
+import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -39,6 +41,12 @@ public class Vision extends SubsystemBase {
   // has a depth camera as well, exclude that
   UsbCamera camera;
 
+  CvSource imageStream;
+  CvSource maskStream;
+
+  double lowSaturation = 0;
+  double highSaturation = 20;
+
   // TODO: stream to dashboard
   // smartdashboard
   SmartDashboard dashboard;
@@ -64,6 +72,7 @@ public class Vision extends SubsystemBase {
   // made of a header (size, storing method, etc.) and a pointer (pixel values of image)
   Mat mat; // RGB
   Mat graymat; // grayscale
+  Mat processed; // grayscale & processed
 
   // an array of camera information (includes, probably, the RGB realsense, depth realsense, and webcam)
   UsbCameraInfo[] info;
@@ -74,12 +83,27 @@ public class Vision extends SubsystemBase {
     // Alexis: 0
     // Sid: 0
     // Chaerin: 1
-    camera = CameraServer.startAutomaticCapture();
+    // rio: 3
+
+    camera = CameraServer.startAutomaticCapture("Color", "/dev/video3");
+
+    camera.setPixelFormat(PixelFormat.kYUYV);
+    camera.setFPS(30);
+    camera.setResolution(424, 240);
+
+    imageStream = CameraServer.putVideo("Image Stream", 424, 240); 
+    maskStream = CameraServer.putVideo("Masked Area", 424, 240);
 
     //shuffleboard stuff
     RobotContainer.cameraTab.add("Camera", camera).withWidget(BuiltInWidgets.kCameraStream)
       .withSize(3, 2)
-      .withPosition(0, 1);
+      .withPosition(0, 1)
+    ;
+
+    RobotContainer.cameraTab.add("Processed Image", imageStream).withWidget(BuiltInWidgets.kCameraStream)
+      .withSize(3, 2)
+      .withPosition(0, 2)
+    ;
 
     // how many cameras do we have?
     // info = camera.enumerateUsbCameras();
@@ -174,8 +198,31 @@ public class Vision extends SubsystemBase {
 
       }
     }
+  }
 
+  public void processImage() {
+
+    // option 0: do nothing to the grayscale image.
+    // Imgproc.cvtColor(mat, graymat, Imgproc.COLOR_BGR2GRAY); 
+    // processed.setTo(graymat);
+
+    // option 1: bilateral filter, supposed to remove noise and blur while keeping edges, but expensive
+    //Imgproc.bilateralFilter(graymat, processed, 5, 10, 10); //i don't know what these values mean
     
+    // option 2: just regular old blur. might wreak havoc on the edges
+    // Size size = new Size(3, 3); // 3x3 filter
+    // Imgproc.blur(graymat, processed, size);
+    
+    // option 3: isolate only low-saturated (whitish, blackish, greyish) colors and then greyscale
+    Scalar nearBlack = new Scalar(0, lowSaturation, 0); // pure black
+    Scalar nearWhite = new Scalar(179, highSaturation, 255); // bluish-white. 
+    // note on above range: it checks for any hue (0-179), a saturation below 20 (0-20), and any brightness (0-255)
+    Imgproc.cvtColor(mat, processed, Imgproc.COLOR_BGR2HSV); // processed is original but in HSV
+    Core.inRange(processed, nearBlack, nearWhite, graymat); // graymat becomes the mask for a bit
+    Core.bitwise_and(mat, mat, processed, graymat); // processed is set to mask region but only in BGR color
+    // graymat.setTo(processed); //set graymat to processed, graymat is now mask region but in BGR color
+    Imgproc.cvtColor(processed, graymat, Imgproc.COLOR_BGR2GRAY); // final output, graymat is is only the masked region, in grayscale
+
   }
 
   // TODO: understand this and put it somewhere
