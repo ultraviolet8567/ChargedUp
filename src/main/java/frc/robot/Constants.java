@@ -25,8 +25,8 @@ public final class Constants {
     public static final boolean fieldOriented = true;
 
     public static final double intakeSpeed = 2.0;
-    public static final double shoulderSpeed = 1.0;
-    public static final double elbowSpeed = 1.0;
+    public static final double shoulderSpeed = 0.1;
+    public static final double elbowSpeed = 0.1;
     
     public static final class CAN {
         public static final int kIntakePort = 2;
@@ -128,6 +128,7 @@ public final class Constants {
         public static final ControllerType controllerType = ControllerType.XBOX;
         
         public static final int kDriverControllerPort = 0;
+        public static final int kToggleControllerPort = 1;
 
         public static final int kDriverYAxis = 1;
         public static final int kDriverXAxis = 0;

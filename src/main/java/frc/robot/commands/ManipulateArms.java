@@ -6,28 +6,36 @@ import frc.robot.subsystems.Arms;
 
 public class ManipulateArms extends CommandBase {
   private Arms arms;
+  private String joint;
+  private String direction;
   
-  public ManipulateArms(Arms arms) {
+  public ManipulateArms(Arms arms, String joint, String direction) {
     this.arms = arms;
     addRequirements(arms);
+
+    this.joint = joint;
+    this.direction = direction;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (RobotContainer.joint() == "shoulder") {
-      if (RobotContainer.direction() == "forward") {
+    if (joint == "shoulder") {
+      if (direction == "forward") {
         arms.runShoulderForward();
-      } else if (RobotContainer.direction() == "backward") {
+      } else if (direction == "backward") {
         arms.runShoulderBackward();
       }
-    } else if (RobotContainer.joint() == "elbow") {
-      if (RobotContainer.direction() == "forward") {
+    } else if (joint == "elbow") {
+      if (direction == "forward") {
         arms.runElbowForward();
-      } else if (RobotContainer.direction() == "backward") {
+      } else if (direction == "backward") {
         arms.runElbowBackward();
       }
     }
+
+    System.out.println(joint);
+    System.out.println(direction);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
