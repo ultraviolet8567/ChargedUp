@@ -35,6 +35,22 @@ public class Intake extends SubsystemBase {
         }
     }
 
+    public void drop() {
+        // TODO: Find out which should be negative (cone or cube)
+        
+        switch (gamePiece) {
+            case "Cone":
+                intake.set(-Constants.intakeSpeed.get());
+                break;
+            case "Cube":
+                
+                intake.set(Constants.intakeSpeed.get());
+                break;
+            default:
+                break;
+        }
+    }
+
     public void stop() {
         intake.stopMotor();
     }

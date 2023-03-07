@@ -39,11 +39,11 @@ public class RobotContainer {
         //new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Stop(swerve, intake, arms));
 
         // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new IntakeCC(intake));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new IntakeCC(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Pickup(intake));
 
-        // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new IntakeCC(intake));
-        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new IntakeCC(intake));
+        // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new Pickup(intake));
+        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new Pickup(intake));
 
         new JoystickButton(driverJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
         new JoystickButton(driverJoystick, XboxController.Button.kY.value).whileTrue(new ManipulateArms(arms, "shoulder", "backward"));   
