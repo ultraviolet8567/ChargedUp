@@ -11,8 +11,10 @@ import edu.wpi.first.apriltag.*;
 import edu.wpi.first.apriltag.AprilTagDetector.Config;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
+import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.UsbCameraInfo;
+import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -39,6 +41,8 @@ public class Vision extends SubsystemBase {
   // has a depth camera as well, exclude that
   UsbCamera camera;
 
+  CvSource imageStream;
+
   // TODO: stream to dashboard
   // smartdashboard
   SmartDashboard dashboard;
@@ -54,7 +58,7 @@ public class Vision extends SubsystemBase {
 
   // NOT NEEDED FOR NOW
   // configuration for below
-  AprilTagPoseEstimator.Config posConfig = new AprilTagPoseEstimator.Config(Constants.testTagSize, Constants.fx, Constants.fy, Constants.cx, Constants.cy);
+  AprilTagPoseEstimator.Config posConfig = new AprilTagPoseEstimator.Config(Constants.tagSize, Constants.fx, Constants.fy, Constants.cx, Constants.cy);
   // predicts and tracks location of tag
 
   // creates the timer for lowering capture rate
@@ -68,22 +72,35 @@ public class Vision extends SubsystemBase {
   // an array of camera information (includes, probably, the RGB realsense, depth realsense, and webcam)
   UsbCameraInfo[] info;
 
+  //size of april tag
+  double hSideLength;
+  double vSideLength;
+
   public Vision() {
     // sets up USB camera capture
     // TODO: for every new laptop, refind the value (uncomment the stuff below this line)
     // Alexis: 0
     // Sid: 0
     // Chaerin: 1
-    camera = CameraServer.startAutomaticCapture();
+    // roborio: 3
+    //camera = CameraServer.startAutomaticCapture(3);
+    camera = CameraServer.startAutomaticCapture("Color", "/dev/video2");
+    camera.setPixelFormat(PixelFormat.kYUYV);
+    camera.setFPS(30);
+    camera.setResolution(424, 240);
+    imageStream = CameraServer.putVideo("Image Stream", 424, 240); 
 
     //shuffleboard stuff
     RobotContainer.cameraTab.add("Camera", camera).withWidget(BuiltInWidgets.kCameraStream)
       .withSize(3, 2)
       .withPosition(0, 1);
 
+    RobotContainer.cameraTab.add("Processed Image", imageStream).withWidget(BuiltInWidgets.kCameraStream)
+      .withSize(3, 2)
+      .withPosition(0, 2);
+
     // how many cameras do we have?
     // info = camera.enumerateUsbCameras();
-
     // int i = 0;
     // for (UsbCameraInfo camera : info) {
     //   System.out.println(i + ": " + camera.name + ": " + camera.path); // name and path
@@ -124,8 +141,8 @@ public class Vision extends SubsystemBase {
     while (!Thread.interrupted()) {
 
       // set in-between run time to be 1 second
-      if (captureTimer.get() > 1.0) {
-        captureTimer.reset();
+      // if (captureTimer.get() > 1.0) {
+      //   captureTimer.reset();
 
         // it might run without this? 
         // TODO: test
@@ -165,12 +182,33 @@ public class Vision extends SubsystemBase {
             var j = (i + 1) % 4;
             var pt1 = new Point(detection.getCornerX(i), detection.getCornerY(i));
             var pt2 = new Point(detection.getCornerX(j), detection.getCornerY(j));
+
+            hSideLength = detection.getCornerX(i) + detection.getCornerX(j);
+            vSideLength = detection.getCornerY(i) + detection.getCornerY(j);
+
+            //these lengths are not final
+            if (hSideLength > vSideLength) {
+              if (hSideLength < 500) {
+                break;
+              } else {
+                System.out.println(hSideLength);
+              }
+            } else if (vSideLength > hSideLength) {
+              if (vSideLength < 500) {
+                break;
+              } else {
+                System.out.println(vSideLength);  
+              }
+            }
+
             Imgproc.line(mat, pt1, pt2, new Scalar(255, 0, 255), 2);
           }
-        }
+        // }
 
         // prints list of tag ids
-        System.out.println(ids);
+        //System.out.println(ids);
+        
+        imageStream.putFrame(mat);
 
       }
     }
