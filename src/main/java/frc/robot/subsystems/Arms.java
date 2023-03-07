@@ -24,19 +24,19 @@ public class Arms extends SubsystemBase {
     public void periodic() {}
 
     public void runShoulderForward() {
-        shoulder.set(Constants.shoulderSpeed);
+        shoulder.set(Constants.shoulderSpeed.get());
     }
     
     public void runElbowForward() {
-        elbow.set(Constants.elbowSpeed);
+        elbow.set(Constants.elbowSpeed.get());
     }
 
     public void runShoulderBackward() {
-        shoulder.set(-Constants.shoulderSpeed);
+        shoulder.set(-Constants.shoulderSpeed.get());
     }
     
     public void runElbowBackward() {
-        elbow.set(-Constants.elbowSpeed);
+        elbow.set(-Constants.elbowSpeed.get());
     }
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder

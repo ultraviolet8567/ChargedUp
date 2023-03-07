@@ -24,14 +24,14 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
 
-    public static final double intakeSpeed = 2.0;
-    public static final double shoulderSpeed = 0.1;
-    public static final double elbowSpeed = 0.1;
+    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 2.0);
+    public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
+    public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.1);
     
     public static final class CAN {
         public static final int kIntakePort = 2;
-        public static final int kShoulderPort = 4;
         public static final int kElbowPort = 3;
+        public static final int kShoulderPort = 4;
 
         public static final int kFrontLeftDriveMotorPort = 12;
         public static final int kFrontRightDriveMotorPort = 22;

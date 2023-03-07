@@ -17,12 +17,12 @@ public class Intake extends SubsystemBase {
     public void periodic() {}
 
     public void pickupCone() {
-        intake.set(Constants.intakeSpeed);
+        intake.set(Constants.intakeSpeed.get());
     }
 
     public void pickupCube () {
         // TODO: Find out which motor is negative
-        intake.set(-Constants.intakeSpeed);
+        intake.set(-Constants.intakeSpeed.get());
     }
 
     public void stop() {
