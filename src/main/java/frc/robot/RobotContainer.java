@@ -1,18 +1,14 @@
 package frc.robot;
 
-import javax.naming.ldap.ManageReferralControl;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class RobotContainer {
     private final Swerve swerve = new Swerve();
@@ -43,11 +39,11 @@ public class RobotContainer {
         //new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Stop(swerve, intake, arms));
 
         // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new IntakeCC(intake, "cone"));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new IntakeCC(intake, "cube"));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new IntakeCC(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new IntakeCC(intake));
 
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new IntakeCC(intake, "cone"));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new IntakeCC(intake, "cube"));
+        // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new IntakeCC(intake));
+        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new IntakeCC(intake));
 
         new JoystickButton(driverJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
         new JoystickButton(driverJoystick, XboxController.Button.kY.value).whileTrue(new ManipulateArms(arms, "shoulder", "backward"));   
@@ -62,5 +58,24 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return null;
+    }
+
+    public static String getGamePiece() {
+        /* Output should come based on the reading from the switch
+         * For now we're just basing it off of the buttons from the Xbox
+         * Since the right bumper runs the intake for a cone, I've let that return "cone"
+         * Since the left bumper runs the intake for a cube, I've let that return "cube"
+         */
+        Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
+
+        if (driverJoystick.getRawButton(XboxController.Button.kRightBumper.value)) {
+            return "Cone";
+        }
+        else if (driverJoystick.getRawButton(XboxController.Button.kLeftBumper.value)) {
+            return "Cube";
+        }
+        else {
+            return "";
+        }
     }
 }
