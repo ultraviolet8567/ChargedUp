@@ -39,8 +39,8 @@ public class RobotContainer {
         //new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Stop(swerve, intake, arms));
 
         // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Pickup(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake));
 
         // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new Pickup(intake));
         // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new Pickup(intake));

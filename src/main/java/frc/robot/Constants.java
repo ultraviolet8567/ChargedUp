@@ -28,6 +28,9 @@ public final class Constants {
     public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
     public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.1);
     
+    public static final int kShoulderEncoderPort = 0;
+    public static final int kElbowEncoderPort = 1;
+
     public static final class CAN {
         public static final int kIntakePort = 2;
         public static final int kElbowPort = 3;

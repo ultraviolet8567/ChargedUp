@@ -1,8 +1,8 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -10,18 +10,29 @@ import frc.robot.Constants.CAN;
 
 public class Arms extends SubsystemBase {
     
-    CANSparkMax shoulder;
-    CANSparkMax elbow;
-    RelativeEncoder shoulderEncoder;
-    RelativeEncoder elbowEncoder;
+    private final CANSparkMax shoulder;
+    private final CANSparkMax elbow;
+    private final DutyCycleEncoder shoulderEncoder;
+    private final DutyCycleEncoder elbowEncoder;
+    private final double shoulderEncoderOffset;
+    private final double elbowEncoderOffset;
 
     public Arms() {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
         elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
+
+        shoulderEncoder = new DutyCycleEncoder(Constants.kShoulderEncoderPort);
+        elbowEncoder = new DutyCycleEncoder(Constants.kElbowEncoderPort);
+
+        this.shoulderEncoderOffset = shoulderEncoder.getPositionOffset();
+        this.elbowEncoderOffset = elbowEncoder.getPositionOffset();
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        System.out.println(shoulderEncoder.getAbsolutePosition());
+        System.out.println(elbowEncoder.getAbsolutePosition());
+    }
 
     public void runShoulderForward() {
         shoulder.set(Constants.shoulderSpeed.get());
@@ -41,14 +52,12 @@ public class Arms extends SubsystemBase {
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double shoulderDeg() {
-        // return 24.0 * shoulderEncoder.getPosition() / 5.0;
-        return 0.0;
+        return shoulderEncoder.getAbsolutePosition() - shoulderEncoderOffset;
     }
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double elbowDeg() {
-        // return 24.0 * elbowEncoder.getPosition() / 5.0; 
-        return 0.0;
+        return elbowEncoder.getAbsolutePosition() - elbowEncoderOffset;
     }
 
     public void stop() {
@@ -62,5 +71,10 @@ public class Arms extends SubsystemBase {
 
     public void stopElbow() {
         elbow.stopMotor();
+    }
+
+    public void resetAbsoluteEncoders() {
+        shoulderEncoder.reset();
+        elbowEncoder.reset();
     }
 }
