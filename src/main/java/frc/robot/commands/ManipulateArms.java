@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Arms;
 
@@ -19,12 +20,19 @@ public class ManipulateArms extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
+  public void initialize() {}
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
     if (joint == "shoulder") {
-      if (direction == "forward") {
+      if (direction == "forward" && arms.checkLocationForward()) {
         arms.runShoulderForward();
-      } else if (direction == "backward") {
-        arms.runShoulderBackward();
+      } else if (direction == "backward" && arms.checkLocationBackward()) {
+        arms.runShoulderBackward(); 
+      } else {
+        System.out.println("hello");
+        arms.stopShoulder();
       }
     } else if (joint == "elbow") {
       if (direction == "forward") {
@@ -33,14 +41,7 @@ public class ManipulateArms extends CommandBase {
         arms.runElbowBackward();
       }
     }
-
-    System.out.println(joint);
-    System.out.println(direction);
   }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override

@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
+import frc.robot.commands.StopShoulder;
 
 public class Arms extends SubsystemBase {
     
@@ -14,8 +15,6 @@ public class Arms extends SubsystemBase {
     private final CANSparkMax elbow;
     private final DutyCycleEncoder shoulderEncoder;
     private final DutyCycleEncoder elbowEncoder;
-    private final double shoulderEncoderOffset;
-    private final double elbowEncoderOffset;
 
     public Arms() {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
@@ -23,15 +22,11 @@ public class Arms extends SubsystemBase {
 
         shoulderEncoder = new DutyCycleEncoder(Constants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(Constants.kElbowEncoderPort);
-
-        this.shoulderEncoderOffset = shoulderEncoder.getPositionOffset();
-        this.elbowEncoderOffset = elbowEncoder.getPositionOffset();
     }
 
     @Override
     public void periodic() {
-        System.out.println(shoulderEncoder.getAbsolutePosition());
-        System.out.println(elbowEncoder.getAbsolutePosition());
+        System.out.println(shoulderDeg());
     }
 
     public void runShoulderForward() {
@@ -52,12 +47,28 @@ public class Arms extends SubsystemBase {
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double shoulderDeg() {
-        return shoulderEncoder.getAbsolutePosition() - shoulderEncoderOffset;
+        return (shoulderEncoder.getAbsolutePosition() - Constants.kShoulderOffset) * 360;
     }
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double elbowDeg() {
-        return elbowEncoder.getAbsolutePosition() - elbowEncoderOffset;
+        return (elbowEncoder.getAbsolutePosition() - elbowEncoder.getPositionOffset()) * 360;
+    }
+
+    public boolean checkLocationBackward() {
+        if (shoulderDeg() <= Constants.stopArmOne) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean checkLocationForward() {
+        if (shoulderDeg() >= Constants.stopArmTwo) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public void stop() {

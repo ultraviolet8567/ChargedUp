@@ -31,6 +31,11 @@ public final class Constants {
     public static final int kShoulderEncoderPort = 0;
     public static final int kElbowEncoderPort = 1;
 
+    public static final double kShoulderOffset = 0.412;
+
+    public static final int stopArmOne = -132;
+    public static final int stopArmTwo = 168;
+
     public static final class CAN {
         public static final int kIntakePort = 2;
         public static final int kElbowPort = 3;
