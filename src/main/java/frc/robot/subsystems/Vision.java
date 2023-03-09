@@ -45,7 +45,10 @@ public class Vision extends SubsystemBase {
   CvSource maskStream;
 
   double lowSaturation = 0;
-  double highSaturation = 20;
+  double highSaturation = 12;
+
+  double minArea = 75;
+  double minSideLength = 64;
 
   // TODO: stream to dashboard
   // smartdashboard
@@ -57,8 +60,9 @@ public class Vision extends SubsystemBase {
 
   // AprilTag detector engine
   AprilTagDetector detector = new AprilTagDetector();
-  // configuration for above (debug, sharpening, threads, quad decimation, blur, snap)
-  AprilTagDetector.Config config = new AprilTagDetector.Config();
+
+  AprilTagDetector.QuadThresholdParameters params = new AprilTagDetector.QuadThresholdParameters();
+
 
   // NOT NEEDED FOR NOW
   // configuration for below
@@ -89,11 +93,11 @@ public class Vision extends SubsystemBase {
     // Chaerin: 1
     // rio: 3
 
-    camera = CameraServer.startAutomaticCapture("Color", "/dev/video3");
+    camera = CameraServer.startAutomaticCapture(0);
 
-    camera.setPixelFormat(PixelFormat.kYUYV);
+    // camera.setPixelFormat(PixelFormat.kYUYV);
     camera.setFPS(30);
-    camera.setResolution(424, 240);
+   //  camera.setResolution(424, 240);
 
     imageStream = CameraServer.putVideo("Image Stream", 424, 240); 
     maskStream = CameraServer.putVideo("Masked Area", 424, 240);
@@ -111,28 +115,26 @@ public class Vision extends SubsystemBase {
 
     // how many cameras do we have?
     // info = camera.enumerateUsbCameras();
+
     // int i = 0;
     // for (UsbCameraInfo camera : info) {
     //   System.out.println(i + ": " + camera.name + ": " + camera.path); // name and path
     //   i += 1;
     // }
 
-    // sorry jase, but this just looks so much neater
-
-    // lowers resolution
-    // camera.setResolution(640, 480);
-
     // get OpenCV access to primary camera feed - can get images from camera for processing on RIO
     sink = CameraServer.getVideo();
 
-    // set up AprilTag detector
-    detector.setConfig(config);
     // which family of tags are we detecting?
     detector.addFamily("tag16h5");
+    
+    detector.setQuadThresholdParameters(params);
 
     // making mats
     mat = new Mat(); // RGB
     graymat = new Mat(); // grayscale
+
+    System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
     //sets up AprilTagPoseEstimator
     AprilTagPoseEstimator estimator = new AprilTagPoseEstimator(posConfig);
@@ -154,9 +156,6 @@ public class Vision extends SubsystemBase {
       // if (captureTimer.get() > 1.0) {
       //   captureTimer.reset();
 
-        // it might run without this? 
-        // TODO: test
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // grabs image from camera
         long time = sink.grabFrame(mat);
@@ -183,40 +182,69 @@ public class Vision extends SubsystemBase {
           // run estimator
           // Transform3d pose = estimator.estimate(detection);
 
-          // adds this tag's id to list
-          ids.add(detection.getId());
+          List<Double> QuadSideLength = new ArrayList<Double>();
 
           // draw lines around the tag
           // TODO: somebody other than chaerin write explanation here
+          
+          double Area = 0.0;
+          
           for (var i = 0; i <= 3; i++) {
             var j = (i + 1) % 4;
+
+            Area += detection.getCornerX(i) * detection.getCornerY(j);
+            Area -= detection.getCornerX(j) * detection.getCornerY(i);
+
+            hSideLength = Math.abs(detection.getCornerX(i) - detection.getCornerX(j));
+            vSideLength = Math.abs(detection.getCornerY(i) - detection.getCornerY(j));
+            
+            QuadSideLength.add(Math.sqrt(Math.pow(hSideLength, 2) + Math.pow(vSideLength, 2)));
+          
+          }
+
+          Boolean shouldContinue = false;
+          for (int i = 0; i <= 3; i++) {
+            if (QuadSideLength.get(i) < minSideLength)
+              shouldContinue = true;
+          }
+          if (shouldContinue) {
+            continue; // incredibly complex piece of code. let me take you through it:
+                      // if you should Continue: you continue.
+          } 
+          
+          Area /= 2.0;
+          Area = Math.abs(Area);
+
+          if (Area < minArea)
+            continue;
+
+
+          for (var i = 0; i <= 3; i++) {
+            var j = (i + 1) % 4;
+
             var pt1 = new Point(detection.getCornerX(i), detection.getCornerY(i));
             var pt2 = new Point(detection.getCornerX(j), detection.getCornerY(j));
 
-            hSideLength = detection.getCornerX(i) + detection.getCornerX(j);
-            vSideLength = detection.getCornerY(i) + detection.getCornerY(j);
-
-            //these lengths are not final
-            if (hSideLength > vSideLength) {
-              if (hSideLength < 500) {
-                break;
-              } else {
-                System.out.println(hSideLength);
-              }
-            } else if (vSideLength > hSideLength) {
-              if (vSideLength < 500) {
-                break;
-              } else {
-                System.out.println(vSideLength);  
-              }
-            }
+            // these lengths are not final
+            // if (hSideLength > vSideLength) {
+            //   if (hSideLength < 50) {
+            //     break;
+            //   } 
+            // } else if (vSideLength > hSideLength) {
+            //   if (vSideLength < 50) {
+            //     break;
+            //   } 
+            // }
 
             Imgproc.line(mat, pt1, pt2, new Scalar(255, 0, 255), 2);
           }
+          
+          // adds this tag's id to list
+          ids.add(detection.getId());
         // }
 
         // prints list of tag ids
-        //System.out.println(ids);
+        System.out.println(ids);
         
         imageStream.putFrame(mat);
 
