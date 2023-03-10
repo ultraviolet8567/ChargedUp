@@ -44,11 +44,13 @@ public class Vision extends SubsystemBase {
   CvSource imageStream;
   CvSource maskStream;
 
+  // TODO: Tweak values below to make apriltag detection consistent
   double lowSaturation = 0;
-  double highSaturation = 12;
-
-  double minArea = 75;
-  double minSideLength = 64;
+  double highSaturation = 12; // (0 - 255) adjust for high saturation value: the higher this value the greater the deviation from
+                              // grayscale that will still be accepted 
+                              // TODO: saturation filter currently disabled - optimize and check for re-enabling
+  double minArea = 75; // (sq. pixels) minimum area of a detection that will be kept and considered
+  double minSideLength = 64; // (lin. pixels) minimum length of any of the sides of the quad created by a detection
 
   // TODO: stream to dashboard
   // smartdashboard
@@ -61,7 +63,7 @@ public class Vision extends SubsystemBase {
   // AprilTag detector engine
   AprilTagDetector detector = new AprilTagDetector();
 
-  AprilTagDetector.QuadThresholdParameters params = new AprilTagDetector.QuadThresholdParameters();
+  AprilTagDetector.QuadThresholdParameters params = new AprilTagDetector.QuadThresholdParameters(); // lies, fairy dust, deceit
 
 
   // NOT NEEDED FOR NOW
@@ -81,9 +83,12 @@ public class Vision extends SubsystemBase {
   // an array of camera information (includes, probably, the RGB realsense, depth realsense, and webcam)
   UsbCameraInfo[] info;
 
-  //size of april tag
+  // size of one side of an april-tag detection
   double hSideLength;
   double vSideLength;
+  
+  // list of sidelengths of detection quads
+  List<Double> QuadSideLength = new ArrayList<Double>();
 
   public Vision() {
     // sets up USB camera capture
@@ -181,45 +186,47 @@ public class Vision extends SubsystemBase {
         for (AprilTagDetection detection : detector.detect(graymat)) {
           // run estimator
           // Transform3d pose = estimator.estimate(detection);
-
-          List<Double> QuadSideLength = new ArrayList<Double>();
-
-          // draw lines around the tag
-          // TODO: somebody other than chaerin write explanation here
           
-          double Area = 0.0;
+          double Area = 0.0; // haven't calculated area of detection yet
+          QuadSideLength.clear(); // clear quadsidelength of previous quad
           
-          for (var i = 0; i <= 3; i++) {
+          for (var i = 0; i <= 3; i++) { // get side lengths of each side of this quad and the area of this quad
             var j = (i + 1) % 4;
 
-            Area += detection.getCornerX(i) * detection.getCornerY(j);
+            Area += detection.getCornerX(i) * detection.getCornerY(j); // shoelace formula for area
             Area -= detection.getCornerX(j) * detection.getCornerY(i);
 
-            hSideLength = Math.abs(detection.getCornerX(i) - detection.getCornerX(j));
-            vSideLength = Math.abs(detection.getCornerY(i) - detection.getCornerY(j));
+            hSideLength = Math.abs(detection.getCornerX(i) - detection.getCornerX(j)); // horizontal size of line
+            vSideLength = Math.abs(detection.getCornerY(i) - detection.getCornerY(j)); // vertical size of line
             
-            QuadSideLength.add(Math.sqrt(Math.pow(hSideLength, 2) + Math.pow(vSideLength, 2)));
+            QuadSideLength.add(Math.sqrt(Math.pow(hSideLength, 2) + Math.pow(vSideLength, 2))); // find and add the length of the line to 
+                                                                                                // the array
           
           }
 
           Boolean shouldContinue = false;
           for (int i = 0; i <= 3; i++) {
             if (QuadSideLength.get(i) < minSideLength)
-              shouldContinue = true;
+              shouldContinue = true; // checks if any of the side lengths are smaller than the minimum, and 
+                                     // skips logging and processing this detection if they are
+                                     // TODO: check for side length ratio OR understand homography matrices to filter (slr better)
           }
+
           if (shouldContinue) {
             continue; // incredibly complex piece of code. let me take you through it:
                       // if you should Continue: you continue.
-          } 
+          }
+
+
           
           Area /= 2.0;
-          Area = Math.abs(Area);
+          Area = Math.abs(Area); // processing Area variable to be positive and the correct magnitude
 
           if (Area < minArea)
-            continue;
+            continue; // if Area is less than minimum area, skip logging and processing this detection
 
 
-          for (var i = 0; i <= 3; i++) {
+          for (var i = 0; i <= 3; i++) { // drawing lines around detection
             var j = (i + 1) % 4;
 
             var pt1 = new Point(detection.getCornerX(i), detection.getCornerY(i));
@@ -235,6 +242,8 @@ public class Vision extends SubsystemBase {
             //     break;
             //   } 
             // }
+            
+            // above code superseded by code outside this loop
 
             Imgproc.line(mat, pt1, pt2, new Scalar(255, 0, 255), 2);
           }
@@ -245,14 +254,14 @@ public class Vision extends SubsystemBase {
 
         // prints list of tag ids
         System.out.println(ids);
-        
+        // adds the frame with detections highlighted to the output stream
         imageStream.putFrame(mat);
 
       }
     }
   }
 
-  public void processImage() {
+  public void processImage() { // TODO: image processing required?
 
     // option 0: do nothing to the grayscale image.
     // Imgproc.cvtColor(mat, graymat, Imgproc.COLOR_BGR2GRAY); 
@@ -277,7 +286,7 @@ public class Vision extends SubsystemBase {
 
   }
 
-  // TODO: understand this and put it somewhere
+  // TODO: apply this after refining detection to be consistent
 
   // public Pose3d detectFromImage(String path) {
     
