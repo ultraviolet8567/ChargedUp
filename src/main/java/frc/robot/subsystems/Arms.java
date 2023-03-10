@@ -51,20 +51,48 @@ public class Arms extends SubsystemBase {
     }
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
+    //TODO: find the offset of the elbow absolute encoder
     public double elbowDeg() {
         return (elbowEncoder.getAbsolutePosition() - elbowEncoder.getPositionOffset()) * 360;
     }
 
+    public void setArm(int shoulderDegree, int elbowDegree) {
+        //shoulder presetting
+        if (shoulderDegree > shoulderDeg()){
+            while (shoulderDeg() > shoulderDegree) {
+                runShoulderForward();
+            }
+        } else if (shoulderDegree < shoulderDeg()){
+            while (shoulderDeg() < shoulderDegree){
+                runShoulderBackward();
+            }
+        }
+
+        //elbow presetting
+        if (elbowDegree > elbowDeg()){
+            while (elbowDeg() > elbowDegree) {
+                runElbowForward();
+            }
+        } else if (elbowDegree < elbowDeg()){
+            while (elbowDeg() < elbowDegree){
+                runElbowBackward();
+            }
+        }
+                
+    }
+
+    //check if the arm is past the limit of -132 degrees 
     public boolean checkLocationBackward() {
-        if (shoulderDeg() <= Constants.stopArmOne) {
+        if (shoulderDeg() <= Constants.kStopArmOne) {
             return false;
         } else {
             return true;
         }
     }
 
+    //check if the arm is past the limit of 168 degrees
     public boolean checkLocationForward() {
-        if (shoulderDeg() >= Constants.stopArmTwo) {
+        if (shoulderDeg() >= Constants.kStopArmTwo) {
             return false;
         } else {
             return true;

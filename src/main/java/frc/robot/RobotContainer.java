@@ -17,7 +17,7 @@ public class RobotContainer {
     // private final Vision vision = new Vision();
     
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-    private static final Joystick toggleJoystick = new Joystick(OIConstants.kToggleControllerPort);
+    private static final Joystick armJoystick = new Joystick(OIConstants.kToggleControllerPort);
 
     public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
 
@@ -54,6 +54,13 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kY.value).whileFalse(new StopShoulder(arms));   
         new JoystickButton(driverJoystick, XboxController.Button.kB.value).whileFalse(new StopElbow(arms));   
         new JoystickButton(driverJoystick, XboxController.Button.kA.value).whileFalse(new StopElbow(arms));
+
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new PresetArms(arms, "high node"));
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new PresetArms(arms, "mid node"));
+        new JoystickButton(armJoystick, XboxController.Button.kX.value).onTrue(new PresetArms(arms, "hybrid node"));
+        new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new PresetArms(arms, "ground intake"));
+        new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new PresetArms(arms, "high intake"));
+        new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new PresetArms(arms, "starting"));
     }
 
     public Command getAutonomousCommand() {
