@@ -98,11 +98,11 @@ public class Vision extends SubsystemBase {
     // Chaerin: 1
     // rio: 3
 
-    camera = CameraServer.startAutomaticCapture(0);
+    camera = CameraServer.startAutomaticCapture("Color", "/dev/video2");
 
-    // camera.setPixelFormat(PixelFormat.kYUYV);
+    camera.setPixelFormat(PixelFormat.kYUYV);
     camera.setFPS(30);
-   //  camera.setResolution(424, 240);
+    camera.setResolution(424, 240);
 
     imageStream = CameraServer.putVideo("Image Stream", 424, 240); 
     maskStream = CameraServer.putVideo("Masked Area", 424, 240);
@@ -231,20 +231,7 @@ public class Vision extends SubsystemBase {
 
             var pt1 = new Point(detection.getCornerX(i), detection.getCornerY(i));
             var pt2 = new Point(detection.getCornerX(j), detection.getCornerY(j));
-
-            // these lengths are not final
-            // if (hSideLength > vSideLength) {
-            //   if (hSideLength < 50) {
-            //     break;
-            //   } 
-            // } else if (vSideLength > hSideLength) {
-            //   if (vSideLength < 50) {
-            //     break;
-            //   } 
-            // }
             
-            // above code superseded by code outside this loop
-
             Imgproc.line(mat, pt1, pt2, new Scalar(255, 0, 255), 2);
           }
           
@@ -253,11 +240,13 @@ public class Vision extends SubsystemBase {
         // }
 
         // prints list of tag ids
-        System.out.println(ids);
         // adds the frame with detections highlighted to the output stream
-        imageStream.putFrame(mat);
-
       }
+
+      System.out.println(ids);
+
+      imageStream.putFrame(mat);
+
     }
   }
 
@@ -275,14 +264,14 @@ public class Vision extends SubsystemBase {
     // Imgproc.blur(graymat, processed, size);
     
     // option 3: isolate only low-saturated (whitish, blackish, greyish) colors and then greyscale
-    Scalar nearBlack = new Scalar(0, lowSaturation, 0); // pure black
-    Scalar nearWhite = new Scalar(179, highSaturation, 255); // bluish-white. 
-    // note on above range: it checks for any hue (0-179), a saturation below 20 (0-20), and any brightness (0-255)
-    Imgproc.cvtColor(mat, processed, Imgproc.COLOR_BGR2HSV); // processed is original but in HSV
-    Core.inRange(processed, nearBlack, nearWhite, graymat); // graymat becomes the mask for a bit
-    Core.bitwise_and(mat, mat, processed, graymat); // processed is set to mask region but only in BGR color
-    // graymat.setTo(processed); //set graymat to processed, graymat is now mask region but in BGR color
-    Imgproc.cvtColor(processed, graymat, Imgproc.COLOR_BGR2GRAY); // final output, graymat is is only the masked region, in grayscale
+    // Scalar nearBlack = new Scalar(0, lowSaturation, 0); // pure black
+    // Scalar nearWhite = new Scalar(179, highSaturation, 255); // bluish-white. 
+    // // note on above range: it checks for any hue (0-179), a saturation below 20 (0-20), and any brightness (0-255)
+    // Imgproc.cvtColor(mat, processed, Imgproc.COLOR_BGR2HSV); // processed is original but in HSV
+    // Core.inRange(processed, nearBlack, nearWhite, graymat); // graymat becomes the mask for a bit
+    // Core.bitwise_and(mat, mat, processed, graymat); // processed is set to mask region but only in BGR color
+    // // graymat.setTo(processed); //set graymat to processed, graymat is now mask region but in BGR color
+    // Imgproc.cvtColor(processed, graymat, Imgproc.COLOR_BGR2GRAY); // final output, graymat is is only the masked region, in grayscale
 
   }
 
