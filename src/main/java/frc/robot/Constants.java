@@ -34,18 +34,19 @@ public final class Constants {
 
     //arm absolute encoder offset
     public static final double kShoulderOffset = 0.412;
+    public static final double kElbowOffset = 0.543;
 
     //stopping point for shoulder
     public static final int kStopArmOne = -132;
     public static final int kStopArmTwo = 168;
 
     //arm preset points TODO: find these points
-    public static final int[] kHighNodeSetpoints = new int[] {0, 0};
-    public static final int[] kMidNodeSetpoints = new int[] {0, 0};
-    public static final int[] kHybridNodeSetpoints = new int[] {0, 0};
-    public static final int[] kGroundIntakeSetpoints = new int[] {0, 0};
-    public static final int[] kHighIntakeSetpoints = new int[] {0, 0};
-    public static final int[] kStartingSetpoints = new int[] {0, 0};
+    public static final int[] kHighNodeSetpoints = new int[] {50, 0};
+    public static final int[] kMidNodeSetpoints = new int[] {50, 0};
+    public static final int[] kHybridNodeSetpoints = new int[] {50, 0};
+    public static final int[] kGroundIntakeSetpoints = new int[] {50, 0};
+    public static final int[] kHighIntakeSetpoints = new int[] {50, 0};
+    public static final int[] kStartingSetpoints = new int[] {50, 0};
 
     public static final class CAN {
         public static final int kIntakePort = 2;

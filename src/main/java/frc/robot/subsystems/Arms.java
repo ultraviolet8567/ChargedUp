@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
-import frc.robot.commands.StopShoulder;
 
 public class Arms extends SubsystemBase {
     
@@ -26,7 +25,7 @@ public class Arms extends SubsystemBase {
 
     @Override
     public void periodic() {
-        System.out.println(shoulderDeg());
+        System.out.println(elbowDeg());
     }
 
     public void runShoulderForward() {
@@ -53,7 +52,7 @@ public class Arms extends SubsystemBase {
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     //TODO: find the offset of the elbow absolute encoder
     public double elbowDeg() {
-        return (elbowEncoder.getAbsolutePosition() - elbowEncoder.getPositionOffset()) * 360;
+        return (elbowEncoder.getAbsolutePosition() - Constants.kElbowOffset) * 360;
     }
 
     public void setArm(int shoulderDegree, int elbowDegree) {
