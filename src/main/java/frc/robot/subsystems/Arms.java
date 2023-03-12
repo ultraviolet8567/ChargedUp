@@ -15,83 +15,108 @@ public class Arms extends SubsystemBase {
     private final DutyCycleEncoder shoulderEncoder;
     private final DutyCycleEncoder elbowEncoder;
 
+    public boolean shoulderRunning;
+
     public Arms() {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
         elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
 
         shoulderEncoder = new DutyCycleEncoder(Constants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(Constants.kElbowEncoderPort);
+
+        shoulderRunning = false;
     }
 
     @Override
     public void periodic() {
-        System.out.println(elbowDeg());
+        // while (-(180 - elbowDeg()) < 30) {
+        //      elbow.set(Constants.elbowSpeed.get());
+        // }
+        System.out.println(shoulderDeg() + "     " + elbowDeg());
     }
 
-    public void runShoulderForward() {
-        shoulder.set(Constants.shoulderSpeed.get());
+    public void runShoulder(double speed) {
+        shoulder.set(speed);
     }
     
-    public void runElbowForward() {
-        elbow.set(Constants.elbowSpeed.get());
-    }
-
-    public void runShoulderBackward() {
-        shoulder.set(-Constants.shoulderSpeed.get());
-    }
-    
-    public void runElbowBackward() {
-        elbow.set(-Constants.elbowSpeed.get());
+    public void runElbow(double speed) {
+        elbow.set(speed);
     }
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double shoulderDeg() {
-        return (shoulderEncoder.getAbsolutePosition() - Constants.kShoulderOffset) * 360;
+        double shoulderDegrees = -(shoulderEncoder.getAbsolutePosition() - Constants.kShoulderOffset) * 360;
+        if (shoulderDegrees < 0) {
+            shoulderDegrees += 360;
+        }
+        return shoulderDegrees;
     }
 
     // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     //TODO: find the offset of the elbow absolute encoder
     public double elbowDeg() {
-        return (elbowEncoder.getAbsolutePosition() - Constants.kElbowOffset) * 360;
+        double elbowDegrees = (elbowEncoder.getAbsolutePosition() - Constants.kElbowOffset) * 360;
+        if (elbowDegrees < 0) {
+            elbowDegrees += 360;
+        }
+        return elbowDegrees;
     }
 
-    public void setArm(int shoulderDegree, int elbowDegree) {
-        //shoulder presetting
-        if (shoulderDegree > shoulderDeg()){
-            while (shoulderDeg() > shoulderDegree) {
-                runShoulderForward();
-            }
-        } else if (shoulderDegree < shoulderDeg()){
-            while (shoulderDeg() < shoulderDegree){
-                runShoulderBackward();
-            }
-        }
+    // public void setArm(int shoulderDegree, int elbowDegree) {
+    //     //shoulder presetting
+    //     if (shoulderDegree > shoulderDeg()){
+    //         while (shoulderDeg() > shoulderDegree) {
+    //             runShoulder();
+    //         }
+    //     } else if (shoulderDegree < shoulderDeg()){
+    //         while (shoulderDeg() < shoulderDegree){
+    //             runShoulder();
+    //         }
+    //     }
 
-        //elbow presetting
-        if (elbowDegree > elbowDeg()){
-            while (elbowDeg() > elbowDegree) {
-                runElbowForward();
-            }
-        } else if (elbowDegree < elbowDeg()){
-            while (elbowDeg() < elbowDegree){
-                runElbowBackward();
-            }
-        }
+    //     //elbow presetting
+    //     if (elbowDegree > elbowDeg()){
+    //         while (elbowDeg() > elbowDegree) {
+    //             runElbow();
+    //         }
+    //     } else if (elbowDegree < elbowDeg()){
+    //         while (elbowDeg() < elbowDegree){
+    //             runElbow();
+    //         }
+    //     }
                 
-    }
+    // }
 
-    //check if the arm is past the limit of -132 degrees 
-    public boolean checkLocationBackward() {
-        if (shoulderDeg() <= Constants.kStopArmOne) {
+    //check if the bicep is past the limit of 300 degrees moving backward
+    public boolean checkShoulderLocationBackward() {
+        if (shoulderDeg() >= Constants.kStopShoulderMid && shoulderDeg() <= Constants.kStopShoulderBackward) {
             return false;
         } else {
             return true;
         }
     }
 
-    //check if the arm is past the limit of 168 degrees
-    public boolean checkLocationForward() {
-        if (shoulderDeg() >= Constants.kStopArmTwo) {
+    //check if the bicep is past the limit of 220 degrees moving forward
+    public boolean checkShoulderLocationForward() {
+        if (shoulderDeg() <= Constants.kStopShoulderMid && shoulderDeg() >= Constants.kStopShoulderForward) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //check if the forearm is past the limit of 225 degrees moving backward
+    public boolean checkElbowLocationBackward() {
+        if (elbowDeg() <= Constants.kStopElbowBackward && elbowDeg() >= Constants.kStopElbowMid) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //check if the forearm is past the limit of 135 degrees moving forward
+    public boolean checkElbowLocationForward() {
+        if (elbowDeg() >= Constants.kStopElbowForward && elbowDeg() <= Constants.kStopElbowMid) {
             return false;
         } else {
             return true;

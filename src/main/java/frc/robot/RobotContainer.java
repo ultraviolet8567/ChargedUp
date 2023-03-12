@@ -17,7 +17,7 @@ public class RobotContainer {
     // private final Vision vision = new Vision();
     
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-    private static final Joystick armJoystick = new Joystick(OIConstants.kToggleControllerPort);
+    // private static final Joystick armJoystick = new Joystick(OIConstants.kToggleControllerPort);
 
     public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
 
@@ -36,12 +36,10 @@ public class RobotContainer {
     public void configureButtonBindings() {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(swerve));
-        //new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Stop(swerve, intake, arms));
-
-        // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
+        
         new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake));
         new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake));
-
+        
         // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new Pickup(intake));
         // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new Pickup(intake));
         

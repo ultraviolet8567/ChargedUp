@@ -26,19 +26,24 @@ public final class Constants {
 
     public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 2.0);
     public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
-    public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.1);
+    public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
     
     //arm absolute encoder ports
     public static final int kShoulderEncoderPort = 0;
     public static final int kElbowEncoderPort = 1;
 
     //arm absolute encoder offset
-    public static final double kShoulderOffset = 0.412;
-    public static final double kElbowOffset = 0.543;
+    public static final double kShoulderOffset = 0.668;
+    public static final double kElbowOffset = 0.183;
 
     //stopping point for shoulder
-    public static final int kStopArmOne = -132;
-    public static final int kStopArmTwo = 168;
+    public static final int kStopShoulderForward = 220;
+    public static final int kStopShoulderBackward = 300;
+    public static final int kStopShoulderMid = 260;
+
+    public static final int kStopElbowBackward = 135;
+    public static final int kStopElbowForward = 225;
+    public static final int kStopElbowMid = 180;
 
     //arm preset points TODO: find these points
     public static final int[] kHighNodeSetpoints = new int[] {50, 0};
@@ -49,18 +54,18 @@ public final class Constants {
     public static final int[] kStartingSetpoints = new int[] {50, 0};
 
     public static final class CAN {
-        public static final int kIntakePort = 2;
-        public static final int kElbowPort = 3;
+        public static final int kIntakePort = 3;
+        public static final int kElbowPort = 2;
         public static final int kShoulderPort = 4;
 
-        public static final int kFrontLeftDriveMotorPort = 12;
-        public static final int kFrontRightDriveMotorPort = 22;
+        public static final int kFrontLeftDriveMotorPort = 11;
+        public static final int kFrontRightDriveMotorPort = 12;
         public static final int kBackLeftDriveMotorPort = 14;
-        public static final int kBackRightDriveMotorPort = 24;
+        public static final int kBackRightDriveMotorPort = 13;
 
-        public static final int kFrontLeftTurningMotorPort = 11;
-        public static final int kFrontRightTurningMotorPort = 21;
-        public static final int kBackLeftTurningMotorPort = 13;
+        public static final int kFrontLeftTurningMotorPort = 21;
+        public static final int kFrontRightTurningMotorPort = 22;
+        public static final int kBackLeftTurningMotorPort = 24;
         public static final int kBackRightTurningMotorPort = 23;
     }
 
@@ -114,10 +119,10 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 4.305 + 2.600 - 2.149;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.172 - 2.892 + 2.485;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 0.268 - 1.794 + 1.865;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 0.610 + 2.111 - 2.119;
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 4.305 + 2.600 - 2.149 - 1.582 ;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.172 - 2.892 + 2.485 - 0.885;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 0.268 - 1.794 + 1.865 + 1.119;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 0.610 + 2.111 - 2.119 - 1.316;
 
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;

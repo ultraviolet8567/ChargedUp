@@ -9,6 +9,8 @@ public class ManipulateArms extends CommandBase {
   private Arms arms;
   private String joint;
   private String direction;
+  private double elbowSpeed;
+  private double shoulderSpeed;
   
   public ManipulateArms(Arms arms, String joint, String direction) {
     this.arms = arms;
@@ -16,6 +18,9 @@ public class ManipulateArms extends CommandBase {
 
     this.joint = joint;
     this.direction = direction;
+
+    elbowSpeed = 0;
+    shoulderSpeed = 0;
   }
 
   // Called when the command is initially scheduled.
@@ -25,22 +30,71 @@ public class ManipulateArms extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (joint == "shoulder") {
-      if (direction == "forward" && arms.checkLocationForward()) {
-        arms.runShoulderForward();
-      } else if (direction == "backward" && arms.checkLocationBackward()) {
-        arms.runShoulderBackward(); 
-      } else {
-        System.out.println("hello");
-        arms.stopShoulder();
+    // System.out.println(joint + " " + direction);
+      if (joint == "shoulder") {
+        arms.shoulderRunning = true;
+        
+        //run shoulder forward
+        if (direction == "forward" && arms.checkShoulderLocationForward()) {
+          
+          //determine speeds for shoulder and elbow
+          shoulderSpeed = Constants.shoulderSpeed.get();
+          elbowSpeed = -4/5 * shoulderSpeed;
+
+          //set shoulder and elbow to determined speeds
+          arms.runShoulder(shoulderSpeed);
+          arms.runElbow(elbowSpeed);
+
+        //run shoulder backward
+        } else if (direction == "backward" && arms.checkShoulderLocationBackward()) {
+          
+          //determine speeds for shoulder and elbow
+          shoulderSpeed = -Constants.shoulderSpeed.get();
+          elbowSpeed = -4/5 * shoulderSpeed;
+
+          //set shoulder and elbow to determined speeds
+          arms.runShoulder(shoulderSpeed);
+          arms.runElbow(elbowSpeed);
+
+        //in case something goes wrong
+        } else {
+          arms.stopShoulder();
+        }
+      } else if (joint == "elbow") {
+        
+        //run elbow forward
+        if (direction == "forward" && arms.checkElbowLocationForward()) {
+          
+          //determine and set elbow speed if shoulder is running
+          if (arms.shoulderRunning) {
+            elbowSpeed = (-4/5 * shoulderSpeed) + Constants.elbowSpeed.get();
+            arms.runElbow(elbowSpeed);
+
+          //determine and set elbow speed if shoulder is NOT running
+          } else {
+            elbowSpeed = Constants.elbowSpeed.get();
+            arms.runElbow(elbowSpeed);
+          }
+
+          //run elbow backward
+        } else if (direction == "backward" && arms.checkElbowLocationBackward()) {
+          
+          //determine and set elbow speed if shoulder is running
+          if (arms.shoulderRunning) {
+            elbowSpeed = (-4/5 * shoulderSpeed) - Constants.elbowSpeed.get();
+            arms.runElbow(elbowSpeed);
+
+          //determine and set elbow speed if shoulder is NOT running
+          } else {
+            elbowSpeed = -Constants.elbowSpeed.get();
+            arms.runElbow(elbowSpeed);
+          }
+
+        //in case something goes wrong
+        } else {
+          arms.stopElbow();
+        }
       }
-    } else if (joint == "elbow") {
-      if (direction == "forward") {
-        arms.runElbowForward();
-      } else if (direction == "backward") {
-        arms.runElbowBackward();
-      }
-    }
   }
 
   // Called once the command ends or is interrupted.
