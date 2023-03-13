@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
@@ -33,6 +35,9 @@ public class Arms extends SubsystemBase {
         //      elbow.set(Constants.elbowSpeed.get());
         // }
         System.out.println(shoulderDeg() + "     " + elbowDeg());
+
+        Logger.getInstance().recordOutput("Encoders/Shoulder", shoulderDeg());
+        Logger.getInstance().recordOutput("Encoders/Elbow", elbowDeg());
     }
 
     public void runShoulder(double speed) {
@@ -43,7 +48,6 @@ public class Arms extends SubsystemBase {
         elbow.set(speed);
     }
 
-    // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     public double shoulderDeg() {
         double shoulderDegrees = -(shoulderEncoder.getAbsolutePosition() - Constants.kShoulderOffset) * 360;
         if (shoulderDegrees < 0) {
@@ -52,7 +56,6 @@ public class Arms extends SubsystemBase {
         return shoulderDegrees;
     }
 
-    // Should use the REV Through-Bore Encoder for this rather than the SparkMax internal encoder
     //TODO: find the offset of the elbow absolute encoder
     public double elbowDeg() {
         double elbowDegrees = (elbowEncoder.getAbsolutePosition() - Constants.kElbowOffset) * 360;
