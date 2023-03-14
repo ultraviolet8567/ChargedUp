@@ -29,7 +29,6 @@ public class Arms extends SubsystemBase {
         elbowEncoder = new DutyCycleEncoder(Constants.kElbowEncoderPort);
 
         shoulderRunning = false;
-        //test
     }
 
     @Override
@@ -106,16 +105,16 @@ public class Arms extends SubsystemBase {
         
 
         //elbow presetting
-        if (elbowDegree < 180) { // if the goal is less than the 260 value
-            if(elbowDeg() < 180 && elbowDeg() > elbowDegree){
+        if (elbowDegree < Constants.kStopElbowMid) { // if the goal is less than the 260 value
+            if(elbowDeg() < Constants.kStopElbowMid && elbowDeg() > elbowDegree){
                 runElbow(-Constants.elbowSpeed.get());
             } else {
                 runElbow(Constants.elbowSpeed.get());
             }
         }
 
-        else if (elbowDegree > 180) { // if the goal is greater than the 260 value
-            if(elbowDeg() > 180 && elbowDeg() < elbowDegree){
+        else if (elbowDegree > Constants.kStopElbowMid) { // if the goal is greater than the 260 value
+            if(elbowDeg() > Constants.kStopElbowMid && elbowDeg() < elbowDegree){
                 runElbow(Constants.elbowSpeed.get());
             } else {
                 runElbow(-Constants.elbowSpeed.get());
