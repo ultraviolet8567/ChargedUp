@@ -15,7 +15,7 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Arms arms = new Arms();
-    private final Vision m_vision = new Vision();
+    private final PhotonVision m_vision = new PhotonVision();
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
 
     public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
