@@ -36,8 +36,8 @@ public class Arms extends SubsystemBase {
         // }
         System.out.println(shoulderDeg() + "     " + elbowDeg());
 
-        Logger.getInstance().recordOutput("Encoders/Shoulder", shoulderDeg());
-        Logger.getInstance().recordOutput("Encoders/Elbow", elbowDeg());
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderDeg());
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", elbowDeg());
     }
 
     public void runShoulder(double speed) {

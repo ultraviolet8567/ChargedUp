@@ -96,6 +96,11 @@ public final class Constants {
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)); // Back right (-/-)
+        public static final SwerveDriveKinematics kDriveKinematics_old = new SwerveDriveKinematics(
+                new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front left (+/+)
+                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
+                new Translation2d(kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
+                new Translation2d(-kWheelBase / 2, kTrackWidth / 2)); // Back right (-/-)
 
         // Edit depending on specs of MK4i
         public static final boolean kFrontLeftTurningEncoderReversed = true;
@@ -119,11 +124,10 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 4.305 + 2.600 - 2.149 - 1.582 ;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.172 - 2.892 + 2.485 - 0.885;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 0.268 - 1.794 + 1.865 + 1.119;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 0.610 + 2.111 - 2.119 - 1.316;
-
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -1.285 - 1.304 - 1.822;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542;
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
