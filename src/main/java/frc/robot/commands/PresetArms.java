@@ -37,6 +37,9 @@ public class PresetArms extends CommandBase {
         } else if (position == "starting") {
             //set position to starting position
             arms.setArm(Constants.kStartingSetpoints[0], Constants.kStartingSetpoints[1]);
+        } else if (position == "taxi") {
+            //set position to taxi position
+            arms.setArm(Constants.kTaxiSetpoints[0], Constants.kTaxiSetpoints[1]);
         }
     }
 }
