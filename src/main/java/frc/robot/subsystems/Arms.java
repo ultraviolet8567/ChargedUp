@@ -16,6 +16,8 @@ public class Arms extends SubsystemBase {
     private final CANSparkMax elbow;
     private final DutyCycleEncoder shoulderEncoder;
     private final DutyCycleEncoder elbowEncoder;
+    private double shoulderSpeed;
+    private double elbowSpeed;
 
     public boolean shoulderRunning;
 
@@ -65,30 +67,63 @@ public class Arms extends SubsystemBase {
         return elbowDegrees;
     }
 
-    // public void setArm(int shoulderDegree, int elbowDegree) {
-    //     //shoulder presetting
-    //     if (shoulderDegree > shoulderDeg()){
-    //         while (shoulderDeg() > shoulderDegree) {
-    //             runShoulder();
-    //         }
-    //     } else if (shoulderDegree < shoulderDeg()){
-    //         while (shoulderDeg() < shoulderDegree){
-    //             runShoulder();
-    //         }
-    //     }
+    public void setArm(int shoulderDegree, int elbowDegree) {
+        //shoulder presetting
+        if (shoulderDegree < Constants.kStopShoulderMid) { // if the goal is less than the 260 value
+            if(shoulderDeg() < Constants.kStopShoulderMid && shoulderDeg() > shoulderDegree){
+                shoulderSpeed = -Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
 
-    //     //elbow presetting
-    //     if (elbowDegree > elbowDeg()){
-    //         while (elbowDeg() > elbowDegree) {
-    //             runElbow();
-    //         }
-    //     } else if (elbowDegree < elbowDeg()){
-    //         while (elbowDeg() < elbowDegree){
-    //             runElbow();
-    //         }
-    //     }
+                runShoulder(shoulderSpeed);
+                runElbow(elbowSpeed);
+            } else {
+                shoulderSpeed = Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(Constants.shoulderSpeed.get());
+                runElbow(elbowSpeed);
+            }
+        }
+
+        else if (shoulderDegree > Constants.kStopShoulderMid) { // if the goal is greater than the 260 value
+            if(shoulderDeg() > Constants.kStopShoulderMid && shoulderDeg() < shoulderDegree){
+                shoulderSpeed = Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(Constants.shoulderSpeed.get());
+                runElbow(elbowSpeed);
+            } else {
+                shoulderSpeed = -Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(shoulderSpeed);
+                runElbow(elbowSpeed);
+            }
+        } else {
+            stopShoulder();
+        }
+        
+
+        //elbow presetting
+        if (elbowDegree < 180) { // if the goal is less than the 260 value
+            if(elbowDeg() < 180 && elbowDeg() > elbowDegree){
+                runElbow(-Constants.elbowSpeed.get());
+            } else {
+                runElbow(Constants.elbowSpeed.get());
+            }
+        }
+
+        else if (elbowDegree > 180) { // if the goal is greater than the 260 value
+            if(elbowDeg() > 180 && elbowDeg() < elbowDegree){
+                runElbow(Constants.elbowSpeed.get());
+            } else {
+                runElbow(-Constants.elbowSpeed.get());
+            }
+        } else {
+            stopElbow();
+        }
                 
-    // }
+    }
 
     //check if the bicep is past the limit of 300 degrees moving backward
     public boolean checkShoulderLocationBackward() {
