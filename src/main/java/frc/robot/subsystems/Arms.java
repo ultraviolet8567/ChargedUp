@@ -29,6 +29,7 @@ public class Arms extends SubsystemBase {
         elbowEncoder = new DutyCycleEncoder(Constants.kElbowEncoderPort);
 
         shoulderRunning = false;
+        //test
     }
 
     @Override
