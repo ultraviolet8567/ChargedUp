@@ -69,14 +69,20 @@ public class Arms extends SubsystemBase {
 
     public void setArm(int shoulderDegree, int elbowDegree) {
         //shoulder presetting
-        if (shoulderDegree < Constants.kStopShoulderMid) { // if the goal is less than the 260 value
+        if (shoulderDegree < Constants.kStopShoulderMid) { 
+            // if the target angle is between 0 and middle of superstructure
+
             if(shoulderDeg() < Constants.kStopShoulderMid && shoulderDeg() > shoulderDegree){
+                // if current angle is between target angle and middle of superstructure
+                // run shoulder backwards & elbow compensates
                 shoulderSpeed = -Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
                 runShoulder(shoulderSpeed);
                 runElbow(elbowSpeed);
             } else {
+                // if the current angle is not between target angle and middle of superstructure
+                // run shoulder forwards & elbow compensates
                 shoulderSpeed = Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
@@ -85,14 +91,20 @@ public class Arms extends SubsystemBase {
             }
         }
 
-        else if (shoulderDegree > Constants.kStopShoulderMid) { // if the goal is greater than the 260 value
+        else if (shoulderDegree > Constants.kStopShoulderMid) { 
+            // if the target angle is between middle of superstructure and 360
+
             if(shoulderDeg() > Constants.kStopShoulderMid && shoulderDeg() < shoulderDegree){
+                // if current angle is between target angle and middle of superstructure
+                // run shoulder forwards & elbow compensates
                 shoulderSpeed = Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
                 runShoulder(Constants.shoulderSpeed.get());
                 runElbow(elbowSpeed);
             } else {
+                // if current angle is not between target angle and middle of superstructure
+                // run shoulder backwards & elbow compensates
                 shoulderSpeed = -Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
@@ -105,7 +117,10 @@ public class Arms extends SubsystemBase {
         
 
         //elbow presetting
-        if (elbowDegree < Constants.kStopElbowMid) { // if the goal is less than the 260 value
+        if (elbowDegree < Constants.kStopElbowMid) { 
+            // if the target angle is between 0 and 180
+            
+            //run elbow backwards or forwards based on current position
             if(elbowDeg() < Constants.kStopElbowMid && elbowDeg() > elbowDegree){
                 runElbow(-Constants.elbowSpeed.get());
             } else {
@@ -113,7 +128,10 @@ public class Arms extends SubsystemBase {
             }
         }
 
-        else if (elbowDegree > Constants.kStopElbowMid) { // if the goal is greater than the 260 value
+        else if (elbowDegree > Constants.kStopElbowMid) { 
+            // if the target angle is greater than 180 
+
+            //run elbow backwards or forwards based on current position
             if(elbowDeg() > Constants.kStopElbowMid && elbowDeg() < elbowDegree){
                 runElbow(Constants.elbowSpeed.get());
             } else {
