@@ -16,6 +16,8 @@ public class Arms extends SubsystemBase {
     private final CANSparkMax elbow;
     private final DutyCycleEncoder shoulderEncoder;
     private final DutyCycleEncoder elbowEncoder;
+    private double shoulderSpeed;
+    private double elbowSpeed;
 
     public boolean shoulderRunning;
 
@@ -65,30 +67,81 @@ public class Arms extends SubsystemBase {
         return elbowDegrees;
     }
 
-    // public void setArm(int shoulderDegree, int elbowDegree) {
-    //     //shoulder presetting
-    //     if (shoulderDegree > shoulderDeg()){
-    //         while (shoulderDeg() > shoulderDegree) {
-    //             runShoulder();
-    //         }
-    //     } else if (shoulderDegree < shoulderDeg()){
-    //         while (shoulderDeg() < shoulderDegree){
-    //             runShoulder();
-    //         }
-    //     }
+    public void setShoulder(int shoulderDegree) {
+        //shoulder presetting
+        if (shoulderDegree < Constants.kStopShoulderMid) { 
+            // if the target angle is between 0 and middle of superstructure
 
-    //     //elbow presetting
-    //     if (elbowDegree > elbowDeg()){
-    //         while (elbowDeg() > elbowDegree) {
-    //             runElbow();
-    //         }
-    //     } else if (elbowDegree < elbowDeg()){
-    //         while (elbowDeg() < elbowDegree){
-    //             runElbow();
-    //         }
-    //     }
-                
-    // }
+            if(shoulderDeg() < Constants.kStopShoulderMid && shoulderDeg() > shoulderDegree){
+                // if current angle is between target angle and middle of superstructure
+                // run shoulder backwards & elbow compensates
+                shoulderSpeed = -Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(shoulderSpeed);
+                runElbow(elbowSpeed);
+            } else {
+                // if the current angle is not between target angle and middle of superstructure
+                // run shoulder forwards & elbow compensates
+                shoulderSpeed = Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(Constants.shoulderSpeed.get());
+                runElbow(elbowSpeed);
+            }
+        }
+
+        else if (shoulderDegree > Constants.kStopShoulderMid) { 
+            // if the target angle is between middle of superstructure and 360
+
+            if(shoulderDeg() > Constants.kStopShoulderMid && shoulderDeg() < shoulderDegree){
+                // if current angle is between target angle and middle of superstructure
+                // run shoulder forwards & elbow compensates
+                shoulderSpeed = Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(Constants.shoulderSpeed.get());
+                runElbow(elbowSpeed);
+            } else {
+                // if current angle is not between target angle and middle of superstructure
+                // run shoulder backwards & elbow compensates
+                shoulderSpeed = -Constants.shoulderSpeed.get();
+                elbowSpeed = -4/5 * shoulderSpeed;
+
+                runShoulder(shoulderSpeed);
+                runElbow(elbowSpeed);
+            }
+        } else {
+            stopShoulder();
+        }        
+    }
+
+    public void setElbow(int elbowDegree) {
+        //elbow presetting
+        if (elbowDegree < Constants.kStopElbowMid) { 
+            // if the target angle is between 0 and 180
+            
+            //run elbow backwards or forwards based on current position
+            if(elbowDeg() < Constants.kStopElbowMid && elbowDeg() > elbowDegree){
+                runElbow(-Constants.elbowSpeed.get());
+            } else {
+                runElbow(Constants.elbowSpeed.get());
+            }
+        }
+
+        else if (elbowDegree > Constants.kStopElbowMid) { 
+            // if the target angle is greater than 180 
+
+            //run elbow backwards or forwards based on current position
+            if(elbowDeg() > Constants.kStopElbowMid && elbowDeg() < elbowDegree){
+                runElbow(Constants.elbowSpeed.get());
+            } else {
+                runElbow(-Constants.elbowSpeed.get());
+            }
+        } else {
+            stopElbow();
+        }
+    }
 
     //check if the bicep is past the limit of 300 degrees moving backward
     public boolean checkShoulderLocationBackward() {
