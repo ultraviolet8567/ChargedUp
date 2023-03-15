@@ -24,7 +24,7 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
 
-    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 2.0);
+    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.2);
     public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
     public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
     
@@ -96,12 +96,7 @@ public final class Constants {
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)); // Back right (-/-)
-        public static final SwerveDriveKinematics kDriveKinematics_old = new SwerveDriveKinematics(
-                new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front left (+/+)
-                new Translation2d(-kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
-                new Translation2d(kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
-                new Translation2d(-kWheelBase / 2, kTrackWidth / 2)); // Back right (-/-)
-
+                
         // Edit depending on specs of MK4i
         public static final boolean kFrontLeftTurningEncoderReversed = true;
         public static final boolean kFrontRightTurningEncoderReversed = true;
@@ -124,15 +119,15 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -1.285 - 1.304 - 1.822;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542;
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -7.378 + 1.319 - 1.651 - 2.979;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724 - 2.476;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262 - 3.772 - 0.634 - 1.889;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542 - 2.192 + 3.053 - 0.913;
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 4;
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 4;
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 2;
+        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 2;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }

@@ -51,10 +51,10 @@ public class SwerveTeleOp extends CommandBase {
 
         ChassisSpeeds chassisSpeeds;
         if (fieldOrientedFunction.get()) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeed, ySpeed, turningSpeed, swerve.getRotation2d());
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed, swerve.getRotation2d());
         }
         else {
-            chassisSpeeds = new ChassisSpeeds(-xSpeed, ySpeed, turningSpeed);
+            chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
         }
         
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
