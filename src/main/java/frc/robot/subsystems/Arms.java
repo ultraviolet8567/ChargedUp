@@ -67,7 +67,7 @@ public class Arms extends SubsystemBase {
         return elbowDegrees;
     }
 
-    public void setArm(int shoulderDegree, int elbowDegree) {
+    public void setShoulder(int shoulderDegree) {
         //shoulder presetting
         if (shoulderDegree < Constants.kStopShoulderMid) { 
             // if the target angle is between 0 and middle of superstructure
@@ -113,9 +113,10 @@ public class Arms extends SubsystemBase {
             }
         } else {
             stopShoulder();
-        }
-        
+        }        
+    }
 
+    public void setElbow(int elbowDegree) {
         //elbow presetting
         if (elbowDegree < Constants.kStopElbowMid) { 
             // if the target angle is between 0 and 180
@@ -140,7 +141,6 @@ public class Arms extends SubsystemBase {
         } else {
             stopElbow();
         }
-                
     }
 
     //check if the bicep is past the limit of 300 degrees moving backward
