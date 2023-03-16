@@ -8,16 +8,19 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.odometry.Gyro;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveTeleOp extends CommandBase {
     private final Swerve swerve;
+    private final Gyro gyro;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
     private final Supplier<Boolean> fieldOrientedFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
-    public SwerveTeleOp(Swerve swerve, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> fieldOrientedFunction) {
+    public SwerveTeleOp(Swerve swerve, Gyro gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> fieldOrientedFunction) {
         this.swerve = swerve;
+        this.gyro = gyro;
         this.xSpdFunction = xSpdFunction;
         this.ySpdFunction = ySpdFunction;
         this.turningSpdFunction = turningSpdFunction;
@@ -51,7 +54,7 @@ public class SwerveTeleOp extends CommandBase {
 
         ChassisSpeeds chassisSpeeds;
         if (fieldOrientedFunction.get()) {
-            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeed, ySpeed, turningSpeed, swerve.getRotation2d());
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeed, ySpeed, turningSpeed, gyro.getRotation2d());
         }
         else {
             chassisSpeeds = new ChassisSpeeds(-xSpeed, ySpeed, turningSpeed);

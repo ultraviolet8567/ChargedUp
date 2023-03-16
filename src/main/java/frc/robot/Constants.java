@@ -173,9 +173,21 @@ public final class Constants {
 
     public static final class CameraConstants {
 
-        public static final Rotation3d camera1Direction = new Rotation3d(0, 0, 0); // camera mount direction
-        public static final Translation3d camera1Displacement = new Translation3d(0.0, 0.0, 0.0); // exact center, flat
-        public static final Transform3d robotToCamera1 = new Transform3d(camera1Displacement, camera1Direction);
+        public static final Rotation3d[] cameraDirections = new Rotation3d[] { // camera mount directions
+            new Rotation3d(), 
+            new Rotation3d(), 
+            new Rotation3d()
+        }; 
+        public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from center & flat
+            new Translation3d(), 
+            new Translation3d(), 
+            new Translation3d()
+        }; 
+        public static final Transform3d[] cameraDistances = new Transform3d[] { 
+            new Transform3d(cameraDisplacements[0], cameraDirections[0]), 
+            new Transform3d(cameraDisplacements[1], cameraDirections[1]), 
+            new Transform3d(cameraDisplacements[2], cameraDirections[2])
+        };
         
         // bad test values. update when actually mounted.
     }

@@ -1,17 +1,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Swerve;
+import frc.robot.odometry.Gyro;
 
 public class ResetGyro extends CommandBase {
-    private Swerve swerve;
+    private Gyro gyro;
 
-    public ResetGyro(Swerve swerve) {
-        this.swerve = swerve;
+    public ResetGyro(Gyro gyro) {
+        this.gyro = gyro;
     }
 
     @Override
     public void initialize() {
-        swerve.resetGyro();
+        gyro.resetGyro();
     }
 }
