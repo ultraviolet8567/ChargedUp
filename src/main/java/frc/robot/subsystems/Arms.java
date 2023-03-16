@@ -38,8 +38,8 @@ public class Arms extends SubsystemBase {
         // }
         System.out.println(shoulderDeg() + "     " + elbowDeg());
 
-        Logger.getInstance().recordOutput("Encoders/Shoulder", shoulderDeg());
-        Logger.getInstance().recordOutput("Encoders/Elbow", elbowDeg());
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderDeg());
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", elbowDeg());
     }
 
     public void runShoulder(double speed) {
@@ -67,16 +67,22 @@ public class Arms extends SubsystemBase {
         return elbowDegrees;
     }
 
-    public void setArm(int shoulderDegree, int elbowDegree) {
+    public void setShoulder(int shoulderDegree) {
         //shoulder presetting
-        if (shoulderDegree < Constants.kStopShoulderMid) { // if the goal is less than the 260 value
+        if (shoulderDegree < Constants.kStopShoulderMid) { 
+            // if the target angle is between 0 and middle of superstructure
+
             if(shoulderDeg() < Constants.kStopShoulderMid && shoulderDeg() > shoulderDegree){
+                // if current angle is between target angle and middle of superstructure
+                // run shoulder backwards & elbow compensates
                 shoulderSpeed = -Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
                 runShoulder(shoulderSpeed);
                 runElbow(elbowSpeed);
             } else {
+                // if the current angle is not between target angle and middle of superstructure
+                // run shoulder forwards & elbow compensates
                 shoulderSpeed = Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
@@ -85,14 +91,20 @@ public class Arms extends SubsystemBase {
             }
         }
 
-        else if (shoulderDegree > Constants.kStopShoulderMid) { // if the goal is greater than the 260 value
+        else if (shoulderDegree > Constants.kStopShoulderMid) { 
+            // if the target angle is between middle of superstructure and 360
+
             if(shoulderDeg() > Constants.kStopShoulderMid && shoulderDeg() < shoulderDegree){
+                // if current angle is between target angle and middle of superstructure
+                // run shoulder forwards & elbow compensates
                 shoulderSpeed = Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
                 runShoulder(Constants.shoulderSpeed.get());
                 runElbow(elbowSpeed);
             } else {
+                // if current angle is not between target angle and middle of superstructure
+                // run shoulder backwards & elbow compensates
                 shoulderSpeed = -Constants.shoulderSpeed.get();
                 elbowSpeed = -4/5 * shoulderSpeed;
 
@@ -101,11 +113,15 @@ public class Arms extends SubsystemBase {
             }
         } else {
             stopShoulder();
-        }
-        
+        }        
+    }
 
+    public void setElbow(int elbowDegree) {
         //elbow presetting
-        if (elbowDegree < Constants.kStopElbowMid) { // if the goal is less than the 260 value
+        if (elbowDegree < Constants.kStopElbowMid) { 
+            // if the target angle is between 0 and 180
+            
+            //run elbow backwards or forwards based on current position
             if(elbowDeg() < Constants.kStopElbowMid && elbowDeg() > elbowDegree){
                 runElbow(-Constants.elbowSpeed.get());
             } else {
@@ -113,7 +129,10 @@ public class Arms extends SubsystemBase {
             }
         }
 
-        else if (elbowDegree > Constants.kStopElbowMid) { // if the goal is greater than the 260 value
+        else if (elbowDegree > Constants.kStopElbowMid) { 
+            // if the target angle is greater than 180 
+
+            //run elbow backwards or forwards based on current position
             if(elbowDeg() > Constants.kStopElbowMid && elbowDeg() < elbowDegree){
                 runElbow(Constants.elbowSpeed.get());
             } else {
@@ -122,7 +141,6 @@ public class Arms extends SubsystemBase {
         } else {
             stopElbow();
         }
-                
     }
 
     //check if the bicep is past the limit of 300 degrees moving backward

@@ -22,6 +22,8 @@ public class RobotContainer {
 
     public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
 
+    public static String gamePiece = "";
+
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
             swerve,
@@ -38,8 +40,9 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(swerve));
         
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake, "Cone"));
+        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake, "Cube"));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new StopIntake(intake));
         
         // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new Pickup(intake));
         // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new Pickup(intake));

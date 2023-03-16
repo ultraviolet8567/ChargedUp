@@ -25,11 +25,11 @@ public class SwerveModule {
     private final PIDController turningPidController;
 
     private final AnalogInput absoluteEncoder;
-    private final double absolteEncoderOffset;
+    private final double absoluteEncoderOffset;
     private final boolean absoluteEncoderReversed;
 
     public SwerveModule(int driveMotorID, int turningMotorID, boolean driveMotorReversed, boolean turningMotorReversed, int absoluteEncoderID, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
-        this.absolteEncoderOffset = absoluteEncoderOffset;
+        this.absoluteEncoderOffset = absoluteEncoderOffset;
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         absoluteEncoder = new AnalogInput(absoluteEncoderID);
         
@@ -61,7 +61,7 @@ public class SwerveModule {
     public double getAbsoluteEncoderAngle() {
         double angle = absoluteEncoder.getAverageVoltage() / RobotController.getVoltage5V();
         angle *= 2 * Math.PI;
-        angle -= absolteEncoderOffset;
+        angle -= absoluteEncoderOffset;
         angle = MathUtil.inputModulus(angle, -Math.PI, Math.PI);
 
         return angle * (absoluteEncoderReversed ? -1 : 1);
