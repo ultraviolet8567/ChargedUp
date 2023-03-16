@@ -16,8 +16,8 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Arms arms = new Arms();
-    private final Vision vision = new Vision();
-    private final Gyro gyro = new Gyro(swerve);
+    private final VisionOdometry vision = new VisionOdometry();
+    private final GyroOdometry gyro = new GyroOdometry(swerve);
     private final Odometry odometry = new Odometry(gyro, vision);
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
 
