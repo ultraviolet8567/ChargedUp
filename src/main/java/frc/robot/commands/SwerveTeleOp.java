@@ -13,14 +13,15 @@ import frc.robot.subsystems.Swerve;
 public class SwerveTeleOp extends CommandBase {
     private final Swerve swerve;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
-    private final Supplier<Boolean> fieldOrientedFunction;
+    private final Supplier<Boolean> rotationOnFunction, fieldOrientedFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
-    public SwerveTeleOp(Swerve swerve, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> fieldOrientedFunction) {
+    public SwerveTeleOp(Swerve swerve, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> fieldOrientedFunction) {
         this.swerve = swerve;
         this.xSpdFunction = xSpdFunction;
         this.ySpdFunction = ySpdFunction;
         this.turningSpdFunction = turningSpdFunction;
+        this.rotationOnFunction = rotationOnFunction;
         this.fieldOrientedFunction = fieldOrientedFunction;
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
@@ -33,10 +34,12 @@ public class SwerveTeleOp extends CommandBase {
 
     @Override
     public void execute() {
+        
+
         // Get real-time joystick inputs
         double xSpeed = xSpdFunction.get();
         double ySpeed = ySpdFunction.get();
-        double turningSpeed = turningSpdFunction.get();
+        double turningSpeed = rotationOnFunction.get() ? turningSpdFunction.get() : 0;
 
         // Apply deadband (drops to 0 if joystick value is less than the deadband)
         xSpeed = Math.abs(xSpeed) > OIConstants.kDeadband ? xSpeed : 0;

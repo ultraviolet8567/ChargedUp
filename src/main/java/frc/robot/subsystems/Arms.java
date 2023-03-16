@@ -36,7 +36,6 @@ public class Arms extends SubsystemBase {
         // while (-(180 - elbowDeg()) < 30) {
         //      elbow.set(Constants.elbowSpeed.get());
         // }
-        System.out.println(shoulderDeg() + "     " + elbowDeg());
 
         Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderDeg());
         Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", elbowDeg());

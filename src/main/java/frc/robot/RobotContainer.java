@@ -30,6 +30,7 @@ public class RobotContainer {
             () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getY()),
             () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getX()),
             () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
+            () -> driverJoystick.getRawButton(ControllerIO.getTrigger()),
             () -> Constants.fieldOriented));
             // () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonId)));
 
