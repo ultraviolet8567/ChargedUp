@@ -37,22 +37,22 @@ public final class Constants {
     public static final double kElbowOffset = 0.183;
 
     //stopping point for shoulder
-    public static final int kStopShoulderForward = 220;
-    public static final int kStopShoulderBackward = 300;
-    public static final int kStopShoulderMid = 260;
+    public static final double kStopShoulderForward = 5 * Math.PI / 3 + 1;
+    public static final double kStopShoulderBackward = 2 * Math.PI - 1;
+    public static final double kStopShoulderMid = 11 * Math.PI / 6;
 
-    public static final int kStopElbowBackward = 135;
-    public static final int kStopElbowForward = 225;
-    public static final int kStopElbowMid = 180;
+    public static final double kStopElbowBackward = 5 * Math.PI / 3 + 1;
+    public static final double kStopElbowForward = 2 * Math.PI - 1;
+    public static final double kStopElbowMid = 11 * Math.PI / 6;
 
     //arm preset points TODO: find these points
-    public static final int[] kHighNodeSetpoints = new int[] { 50, 0 };
-    public static final int[] kMidNodeSetpoints = new int[] { 50, 0 };
-    public static final int[] kHybridNodeSetpoints = new int[] { 50, 0 };
-    public static final int[] kGroundIntakeSetpoints = new int[] { 50, 0 };
-    public static final int[] kHighIntakeSetpoints = new int[] { 50, 0 };
-    public static final int[] kStartingSetpoints = new int[] { 50, 0 };
-    public static final int[] kTaxiSetpoints = new int[] { 50, 0 };
+    public static final int[] kHighNodeSetpoints = new int[] { 0, 0 };
+    public static final int[] kMidNodeSetpoints = new int[] { 0, 0 };
+    public static final int[] kHybridNodeSetpoints = new int[] { 0, 0 };
+    public static final int[] kGroundIntakeSetpoints = new int[] { 0, 0 };
+    public static final int[] kHighIntakeSetpoints = new int[] { 0, 0 };
+    public static final int[] kStartingSetpoints = new int[] { 0, 0 };
+    public static final int[] kTaxiSetpoints = new int[] { 0, 0 };
 
     public static final class CAN {
         public static final int kIntakePort = 3;
