@@ -83,7 +83,7 @@ public class Swerve extends SubsystemBase {
         // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
         Logger.getInstance().recordOutput("SwerveModuleStates/Measured", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
 
-        Logger.getInstance().recordOutput("Encoders/SwerveAbsolute", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
     }
     
     public void setModuleStates(SwerveModuleState[] desiredStates) {

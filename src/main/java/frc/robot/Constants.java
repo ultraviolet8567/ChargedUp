@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.ControllerIO.ControllerType;
 
 public final class Constants {
     /** General info
@@ -24,7 +25,7 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
 
-    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 2.0);
+    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.2);
     public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
     public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
     
@@ -97,7 +98,7 @@ public final class Constants {
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)); // Back right (-/-)
-
+                
         // Edit depending on specs of MK4i
         public static final boolean kFrontLeftTurningEncoderReversed = true;
         public static final boolean kFrontRightTurningEncoderReversed = true;
@@ -120,16 +121,15 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 4.305 + 2.600 - 2.149 - 1.582 ;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.172 - 2.892 + 2.485 - 0.885;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 0.268 - 1.794 + 1.865 + 1.119;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 0.610 + 2.111 - 2.119 - 1.316;
-
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -7.378 + 1.319 - 1.651 - 2.979 - 0.141 + 0.253 - 1.694;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724 - 2.476 + 2.4375 + 0.032;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262 - 3.772 - 0.634 - 1.889 + 0.0932 - 0.037;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542 - 2.192 + 3.053 - 0.913 - 0.010 - 0.058;
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 4;
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 4;
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 2;
+        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 2 * 0.4;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }
@@ -151,14 +151,11 @@ public final class Constants {
     }
 
     public static final class OIConstants {
-        public static final ControllerType controllerType = ControllerType.XBOX;
+        public static final ControllerType controllerType = ControllerType.JOYSTICK;
         
         public static final int kDriverControllerPort = 0;
         public static final int kToggleControllerPort = 1;
 
-        public static final int kDriverYAxis = 1;
-        public static final int kDriverXAxis = 0;
-        public static final int kDriverRotAxis = controllerType == ControllerType.XBOX ? 4 : 2;
         public static final int kDriverFieldOrientedButtonId = XboxController.Button.kStart.value;
 
         public static final double kDeadband = 0.15;
@@ -176,11 +173,6 @@ public final class Constants {
 
         // Replaying from a log file
         REPLAY
-    }
-
-    public static enum ControllerType {
-        XBOX,
-        LOGITECH
     }
 
     // fx = camera horizontal focal length (pixels)

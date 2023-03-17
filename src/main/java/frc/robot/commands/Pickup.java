@@ -5,13 +5,15 @@ import frc.robot.subsystems.Intake;
 
 public class Pickup extends CommandBase {
     private Intake intake;
+    private String gamePiece;
     
-    public Pickup(Intake intake) {
+    public Pickup(Intake intake, String gamePiece) {
         this.intake = intake;
+        this.gamePiece = gamePiece;
     }
 
     @Override 
     public void initialize() {  
-        intake.pickup();
+        intake.pickup(gamePiece);
     }
 }

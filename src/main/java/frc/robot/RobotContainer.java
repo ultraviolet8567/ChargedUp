@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.util.ControllerIO;
 
 public class RobotContainer {
     private final Swerve swerve = new Swerve();
@@ -21,12 +22,15 @@ public class RobotContainer {
 
     public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
 
+    public static String gamePiece = "";
+
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
             swerve,
-            () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
-            () -> driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
-            () -> driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
+            () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getY()),
+            () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getX()),
+            () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
+            () -> driverJoystick.getRawButton(ControllerIO.getTrigger()),
             () -> Constants.fieldOriented));
             // () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonId)));
 
@@ -37,8 +41,9 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(swerve));
         
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake, "Cone"));
+        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake, "Cube"));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new StopIntake(intake));
         
         // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new Pickup(intake));
         // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new Pickup(intake));

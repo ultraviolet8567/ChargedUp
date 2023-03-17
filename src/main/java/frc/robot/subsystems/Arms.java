@@ -42,8 +42,9 @@ public class Arms extends SubsystemBase {
         // while (-(180 - elbowDeg()) < 30) {
         //      elbow.set(Constants.elbowSpeed.get());
         // }
-        Logger.getInstance().recordOutput("Encoders/Shoulder", shoulderRadians());
-        Logger.getInstance().recordOutput("Encoders/Elbow", elbowRadians());
+
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderRadians());
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", shoulderRadians());
     }
 
     public void runShoulder(double speed) {
