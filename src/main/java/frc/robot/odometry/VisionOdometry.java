@@ -2,7 +2,7 @@ package frc.robot.odometry;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 
-public class Vision {
+public class VisionOdometry {
 
   private final Camera camera1 = new Camera(0);
   private final Camera camera2 = new Camera(1);
@@ -14,8 +14,9 @@ public class Vision {
     camera3
   };
 
-  public Vision() {}
+  public VisionOdometry() {}
 
+  // counts the number of cameras that have detected something
   public Integer checkCameras() {
     Integer count = 0;
 
@@ -28,6 +29,7 @@ public class Vision {
     return count;
   }
 
+  // gets X-translational values from cameras that have detections and averages them
   public double getX() {
     double x = 0.0;
 
@@ -40,6 +42,7 @@ public class Vision {
     return (x / checkCameras());
   }
 
+    // gets Y-translational values from cameras that have detections and averages them
   public double getY() {
     double y = 0.0;
 
@@ -52,6 +55,7 @@ public class Vision {
     return (y / checkCameras());
   }
 
+    // gets Z-translational values (depth) from cameras that have detections and averages them
   public double getZ() {
     double z = 0.0;
 
@@ -64,6 +68,7 @@ public class Vision {
     return (z / checkCameras());
   }
 
+    // gets rotational vlues from cameras that have detections and averages them
   public Rotation3d getHeading() {
     double roll = 0.0;
     double pitch = 0.0;
@@ -82,5 +87,4 @@ public class Vision {
       (pitch / checkCameras()), 
       (yaw / checkCameras()));
   }
-
 }

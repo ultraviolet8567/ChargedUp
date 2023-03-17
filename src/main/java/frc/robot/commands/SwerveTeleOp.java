@@ -8,17 +8,17 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.odometry.Gyro;
+import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveTeleOp extends CommandBase {
     private final Swerve swerve;
-    private final Gyro gyro;
+    private final GyroOdometry gyro;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
     private final Supplier<Boolean> fieldOrientedFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
-    public SwerveTeleOp(Swerve swerve, Gyro gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> fieldOrientedFunction) {
+    public SwerveTeleOp(Swerve swerve, GyroOdometry gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> fieldOrientedFunction) {
         this.swerve = swerve;
         this.gyro = gyro;
         this.xSpdFunction = xSpdFunction;

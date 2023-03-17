@@ -1,12 +1,12 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.odometry.Gyro;
+import frc.robot.odometry.GyroOdometry;
 
 public class ResetGyro extends CommandBase {
-    private Gyro gyro;
+    private GyroOdometry gyro;
 
-    public ResetGyro(Gyro gyro) {
+    public ResetGyro(GyroOdometry gyro) {
         this.gyro = gyro;
     }
 

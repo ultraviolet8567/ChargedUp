@@ -11,60 +11,100 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Odometry extends SubsystemBase {
 
-  Gyro gyro;
-  Vision vision;
+  GyroOdometry gyro;
+  VisionOdometry vision;
+
+  private NetworkTableEntry camera1;
+
+  // TODO: find the actual value
+  private double framerate = 30;
 
   Optional<EstimatedRobotPose> pose;
 
-  public Odometry(Gyro gyro, Vision vision) {
+  public Odometry(GyroOdometry gyro, VisionOdometry vision) {
     this.gyro = gyro;
     this.vision = vision;
-    
   }
 
   @Override
   public void periodic() {
+    // updates gyro
+    gyro.updateGyroOdometry();
 
     // CCW+
     Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
   }
 
+  // i have no idea what this does
   public double calculateVisionPercent() {
-    // stuff goes here
-    return 4.0; // example value
+    double errorScale = Math.abs(gyro.getRate()) / Units.degreesToRadians(8.0);
+    errorScale = MathUtil.clamp(errorScale, 0, 1); // errorscale is between 0 and 1
+    double shift = 1 - Math.pow(1 - 0.85, 1 / framerate); // i have no idea why this is happening but it's happening!
+    shift *= 1 - errorScale;
+
+    return shift;
   }
 
 
+
+  // average of X-values
   public double getX() {
-    return calculateAverage(vision.getX(), gyro.getX());
+    if (vision.checkCameras() >= 1) {
+      return calculateAverage(vision.getX(), gyro.getX());
+    } else {
+      return gyro.getX();
+    }
   }
 
+  // average of Y-values
   public double getY() {
-    return calculateAverage(vision.getY(), gyro.getY());
+    if (vision.checkCameras() >= 1) {
+      return calculateAverage(vision.getY(), gyro.getY());
+    } else {
+      return gyro.getY();
+    }
   }
 
+  // depth
   public double getZ() {
-    return vision.getZ();
+    if (vision.checkCameras() >= 1) {
+      return vision.getZ();
+    } else {
+      return 0.0;
+    }
   }
 
+  // calculates heading (angle) average
   public Rotation3d getHeading() {
-    return calculateHeadingAverage(vision.getHeading(), gyro.getHeading());
+    if (vision.checkCameras() >= 1) {
+      return calculateHeadingAverage(vision.getHeading(), gyro.getHeading());
+    } else {
+      return gyro.getHeading();
+    }
   }
 
+  // for logger
   public Rotation2d getRotation2d() {
     return Rotation2d.fromDegrees(gyro.getReading());
   }
 
+  // weighted average 
   public double calculateAverage(double visionValue, double gyroValue) {
     return (calculateVisionPercent() * visionValue) + ((100 - calculateVisionPercent()) * gyroValue);
   }
 
+  // weight average for heading
   public Rotation3d calculateHeadingAverage(Rotation3d visionValue, Rotation3d gyroValue) {
     double roll = calculateAverage(visionValue.getX(), gyroValue.getX());
     double pitch = calculateAverage(visionValue.getY(), gyroValue.getY());
@@ -72,60 +112,4 @@ public class Odometry extends SubsystemBase {
 
     return new Rotation3d(roll, pitch, yaw);
   }
-
-  /** what Jonah wrote (for reference, do NOT use this)
-   *  public void addVisionMeasurement(TimestampedTranslation2d data) {
-    Optional<Pose2d> historicalFieldToTarget = poseHistory.get(data.timestamp);
-    if (historicalFieldToTarget.isPresent()) {
-
-      // Calculate new robot pose
-      Rotation2d robotRotation = historicalFieldToTarget.get().getRotation();
-      Rotation2d cameraRotation =
-          robotRotation.rotateBy(vehicleToCamera.getRotation());
-      Transform2d fieldToTargetRotated =
-          new Transform2d(FieldConstants.hubCenter, cameraRotation);
-      Transform2d fieldToCamera = fieldToTargetRotated.plus(
-          GeomUtil.transformFromTranslation(data.translation.unaryMinus()));
-      Pose2d visionFieldToTarget = GeomUtil
-          .transformToPose(fieldToCamera.plus(vehicleToCamera.inverse()));
-
-      // Save vision pose for logging
-      noVisionTimer.reset();
-      lastVisionPose = visionFieldToTarget;
-
-      // Calculate vision percent
-      double angularErrorScale =
-          Math.abs(inputs.gyroVelocityRadPerSec) / visionMaxAngularVelocity;
-      angularErrorScale = MathUtil.clamp(angularErrorScale, 0, 1);
-      double visionShift =
-          1 - Math.pow(1 - visionShiftPerSec, 1 / visionNominalFramerate);
-      visionShift *= 1 - angularErrorScale;
-
-      // Reset pose
-      Pose2d currentFieldToTarget = getPose();
-      Translation2d fieldToVisionField = new Translation2d(
-          visionFieldToTarget.getX() - historicalFieldToTarget.get().getX(),
-          visionFieldToTarget.getY() - historicalFieldToTarget.get().getY());
-      Pose2d visionLatencyCompFieldToTarget =
-          new Pose2d(currentFieldToTarget.getX() + fieldToVisionField.getX(),
-              currentFieldToTarget.getY() + fieldToVisionField.getY(),
-              currentFieldToTarget.getRotation());
-
-      if (resetOnVision) {
-        setPose(new Pose2d(visionFieldToTarget.getX(),
-            visionFieldToTarget.getY(), currentFieldToTarget.getRotation()),
-            true);
-        resetOnVision = false;
-      } else {
-        setPose(new Pose2d(
-            currentFieldToTarget.getX() * (1 - visionShift)
-                + visionLatencyCompFieldToTarget.getX() * visionShift,
-            currentFieldToTarget.getY() * (1 - visionShift)
-                + visionLatencyCompFieldToTarget.getY() * visionShift,
-            currentFieldToTarget.getRotation()), false);
-      }
-    }
-  }
-   */
-
 }

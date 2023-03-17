@@ -21,7 +21,7 @@ public class RobotContainer {
     private final Odometry odometry = new Odometry(gyro, vision);
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
 
-    public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
+    public final static ShuffleboardTab tabOdometry = Shuffleboard.getTab("Odometry");
 
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(

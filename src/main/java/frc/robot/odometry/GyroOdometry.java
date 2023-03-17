@@ -16,7 +16,7 @@ import frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.wpilibj.SPI;
 
-public class Gyro {
+public class GyroOdometry {
 
   Swerve swerve;
 
@@ -27,7 +27,7 @@ public class Gyro {
   // the pose2d is the starting pose estimate of the robot (find, position)
   public SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
 
-  public Gyro(Swerve swerve) {
+  public GyroOdometry(Swerve swerve) {
     this.swerve = swerve;
     new Thread(() -> {
       try {
@@ -45,10 +45,12 @@ public class Gyro {
       gyro.reset();
   }
 
+  // updates the pose estimator
   public void updateGyroOdometry() {
     estimator.update(getRotation2d(), swerve.getModulePositions());
   }
 
+  // returns angular(?) values in rotation3d format
   public Rotation3d getHeading() {
     return new Rotation3d(gyro.getRoll(), gyro.getPitch(), gyro.getYaw());
   } 
@@ -62,11 +64,17 @@ public class Gyro {
     return Rotation2d.fromDegrees(getReading());
   }
 
+  // gets X-translational value
   public double getX() {
     return estimator.getEstimatedPosition().getX();
   }
 
+  // gets Y-translational value
   public double getY() {
     return estimator.getEstimatedPosition().getY();
+  }
+
+  public double getRate() {
+    return gyro.getRate();
   }
 }
