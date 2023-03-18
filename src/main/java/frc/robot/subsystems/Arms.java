@@ -96,19 +96,6 @@ public class Arms extends SubsystemBase {
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -0.5, 0.5);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -0.5, 0.5);
 
-        //changing the direction of the motor in case the motor was going to run into the superstructure
-        if (shoulderRadians() > 0 && shoulderRadians() < shoulderSetpoint && shoulderSpeed < 0) {
-            shoulderSpeed *= -1;
-        } else if (shoulderRadians() < 5 * Math.PI / 3 && shoulderRadians() > shoulderSetpoint && shoulderSpeed > 0) {
-            shoulderSpeed *= -1;
-        }
-
-        if (elbowRadians() > 0 && elbowRadians() < elbowSetpoint && elbowSpeed < 0) {
-            elbowSpeed *= -1;
-        } else if (elbowRadians() < 5 * Math.PI / 3 && elbowRadians() > elbowSetpoint && elbowSpeed > 0) {
-            elbowSpeed *= -1;
-        }
-
         return new double[] {shoulderSpeed, elbowSpeed};
     }
 
