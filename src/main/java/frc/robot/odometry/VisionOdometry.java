@@ -1,5 +1,6 @@
 package frc.robot.odometry;
 
+import java.util.Timer;
 import edu.wpi.first.math.geometry.Rotation3d;
 
 public class VisionOdometry {
@@ -13,6 +14,8 @@ public class VisionOdometry {
     camera2,  
     camera3
   };
+
+  Timer timer = new Timer();
 
   public VisionOdometry() {}
 
@@ -39,7 +42,7 @@ public class VisionOdometry {
       }
     }
 
-    return (x / checkCameras());
+    return x / checkCameras();
   }
 
     // gets Y-translational values from cameras that have detections and averages them
@@ -86,5 +89,11 @@ public class VisionOdometry {
       (roll / checkCameras()), 
       (pitch / checkCameras()), 
       (yaw / checkCameras()));
+  }
+
+  public void updateVision() {
+    for (Camera camera : cameras) {
+      camera.update();
+    }
   }
 }

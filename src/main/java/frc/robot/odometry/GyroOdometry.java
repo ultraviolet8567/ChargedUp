@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.odometry;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -11,10 +7,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
-
-import edu.wpi.first.wpilibj.SPI;
 
 public class GyroOdometry {
 
@@ -31,12 +26,10 @@ public class GyroOdometry {
     this.swerve = swerve;
     new Thread(() -> {
       try {
-          Thread.sleep(1000);
+          Thread.sleep(100);
           gyro.calibrate();
           resetGyro();
-      } catch (Exception e) {
-
-      }
+      } catch (Exception e) { }
     });
   }
 

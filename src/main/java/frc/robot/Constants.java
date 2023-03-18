@@ -181,7 +181,7 @@ public final class Constants {
         public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from center & flat
             new Translation3d(), 
             new Translation3d(), 
-            new Translation3d()
+            new Translation3d() //height values are from the ground not from center of robot but others are from center of robot
         }; 
         public static final Transform3d[] cameraDistances = new Transform3d[] { 
             new Transform3d(cameraDisplacements[0], cameraDirections[0]), 

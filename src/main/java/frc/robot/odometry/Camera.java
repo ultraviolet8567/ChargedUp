@@ -5,13 +5,10 @@ import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 public class Camera {
@@ -20,9 +17,9 @@ public class Camera {
 
   private PhotonCamera camera;
 
-  private Integer ID;
+  private int ID;
 
-  public Camera(Integer cameraID) {
+  public Camera(int cameraID) {
     ID = cameraID;
 
     camera = new PhotonCamera("camera" + cameraID);
@@ -30,29 +27,10 @@ public class Camera {
     estimator = new PhotonPoseEstimator(Constants.FieldConstants.aprilTags, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.CameraConstants.cameraDistances[ID]);
   }
 
-  // find distance from tag to robot
-  public double distanceTag(PhotonPipelineResult result) {
-    double distance;
-
-    if (result.hasTargets()) { // checks that there are targets in the given result
-      double range = PhotonUtils.calculateDistanceToTargetMeters(
-        Constants.CameraConstants.cameraDisplacements[ID].getZ(), 
-        Constants.tagHeight, 
-        Constants.CameraConstants.cameraDirections[ID].getY(), 
-        Units.degreesToRadians(result.getBestTarget().getPitch()));
-      distance = range;
-    } else {
-      distance = 0.0;
-    }
-
-    return distance;
-  }
-
   // get the "best" (most reliable) tag's ID
-  public Integer getTagID() {
+  public double getTimestamp() {
     PhotonPipelineResult result = camera.getLatestResult();
-    PhotonTrackedTarget target = result.getBestTarget();
-    return target.getFiducialId();
+    return result.getTimestampSeconds();
   }
 
   // updates pose estimator, used for odometry updates
@@ -78,7 +56,17 @@ public class Camera {
 
   public boolean checkDetections() {
     PhotonPipelineResult result = camera.getLatestResult();
-    return result.hasTargets();
+    
+    if (!result.hasTargets())
+      return false;
+    else {
+      if (result.getBestTarget().getPoseAmbiguity() >= 0.0 && result.getBestTarget().getPoseAmbiguity() < 0.15)
+        return true;
+      else return false;
+    }
   }
 
+  public void update() {
+    camera.getLatestResult();
+  }
 }
