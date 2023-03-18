@@ -6,11 +6,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
-
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.MathUtil;
 
 public class Arms extends SubsystemBase {
     
@@ -34,15 +35,11 @@ public class Arms extends SubsystemBase {
 
         shoulderRunning = false;
 
-        armsPidController = new PIDController(0, 0, 0);
+        armsPidController = new PIDController(0.05, 0, 0);
     }
 
     @Override
     public void periodic() {
-        // while (-(180 - elbowDeg()) < 30) {
-        //      elbow.set(Constants.elbowSpeed.get());
-        // }
-
         Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderRadians());
         Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", shoulderRadians());
     }
@@ -93,6 +90,23 @@ public class Arms extends SubsystemBase {
             } else {
                 elbowSpeed = 0;
             }
+        }
+
+        //clamp the speeds between -0.5 & 0.5 for safety & testing
+        shoulderSpeed = MathUtil.clamp(shoulderSpeed, -0.5, 0.5);
+        elbowSpeed = MathUtil.clamp(elbowSpeed, -0.5, 0.5);
+
+        //changing the direction of the motor in case the motor was going to run into the superstructure
+        if (shoulderRadians() > 0 && shoulderRadians() < shoulderSetpoint && shoulderSpeed < 0) {
+            shoulderSpeed *= -1;
+        } else if (shoulderRadians() < 5 * Math.PI / 3 && shoulderRadians() > shoulderSetpoint && shoulderSpeed > 0) {
+            shoulderSpeed *= -1;
+        }
+
+        if (elbowRadians() > 0 && elbowRadians() < elbowSetpoint && elbowSpeed < 0) {
+            elbowSpeed *= -1;
+        } else if (elbowRadians() < 5 * Math.PI / 3 && elbowRadians() > elbowSetpoint && elbowSpeed > 0) {
+            elbowSpeed *= -1;
         }
 
         return new double[] {shoulderSpeed, elbowSpeed};
