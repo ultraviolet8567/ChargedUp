@@ -41,13 +41,11 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(swerve));
         
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Pickup(intake, "Cone"));
-        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new Pickup(intake, "Cube"));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).onTrue(new StopIntake(intake));
-        
-        // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new Pickup(intake));
-        // new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new Pickup(intake));
-        
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake, getGamePiece()));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileFalse(new StopIntake(intake));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake, getGamePiece()));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileFalse(new StopIntake(intake));
+                
         new JoystickButton(driverJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
         new JoystickButton(driverJoystick, XboxController.Button.kY.value).whileTrue(new ManipulateArms(arms, "shoulder", "backward"));   
         new JoystickButton(driverJoystick, XboxController.Button.kB.value).whileTrue(new ManipulateArms(arms, "elbow", "forward"));   
@@ -58,13 +56,13 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kB.value).whileFalse(new StopElbow(arms));   
         new JoystickButton(driverJoystick, XboxController.Button.kA.value).whileFalse(new StopElbow(arms));
 
-        // new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new PresetArms(arms, "high node"));
-        // new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new PresetArms(arms, "mid node"));
-        // new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new PresetArms(arms, "hybrid node"));
-        // new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new PresetArms(arms, "ground intake"));
-        // new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new PresetArms(arms, "high intake"));
-        // new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new PresetArms(arms, "starting"));
-        // new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new PresetArms(arms, "taxi"));
+        new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new PresetArms(arms, "high node"));
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new PresetArms(arms, "mid node"));
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new PresetArms(arms, "hybrid node"));
+        new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new PresetArms(arms, "ground intake"));
+        new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new PresetArms(arms, "high intake"));
+        new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new PresetArms(arms, "starting"));
+        new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new PresetArms(arms, "taxi"));
     }
 
     public Command getAutonomousCommand() {
