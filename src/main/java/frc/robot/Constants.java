@@ -21,7 +21,7 @@ public final class Constants {
      *  - Counterclockwise = z-
      */
 
-    public static final Mode currentMode = Mode.REAL;
+    public static final Mode currentMode = Mode.SIM;
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
 

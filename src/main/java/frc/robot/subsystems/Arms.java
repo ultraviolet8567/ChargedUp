@@ -57,7 +57,7 @@ public class Arms extends SubsystemBase {
 
         armsPidController = new PIDController(0.05, 0, 0);
 
-        armsMech = new Mechanism2d(2, 3);   
+        armsMech = new Mechanism2d(2, 2);   
         armsRoot = armsMech.getRoot("arms", 1, 0);
         superstructureMech = armsRoot.append(new MechanismLigament2d("superstructure", Units.inchesToMeters(25), 90));
         shoulderMech = superstructureMech.append(new MechanismLigament2d("bicep", Units.inchesToMeters(20), shoulderRadians(), 5, new Color8Bit(0, 0, 255)));
@@ -142,9 +142,9 @@ public class Arms extends SubsystemBase {
             if (movingShoulder) {
                 if (shoulderRadians() > Units.radiansToDegrees(Constants.kStopShoulderBackward) && shoulderRadians() < Units.radiansToDegrees(Constants.kStopShoulderForward)) {
                     if (shoulderRadians() > shoulderSetpoint) {
-                        shoulderSpeed = -0.5;
+                        shoulderSpeed = -0.3;
                     } else if (shoulderRadians() < shoulderSetpoint) {
-                        shoulderSpeed = 0.5;
+                        shoulderSpeed = 0.3;
                     }
 
                     if (!movingElbow) {
@@ -158,9 +158,9 @@ public class Arms extends SubsystemBase {
                 if (elbowRadians() > Units.radiansToDegrees(Constants.kStopElbowBackward) && elbowRadians() < Units.radiansToDegrees(Constants.kStopElbowForward)) {
                     elbowSpeed = armsPidController.calculate(elbowRadians(), elbowSetpoint);
                     if (elbowRadians() > elbowSetpoint) {
-                        elbowSpeed = -0.5;
+                        elbowSpeed = -0.3;
                     } else if (elbowRadians() < elbowSetpoint) {
-                        elbowSpeed = 0.5;
+                        elbowSpeed = 0.3;
                     }
 
                     if (movingShoulder) {
@@ -178,173 +178,76 @@ public class Arms extends SubsystemBase {
         return new double[] {shoulderSpeed, elbowSpeed};
     }
 
-    // public void setShoulder(int setpoint) {
-    //     //shoulder presetting
-    //     if (setpoint < Constants.kStopShoulderMid) { 
-    //         // if the target angle is between 0 and middle of superstructure
-            
-    //         if (shoulderDeg() < Constants.kStopShoulderMid && shoulderDeg() > setpoint){
-
-    //             // if current angle is between target angle and middle of superstructure
-    //             // run shoulder backwards & elbow compensates
-    //             shoulderSpeed = -Constants.shoulderSpeed.get();
-    //             elbowSpeed = -4/5 * shoulderSpeed;
-
-    //             runShoulder(shoulderSpeed);
-    //             // runElbow(elbowSpeed);
-
-    //             if (shoulderDeg() <= setpoint) {
-    //                 shoulderSet = true;
-    //                 shoulder.stopMotor();
-    //             } else {
-    //                 shoulderSet = false;
-    //             }
-    //         } else {
-    //             // if the current angle is not between target angle and middle of superstructure
-    //             // run shoulder forwards & elbow compensates
-    //             shoulderSpeed = Constants.shoulderSpeed.get();
-    //             elbowSpeed = -4/5 * shoulderSpeed;
-
-    //             runShoulder(shoulderSpeed);
-    //             // runElbow(elbowSpeed);
-
-    //             if (shoulderDeg() >= setpoint && shoulderDeg() <= Constants.kStopShoulderMid) {
-    //                 shoulderSet = true;
-    //                 shoulder.stopMotor();
-    //             } else {
-    //                 shoulderSet = false;
-    //             }
-    //         }
-    //     }
-
-    //     else if (setpoint > Constants.kStopShoulderMid) {
-    //         // if the target angle is between middle of superstructure and 360
-
-    //         if (shoulderDeg() > Constants.kStopShoulderMid && shoulderDeg() < setpoint){
-    //             // if current angle is between target angle and middle of superstructure
-    //             // run shoulder forwards & elbow compensates
-    //             shoulderSpeed = Constants.shoulderSpeed.get();
-    //             elbowSpeed = -4/5 * shoulderSpeed;
-
-    //             runShoulder(Constants.shoulderSpeed.get());
-    //             // runElbow(elbowSpeed);
-
-    //             if (shoulderDeg() >= setpoint) {
-    //                 shoulderSet = true;
-    //                 shoulder.stopMotor();
-    //             } else {
-    //                 shoulderSet = false;
-    //             }
-    //         } else {
-    //             // if current angle is not between target angle and middle of superstructure
-    //             // run shoulder backwards & elbow compensates
-    //             shoulderSpeed = -Constants.shoulderSpeed.get();
-    //             elbowSpeed = -4/5 * shoulderSpeed;
-
-    //             runShoulder(shoulderSpeed);
-    //             // runElbow(elbowSpeed);
-
-    //             if (shoulderDeg() <= setpoint) {
-    //                 shoulderSet = true;
-    //                 shoulder.stopMotor();
-    //             } else {
-    //                 shoulderSet = false;
-    //             }
-    //         }
-    //     } else {
-    //         stopShoulder();
-    //     }        
-    // }
-
-    // public void setElbow(int setpoint) {
-    //     //elbow presetting
-    //     if (setpoint < Constants.kStopElbowMid) { 
-    //         // if the target angle is between 0 and 180
-            
-    //         //run elbow backwards or forwards based on current position
-    //         if (elbowDeg() < Constants.kStopElbowMid && elbowDeg() > setpoint) {
-    //             runElbow(-Constants.elbowSpeed.get());
-
-    //             if (elbowDeg() <= setpoint) {
-    //                 elbowSet = true;
-    //                 elbow.stopMotor();
-    //             } else {
-    //                 elbowSet = false;
-    //             }
-    //         } else {
-    //             runElbow(Constants.elbowSpeed.get());
-
-    //             if (elbowDeg() >= setpoint) {
-    //                 elbowSet = true;
-    //                 elbow.stopMotor();
-    //             } else {
-    //                 elbowSet = false;
-    //             }
-    //         }
-    //     }
-
-    //     else if (setpoint > Constants.kStopElbowMid) { 
-    //         // if the target angle is greater than 180 
-
-    //         //run elbow backwards or forwards based on current position
-    //         if(elbowDeg() > Constants.kStopElbowMid && elbowDeg() < setpoint){
-    //             runElbow(Constants.elbowSpeed.get());
-
-    //             if (elbowDeg() >= setpoint) {
-    //                 elbowSet = true;
-    //                 elbow.stopMotor();
-    //             } else {
-    //                 elbowSet = false;
-    //             }
-    //         } else {
-    //             runElbow(-Constants.elbowSpeed.get());
-
-    //             if (elbowDeg() <= setpoint) {
-    //                 elbowSet = true;
-    //                 elbow.stopMotor();
-    //             } else {
-    //                 elbowSet = false;
-    //             }
-    //         }
-    //     } else {
-    //         stopElbow();
-    //     }
-    // }
-
     //check if the bicep is past the limit of 300 degrees moving backward
     public boolean checkShoulderLocationBackward() {
-        if (shoulderRadians() >= Constants.kStopShoulderMid && shoulderRadians() <= Constants.kStopShoulderBackward) {
-            return false;
-        } else {
-            return true;
+        if (Constants.currentMode == Mode.REAL) {
+            if (shoulderRadians() >= Constants.kStopShoulderMid && shoulderRadians() <= Constants.kStopShoulderBackward) {
+                return false;
+            } else {
+                return true;
+            }   
+        } else if (Constants.currentMode == Mode.SIM) {
+            if (shoulderRadians() >= Units.radiansToDegrees(Constants.kStopShoulderMid) && shoulderRadians() <= Units.radiansToDegrees(Constants.kStopShoulderBackward)) {
+                return false;
+            } else {
+                return true;
+            } 
         }
+        return false;
     }
 
     //check if the bicep is past the limit of 220 degrees moving forward
     public boolean checkShoulderLocationForward() {
-        if (shoulderRadians() <= Constants.kStopShoulderMid && shoulderRadians() >= Constants.kStopShoulderForward) {
-            return false;
-        } else {
-            return true;
+        if (Constants.currentMode == Mode.REAL) {
+            if (shoulderRadians() <= Constants.kStopShoulderMid && shoulderRadians() >= Constants.kStopShoulderForward) {
+                return false;
+            } else {
+                return true;
+            }
+        } else if (Constants.currentMode == Mode.SIM) { 
+            if (shoulderRadians() <= Units.radiansToDegrees(Constants.kStopShoulderMid) && shoulderRadians() >= Units.radiansToDegrees(Constants.kStopShoulderForward)) {
+                return false;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 
     //check if the forearm is past the limit of 225 degrees moving backward
     public boolean checkElbowLocationBackward() {
-        if (elbowRadians() <= Constants.kStopElbowBackward && elbowRadians() >= Constants.kStopElbowMid) {
-            return false;
-        } else {
-            return true;
+        if (Constants.currentMode == Mode.REAL) {
+            if (elbowRadians() <= Constants.kStopElbowBackward && elbowRadians() >= Constants.kStopElbowMid) {
+                return false;
+            } else {
+                return true;
+            }
+        } else if (Constants.currentMode == Mode.SIM) { 
+            if (elbowRadians() <= Units.radiansToDegrees(Constants.kStopElbowBackward) && elbowRadians() >= Units.radiansToDegrees(Constants.kStopElbowMid)) {
+                return false;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 
     //check if the forearm is past the limit of 135 degrees moving forward
     public boolean checkElbowLocationForward() {
-        if (elbowRadians() >= Constants.kStopElbowForward && elbowRadians() <= Constants.kStopElbowMid) {
-            return false;
-        } else {
-            return true;
+        if (Constants.currentMode == Mode.REAL) {
+            if (elbowRadians() >= Units.radiansToDegrees(Constants.kStopElbowForward) && elbowRadians() <= Units.radiansToDegrees(Constants.kStopElbowMid)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else if (Constants.currentMode == Mode.SIM) { 
+            if (elbowRadians() >= Constants.kStopElbowForward && elbowRadians() <= Constants.kStopElbowMid) {
+                return false;
+            } else {
+                return true;
+            }
         }
+        return false;
     }
 
     public void stop() {
