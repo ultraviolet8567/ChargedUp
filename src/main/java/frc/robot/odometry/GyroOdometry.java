@@ -21,7 +21,7 @@ public class GyroOdometry {
     SwerveModulePosition[] modulePositions = swerve.getModulePositions();
   
     boolean onSlope;
-    private double lastY;
+    private double lastX;
     // private double slopeY;
     
     private static double minimumAngle = 0.03; // minimum angle for slope in radians
@@ -51,14 +51,14 @@ public class GyroOdometry {
     // updates the pose estimator, runs in periodic
     public void updateGyroOdometry() {
         if (!onSlope) { //if not on slope at start of tick
-            if (getHeading().getX() > -minimumAngle && getHeading().getX() < minimumAngle) { //check if on slope
+            if (getHeading().getY() > -minimumAngle && getHeading().getY() < minimumAngle) { //check if on slope
                 startSlope(); //if on slope, switch into slope mode
             } 
             else { //if still not on slope
                 normalCalc(); //calculate position normally
             }
         } else { //if on slope at start of tick
-            if (getHeading().getX() < -minimumAngle || getHeading().getX() > minimumAngle) { //check if not on slope
+            if (getHeading().getY() < -minimumAngle || getHeading().getY() > minimumAngle) { //check if not on slope
                 endSlope(); //if not on slope, switch out of slope mode
             }
             else { //if still on slope
@@ -66,7 +66,7 @@ public class GyroOdometry {
             }
         }
 
-        lastY = getY();
+        lastX = getX();
     }
 
     public void normalCalc() {
@@ -79,12 +79,13 @@ public class GyroOdometry {
         slopeCalc();
     }
 
+    // ;󠀿
     public void slopeCalc() {
         estimator.update(getRotation2d(), swerve.getModulePositions());
-        double pΔY = getY() - lastY;
-        double aΔY = pΔY * Math.cos(getHeading().getX());
-        double aCurrentY = lastY + aΔY;
-        Pose2d updatedPose = new Pose2d(new Translation2d(getX(), aCurrentY), getRotation2d());
+        double pΔX = getX() - lastX;
+        double aΔX = pΔX * Math.cos(getHeading().getX());
+        double aCurrentX = lastX + aΔX;
+        Pose2d updatedPose = new Pose2d(new Translation2d(getY(), aCurrentX), getRotation2d());
         // hope and pray that this sets the current position to the updatedPose and doesn't just break things
         estimator.resetPosition(gyro.getRotation2d(), modulePositions, updatedPose);
     }
