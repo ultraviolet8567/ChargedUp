@@ -22,12 +22,13 @@ public class GyroOdometry {
   
     boolean onSlope;
     private double lastY;
-    private double slopeY;
+    // private double slopeY;
     
     private static double minimumAngle = 0.03; // minimum angle for slope in radians
 
     // the pose2d is the starting pose estimate of the robot 
     // TODO: (find initial position)
+    // the pose2d says 'constructs a pose at origin facing towards the positive x axis' --> x is forwards? 
     public SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
 
     public GyroOdometry(Swerve swerve) {
@@ -102,13 +103,9 @@ public class GyroOdometry {
             toRadians(gyro.getYaw()));
     } 
 
-    public double getReading() {
-        // Negate the reading because the navX has CCW- and we need CCW+
-        return Math.IEEEremainder(-gyro.getAngle(), 360);
-    }
-
     public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getReading());
+        // Negate the reading because the navX has CCW- and we need CCW+
+        return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
     }
 
     // gets X-translational value

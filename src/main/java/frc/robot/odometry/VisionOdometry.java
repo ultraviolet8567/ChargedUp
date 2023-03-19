@@ -2,10 +2,8 @@ package frc.robot.odometry;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Timer;
 
 import org.photonvision.EstimatedRobotPose;
-import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 
@@ -20,8 +18,6 @@ public class VisionOdometry {
     camera2,  
     camera3
   };
-
-  Timer timer = new Timer();
 
   public VisionOdometry() {}
 
@@ -38,7 +34,8 @@ public class VisionOdometry {
     return count;
   }
 
-  public ArrayList<Optional<EstimatedRobotPose>> updateVision() {
+  // list of detections that were detected in a 60ms time frame
+  public ArrayList<Optional<EstimatedRobotPose>> updateVisionOdometry() {
     ArrayList<Optional<EstimatedRobotPose>> results = new ArrayList<>();
     for (int i = 0; i <= 2; i++) {
         try {
@@ -59,12 +56,12 @@ public class VisionOdometry {
   }
 
   // gets X-translational values from cameras that have detections and averages them
-  public double getX() {
+  public double getX(ArrayList<Optional<EstimatedRobotPose>> detections) {
     double x = 0.0;
 
-    for (Camera camera : cameras) {
-      if (camera.checkDetections()) {
-        x += camera.getX();
+    for (Optional<EstimatedRobotPose> detection : detections) {
+      if (detection.isPresent()) {
+        x += detection.get().estimatedPose.getX();
       }
     }
 
@@ -72,42 +69,42 @@ public class VisionOdometry {
   }
 
     // gets Y-translational values from cameras that have detections and averages them
-  public double getY() {
+  public double getY(ArrayList<Optional<EstimatedRobotPose>> detections) {
     double y = 0.0;
 
-    for (Camera camera : cameras) {
-      if (camera.checkDetections()) {
-        y += camera.getY();
-      }
+    for (Optional<EstimatedRobotPose> detection : detections) {
+        if (detection.isPresent()) {
+          y += detection.get().estimatedPose.getY();
+        }
     }
 
     return (y / checkCameras());
   }
 
     // gets Z-translational values (depth) from cameras that have detections and averages them
-  public double getZ() {
+  public double getZ(ArrayList<Optional<EstimatedRobotPose>> detections) {
     double z = 0.0;
 
-    for (Camera camera : cameras) {
-      if (camera.checkDetections()) {
-        z += camera.getZ();
-      }
+    for (Optional<EstimatedRobotPose> detection : detections) {
+        if (detection.isPresent()) {
+          z += detection.get().estimatedPose.getZ();
+        }
     }
 
     return (z / checkCameras());
   }
 
-    // gets rotational vlues from cameras that have detections and averages them
-  public Rotation3d getHeading() {
+// gets rotational vlues from cameras that have detections and averages them
+  public Rotation3d getHeading(ArrayList<Optional<EstimatedRobotPose>> detections) {
     double roll = 0.0;
     double pitch = 0.0;
     double yaw = 0.0;
 
-    for (Camera camera : cameras) {
-      if (camera.checkDetections()) {
-        roll += camera.getHeading().getX();
-        pitch += camera.getHeading().getY();
-        yaw += camera.getHeading().getZ();
+    for (Optional<EstimatedRobotPose> detection : detections) {
+      if (detection.isPresent()) {
+        roll += detection.get().estimatedPose.getRotation().getX();
+        pitch += detection.get().estimatedPose.getRotation().getX();
+        yaw += detection.get().estimatedPose.getRotation().getX();
       }
     }
 

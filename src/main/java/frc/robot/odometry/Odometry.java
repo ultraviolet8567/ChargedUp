@@ -23,7 +23,8 @@ public class Odometry extends SubsystemBase {
   GyroOdometry gyro;
   VisionOdometry vision;
 
-  ArrayList<Double> timestamps;
+  int count = 0;
+  ArrayList<Optional<EstimatedRobotPose>> visionDetections;
 
   // TODO: find the actual value
   private double framerate = 30;
@@ -42,7 +43,14 @@ public class Odometry extends SubsystemBase {
 
     // CCW+
     Logger.getInstance().recordOutput("Odometry/Heading", getHeading().toRotation2d().getRadians());
-  }
+  
+    if (count <= 2) {
+        count += 1;
+    } else {
+        visionDetections = vision.updateVisionOdometry();
+    }
+
+}
 
   // i have no idea what this does
   public double calculateVisionPercent() {
@@ -54,14 +62,12 @@ public class Odometry extends SubsystemBase {
     return shift;
   }
 
-  // check for camera detections within the last (15-50?) milliseconds instead of checking for camera detections within the last frame
-
   // average of X-values
   public double getX() {
-    if (vision.checkCameras() >= 1) {
-      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+    if (visionDetections.isEmpty()) {
+      double error = Math.abs((vision.getHeading(visionDetections).getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
       if (error > maxHeadingError) {
-        return calculateAverage(vision.getX(), gyro.getX()); 
+        return calculateAverage(vision.getX(visionDetections), gyro.getX()); 
       } else {
         return gyro.getX(); 
       }
@@ -72,10 +78,10 @@ public class Odometry extends SubsystemBase {
 
   // average of Y-values
   public double getY() {
-    if (vision.checkCameras() >= 1) {
-      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+    if (visionDetections.isEmpty()) {
+      double error = Math.abs((vision.getHeading(visionDetections).getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
       if (error > maxHeadingError) {
-        return calculateAverage(vision.getY(), gyro.getY()); 
+        return calculateAverage(vision.getY(visionDetections), gyro.getY()); 
       } else {
         return gyro.getY(); 
       }
@@ -87,8 +93,8 @@ public class Odometry extends SubsystemBase {
 
   // depth
   public double getZ() {
-    if (vision.checkCameras() >= 1) {
-      return vision.getZ();
+    if (visionDetections.isEmpty()) {
+      return vision.getZ(visionDetections);
     } else {
       return 0.0;
     }
@@ -96,10 +102,10 @@ public class Odometry extends SubsystemBase {
 
   // calculates heading (angle) average
   public Rotation3d getHeading() {
-    if (vision.checkCameras() >= 1) {
-      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+    if (visionDetections.isEmpty()) {
+      double error = Math.abs((vision.getHeading(visionDetections).getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
       if (error > maxHeadingError) {
-        return calculateHeadingAverage(vision.getHeading(), gyro.getHeading()); 
+        return calculateHeadingAverage(vision.getHeading(visionDetections), gyro.getHeading()); 
       } else {
         return gyro.getHeading();
       } 

@@ -8,7 +8,6 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants;
 
 public class Camera {
@@ -27,32 +26,26 @@ public class Camera {
     estimator = new PhotonPoseEstimator(Constants.FieldConstants.aprilTags, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.CameraConstants.cameraDistances[ID]);
   }
 
-  // get the "best" (most reliable) tag's ID
-  public double getTimestamp() {
-    PhotonPipelineResult result = camera.getLatestResult();
-    return result.getTimestampSeconds();
-  }
-
   // updates pose estimator, used for odometry updates
   public Optional<EstimatedRobotPose> getEstimate() {
     return estimator.update(); // creates estimated robot poses
   }
 
-  public double getX() {
-    return getEstimate().get().estimatedPose.getX();
-  }
+//   public double getX() {
+//     return getEstimate().get().estimatedPose.getX();
+//   }
 
-  public double getY() {
-    return getEstimate().get().estimatedPose.getY();
-  }
+//   public double getY() {
+//     return getEstimate().get().estimatedPose.getY();
+//   }
 
-  public double getZ() {
-    return getEstimate().get().estimatedPose.getZ();
-  }
+//   public double getZ() {
+//     return getEstimate().get().estimatedPose.getZ();
+//   }
 
-  public Rotation3d getHeading() {
-    return getEstimate().get().estimatedPose.getRotation();
-  }
+//   public Rotation3d getHeading() {
+//     return getEstimate().get().estimatedPose.getRotation();
+//   }
 
   public boolean checkDetections() {
     PhotonPipelineResult result = camera.getLatestResult();
@@ -64,9 +57,5 @@ public class Camera {
         return true;
       else return false;
     }
-  }
-
-  public PhotonPipelineResult update() {
-    return camera.getLatestResult();
   }
 }
