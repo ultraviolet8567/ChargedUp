@@ -16,6 +16,7 @@ public class SwerveTeleOp extends CommandBase {
     private final Supplier<Boolean> rotationOnFunction, fieldOrientedFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
+    // First supplier is the forward velocity, then its horizontal velocity, then rotational velocity
     public SwerveTeleOp(Swerve swerve, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> fieldOrientedFunction) {
         this.swerve = swerve;
         this.xSpdFunction = xSpdFunction;
@@ -34,8 +35,6 @@ public class SwerveTeleOp extends CommandBase {
 
     @Override
     public void execute() {
-        
-
         // Get real-time joystick inputs
         double xSpeed = xSpdFunction.get();
         double ySpeed = ySpdFunction.get();

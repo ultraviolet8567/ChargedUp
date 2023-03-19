@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.*;
+import frc.robot.commands.AutoCommands.AutoDriveOut;
 import frc.robot.subsystems.*;
 import frc.robot.util.ControllerIO;
 
@@ -35,6 +36,9 @@ public class RobotContainer {
             // () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonId)));
 
         configureButtonBindings();
+    }
+    public Swerve getSwerve(){
+        return swerve;
     }
 
     public void configureButtonBindings() {
@@ -66,7 +70,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        return (new AutoDriveOut(swerve));
     }
 
     public static String getGamePiece() {
