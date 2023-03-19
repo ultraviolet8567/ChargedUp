@@ -3,12 +3,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arms;
 import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 
 public class PresetArms extends CommandBase {
     private Arms arms;
     private String position;
-    private int shoulderSetpoint;
-    private int elbowSetpoint;
+    private double shoulderSetpoint;
+    private double elbowSetpoint;
 
     private boolean shoulderSet = false;
     private boolean elbowSet = false;
@@ -57,21 +58,52 @@ public class PresetArms extends CommandBase {
     public void execute() {
         //TODO figure out which goes first, shoulder or elbow
         //move to the preset point
-        if (Math.abs(arms.shoulderRadians() - shoulderSetpoint) >= 1.0) {
-            shoulderSet = true;
-        } else {
-            shoulderSet = false;
-        }
+        if (Constants.currentMode == Mode.REAL) {
+            if (Math.abs(arms.shoulderRadians() - shoulderSetpoint) >= 0.1) {
+                shoulderSet = true;
+            } else {
+                shoulderSet = false;
+            }
 
-        if (Math.abs(arms.elbowRadians() - elbowSetpoint) >= 1.0) {
-            elbowSet = true;
-        } else {
-            elbowSet = false;
+            if (Math.abs(arms.elbowRadians() - elbowSetpoint) >= 0.1) {
+                elbowSet = true;
+            } else {
+                elbowSet = false;
+            }
+        } else if (Constants.currentMode == Mode.SIM) {
+            if (Math.abs(arms.shoulderRadians() - shoulderSetpoint) >= 1) {
+                shoulderSet = true;
+            } else {
+                shoulderSet = false;
+            }
+
+            if (Math.abs(arms.elbowRadians() - elbowSetpoint) >= 1) {
+                elbowSet = true;
+            } else {
+                elbowSet = false;
+            }
         }
 
         speeds = arms.calculateMotorSpeeds(shoulderSetpoint, elbowSetpoint, shoulderSet, elbowSet);
 
-        arms.shoulder.set(speeds[0]);
-        arms.elbow.set(speeds[1]);           
+        System.out.println(speeds[0] + " " + speeds[1]);
+        System.out.println(arms.shoulderRadians() + " " + arms.elbowRadians());
+
+        arms.runShoulder(speeds[0]);
+        arms.runElbow(speeds[1]);           
+    }
+
+    @Override
+    public void end(boolean interuppted) {
+        arms.stop();
+    }
+
+    @Override
+    public boolean isFinished() {
+        if (shoulderSet && elbowSet) {
+            return true;
+        }
+        
+        return false;
     }
 }

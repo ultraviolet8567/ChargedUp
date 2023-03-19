@@ -36,24 +36,24 @@ public final class Constants {
     //arm absolute encoder offset
     public static final double kShoulderOffset = 0.668;
     public static final double kElbowOffset = 0.183;
-
+ 
     //stopping point for shoulder
-    public static final double kStopShoulderForward = 5 * Math.PI / 3 + 1;
-    public static final double kStopShoulderBackward = 2 * Math.PI - 1;
-    public static final double kStopShoulderMid = 11 * Math.PI / 6;
+    public static final double kStopShoulderForward = 5 * Math.PI / 6;
+    public static final double kStopShoulderBackward = -5 * Math.PI / 6;
+    public static final double kStopShoulderMid = Math.PI;
 
-    public static final double kStopElbowBackward = 5 * Math.PI / 3 + 1;
-    public static final double kStopElbowForward = 2 * Math.PI - 1;
-    public static final double kStopElbowMid = 11 * Math.PI / 6;
+    public static final double kStopElbowBackward = 5 * Math.PI / 6;
+    public static final double kStopElbowForward = -5 * Math.PI / 6;
+    public static final double kStopElbowMid = Math.PI;
 
     //arm preset points TODO: find these points
-    public static final int[] kHighNodeSetpoints = new int[] { 0, 0 };
-    public static final int[] kMidNodeSetpoints = new int[] { 0, 0 };
-    public static final int[] kHybridNodeSetpoints = new int[] { 0, 0 };
-    public static final int[] kGroundIntakeSetpoints = new int[] { 0, 0 };
-    public static final int[] kHighIntakeSetpoints = new int[] { 0, 0 };
-    public static final int[] kStartingSetpoints = new int[] { 0, 0 };
-    public static final int[] kTaxiSetpoints = new int[] { 0, 0 };
+    public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
+    public static final double[] kMidNodeSetpoints = new double[] { 0, 0 };
+    public static final double[] kHybridNodeSetpoints = new double[] { -Math.PI / 2, -Math.PI / 2 };
+    public static final double[] kGroundIntakeSetpoints = new double[] { 0, 0 };
+    public static final double[] kHighIntakeSetpoints = new double[] { 0, 0 };
+    public static final double[] kStartingSetpoints = new double[] { 0, 0 };
+    public static final double[] kTaxiSetpoints = new double[] { 0, 0 };
 
     public static final class CAN {
         public static final int kIntakePort = 3;

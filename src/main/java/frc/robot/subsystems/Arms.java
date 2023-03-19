@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.lang.reflect.GenericSignatureFormatError;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkMax;
@@ -10,8 +12,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.Mode;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 
 public class Arms extends SubsystemBase {
     
@@ -26,6 +34,15 @@ public class Arms extends SubsystemBase {
 
     private final PIDController armsPidController;
 
+    Mechanism2d armsMech;
+    MechanismRoot2d armsRoot;
+    MechanismLigament2d superstructureMech;
+    MechanismLigament2d shoulderMech;
+    MechanismLigament2d elbowMech;
+
+    private double shoulderSimEncoder;
+    private double elbowSimEncoder;
+
     public Arms() {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
         elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
@@ -33,65 +50,127 @@ public class Arms extends SubsystemBase {
         shoulderEncoder = new DutyCycleEncoder(Constants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(Constants.kElbowEncoderPort);
 
+        shoulderSimEncoder = 0;
+        elbowSimEncoder = 0;
+
         shoulderRunning = false;
 
         armsPidController = new PIDController(0.05, 0, 0);
+
+        armsMech = new Mechanism2d(2, 3);   
+        armsRoot = armsMech.getRoot("arms", 1, 0);
+        superstructureMech = armsRoot.append(new MechanismLigament2d("superstructure", Units.inchesToMeters(25), 90));
+        shoulderMech = superstructureMech.append(new MechanismLigament2d("bicep", Units.inchesToMeters(20), shoulderRadians(), 5, new Color8Bit(0, 0, 255)));
+        elbowMech = shoulderMech.append(new MechanismLigament2d("forearm", Units.inchesToMeters(16), elbowRadians(), 3, new Color8Bit(0, 255, 0)));
     }
 
     @Override
     public void periodic() {
         Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderRadians());
-        Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", shoulderRadians());
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", elbowRadians());
+
+        Logger.getInstance().recordOutput("AbsoluteEncoders/SimShoulder", shoulderSimEncoder);
+        Logger.getInstance().recordOutput("AbsoluteEncoders/SimElbow", elbowSimEncoder);
+
+        shoulderMech.setAngle(shoulderSimEncoder);
+        elbowMech.setAngle(elbowSimEncoder);
+
+        Logger.getInstance().recordOutput("Mechanisms", armsMech);
     }
 
     public void runShoulder(double speed) {
-        shoulder.set(speed);
+        if (Constants.currentMode == Mode.REAL) {
+            shoulder.set(speed);
+        } else if (Constants.currentMode == Mode.SIM) {
+            shoulderSimEncoder += speed * 5;
+        }    
     }
     
     public void runElbow(double speed) {
-        elbow.set(speed);
+        if (Constants.currentMode == Mode.REAL) {
+            elbow.set(speed);
+        } else if (Constants.currentMode == Mode.SIM) {
+            elbowSimEncoder += speed * 5;
+        }
     }
 
     public double shoulderRadians() {
-        double shoulderDegrees = -(shoulderEncoder.getAbsolutePosition() - Constants.kShoulderOffset) * 2 * Math.PI - (Math.PI/3);
-        if (shoulderDegrees < 0) {
-            shoulderDegrees += 360;
+        double shoulderDegrees = 0;
+        if (Constants.currentMode == Mode.REAL) {
+            shoulderDegrees = -(shoulderEncoder.getAbsolutePosition() - Constants.kShoulderOffset) * 2 * Math.PI - (Math.PI);
+        } else if (Constants.currentMode == Mode.SIM) {
+            shoulderDegrees = shoulderSimEncoder;
         }
         return shoulderDegrees;
     }
 
-    //TODO: find the offset of the elbow absolute encoder
     public double elbowRadians() {
-        double elbowDegrees = (elbowEncoder.getAbsolutePosition() - Constants.kElbowOffset) * 2 * Math.PI - (3 * Math.PI / 4);
-        if (elbowDegrees < 0) {
-            elbowDegrees += 360;
+        double elbowDegrees = 0;
+        if (Constants.currentMode == Mode.SIM) {
+            elbowDegrees = (elbowEncoder.getAbsolutePosition() - Constants.kElbowOffset) * 2 * Math.PI - (Math.PI);
+        } else if (Constants.currentMode == Mode.SIM) {
+            elbowDegrees = elbowSimEncoder;
         }
         return elbowDegrees;
     }
 
-    public double[] calculateMotorSpeeds(int shoulderSetpoint, int elbowSetpoint, boolean movingShoulder, boolean movingElbow) {
-        if (movingShoulder) {
-            if (shoulderRadians() > 0 && shoulderRadians() < 5 * Math.PI / 3) {
-                shoulderSpeed = armsPidController.calculate(shoulderRadians(), shoulderSetpoint);
+    public double[] calculateMotorSpeeds(double shoulderSetpoint, double elbowSetpoint, boolean movingShoulder, boolean movingElbow) {
+        if (Constants.currentMode == Mode.REAL) {
+            if (movingShoulder) {
+                if (shoulderRadians() > Constants.kStopShoulderBackward && shoulderRadians() < Constants.kStopShoulderForward) {
+                    shoulderSpeed = armsPidController.calculate(shoulderRadians(), shoulderSetpoint);
 
-                if (!movingElbow) {
-                    elbowSpeed = -296/322 * shoulderSpeed;
+                    if (!movingElbow) {
+                        elbowSpeed = -296/322 * shoulderSpeed;
+                    }
+                } else {
+                    shoulderSpeed = 0;
                 }
-            } else {
-                shoulderSpeed = 0;
+            } 
+            if (movingElbow) {
+                if (elbowRadians() > Constants.kStopElbowBackward && elbowRadians() < Constants.kStopElbowForward) {
+                    elbowSpeed = armsPidController.calculate(elbowRadians(), elbowSetpoint);
+
+                    if (movingShoulder) {
+                        elbowSpeed += -296/322 * shoulderSpeed;
+                    } 
+                } else {
+                    elbowSpeed = 0;
+                }
             }
-        } 
-        if (movingElbow) {
-            if (elbowRadians() > 0 && elbowRadians() < 5 * Math.PI / 3) {
-                elbowSpeed = armsPidController.calculate(elbowRadians(), elbowSetpoint);
-                if (movingShoulder) {
-                    elbowSpeed += -296/322 * shoulderSpeed;
-                } 
-            } else {
-                elbowSpeed = 0;
+        } else if (Constants.currentMode == Mode.SIM) {
+            if (movingShoulder) {
+                if (shoulderRadians() > Units.radiansToDegrees(Constants.kStopShoulderBackward) && shoulderRadians() < Units.radiansToDegrees(Constants.kStopShoulderForward)) {
+                    if (shoulderRadians() > shoulderSetpoint) {
+                        shoulderSpeed = -0.5;
+                    } else if (shoulderRadians() < shoulderSetpoint) {
+                        shoulderSpeed = 0.5;
+                    }
+
+                    if (!movingElbow) {
+                        elbowSpeed = -296/322 * shoulderSpeed;
+                    }
+                } else {
+                    shoulderSpeed = 0;
+                }
+            } 
+            if (movingElbow) {
+                if (elbowRadians() > Units.radiansToDegrees(Constants.kStopElbowBackward) && elbowRadians() < Units.radiansToDegrees(Constants.kStopElbowForward)) {
+                    elbowSpeed = armsPidController.calculate(elbowRadians(), elbowSetpoint);
+                    if (elbowRadians() > elbowSetpoint) {
+                        elbowSpeed = -0.5;
+                    } else if (elbowRadians() < elbowSetpoint) {
+                        elbowSpeed = 0.5;
+                    }
+
+                    if (movingShoulder) {
+                        elbowSpeed += -296/322 * shoulderSpeed;
+                    } 
+                } else {
+                    elbowSpeed = 0;
+                }
             }
         }
-
         //clamp the speeds between -0.5 & 0.5 for safety & testing
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -0.5, 0.5);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -0.5, 0.5);
