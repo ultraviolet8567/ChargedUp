@@ -1,6 +1,12 @@
 package frc.robot.odometry;
 
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Timer;
+
+import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonPipelineResult;
+
 import edu.wpi.first.math.geometry.Rotation3d;
 
 public class VisionOdometry {
@@ -20,8 +26,8 @@ public class VisionOdometry {
   public VisionOdometry() {}
 
   // counts the number of cameras that have detected something
-  public Integer checkCameras() {
-    Integer count = 0;
+  public int checkCameras() {
+    int count = 0;
 
     for (Camera camera : cameras) {
       if (camera.checkDetections()) {
@@ -30,6 +36,26 @@ public class VisionOdometry {
     }
 
     return count;
+  }
+
+  public ArrayList<Optional<EstimatedRobotPose>> updateVision() {
+    ArrayList<Optional<EstimatedRobotPose>> results = new ArrayList<>();
+    for (int i = 0; i <= 2; i++) {
+        try {
+            Thread.sleep(20);
+            for (Camera camera : cameras) {
+                if (camera.checkDetections()) {
+                    results.add(camera.getEstimate());
+                } else {
+                    results.add(null);
+                }
+            }
+        } catch (InterruptedException e) {
+
+        }
+    }
+
+    return results;
   }
 
   // gets X-translational values from cameras that have detections and averages them
@@ -89,11 +115,5 @@ public class VisionOdometry {
       (roll / checkCameras()), 
       (pitch / checkCameras()), 
       (yaw / checkCameras()));
-  }
-
-  public void updateVision() {
-    for (Camera camera : cameras) {
-      camera.update();
-    }
   }
 }

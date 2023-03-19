@@ -34,7 +34,7 @@ public class Camera {
   }
 
   // updates pose estimator, used for odometry updates
-  public static Optional<EstimatedRobotPose> getEstimate() {
+  public Optional<EstimatedRobotPose> getEstimate() {
     return estimator.update(); // creates estimated robot poses
   }
 
@@ -66,7 +66,7 @@ public class Camera {
     }
   }
 
-  public void update() {
-    camera.getLatestResult();
+  public PhotonPipelineResult update() {
+    return camera.getLatestResult();
   }
 }

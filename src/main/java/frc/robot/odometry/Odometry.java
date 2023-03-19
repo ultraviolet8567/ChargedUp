@@ -39,7 +39,6 @@ public class Odometry extends SubsystemBase {
   public void periodic() {
     // updates gyro
     gyro.updateGyroOdometry();
-    vision.updateVision();
 
     // CCW+
     Logger.getInstance().recordOutput("Odometry/Heading", getHeading().toRotation2d().getRadians());
