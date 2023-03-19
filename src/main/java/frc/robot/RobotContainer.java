@@ -40,6 +40,7 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
         // new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).onTrue(new Stop(swerve));
+        new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new GetValues(odometry));
 
         // these aren't where they are, but rather mere examples for new people who need to see how to configure button bindings
         new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new Cone(intake));

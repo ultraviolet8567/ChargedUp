@@ -174,14 +174,17 @@ public final class Constants {
     public static final class CameraConstants {
 
         public static final Rotation3d[] cameraDirections = new Rotation3d[] { // camera mount directions
-            new Rotation3d(), 
-            new Rotation3d(), 
-            new Rotation3d()
+            new Rotation3d(0, 0, 0), 
+            new Rotation3d(0, 0, Units.degreesToRadians(90)), 
+            new Rotation3d(0, 0, Units.degreesToRadians(180))
         }; 
-        public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from center & flat
-            new Translation3d(), 
-            new Translation3d(), 
-            new Translation3d() //height values are from the ground not from center of robot but others are from center of robot
+        // 1's are values we need to find
+        // TODO: somebody other than chaerin with a working mechanical brain think about this, please?
+        // please :()
+        public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from flat center
+            new Translation3d(1, 1, 1), 
+            new Translation3d(1, 1, 0), 
+            new Translation3d(1, 1, 0) // height values are from the ground not from center of robot but others are from center of robot
         }; 
         public static final Transform3d[] cameraDistances = new Transform3d[] { 
             new Transform3d(cameraDisplacements[0], cameraDirections[0]), 

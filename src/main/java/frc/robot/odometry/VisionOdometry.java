@@ -8,7 +8,6 @@ import org.photonvision.EstimatedRobotPose;
 import edu.wpi.first.math.geometry.Rotation3d;
 
 public class VisionOdometry {
-
   private final Camera camera1 = new Camera(0);
   private final Camera camera2 = new Camera(1);
   private final Camera camera3 = new Camera(2);

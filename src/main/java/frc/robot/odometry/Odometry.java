@@ -4,6 +4,10 @@
 // robot translation (x, y, z)
 // robot heading relative to the field
 
+// things to do with one camera: find the camera transform3ds
+// check odometry
+// see if the get methods actually work
+
 package frc.robot.odometry;
 
 import java.util.ArrayList;
@@ -49,7 +53,6 @@ public class Odometry extends SubsystemBase {
     } else {
         visionDetections = vision.updateVisionOdometry();
     }
-
 }
 
   // i have no idea what this does
@@ -90,7 +93,6 @@ public class Odometry extends SubsystemBase {
     }
   }
 
-
   // depth
   public double getZ() {
     if (visionDetections.isEmpty()) {
@@ -112,6 +114,11 @@ public class Odometry extends SubsystemBase {
     } else {
       return gyro.getHeading();
     }
+  }
+
+  public String getValuesVision() {
+    String thing = "X:" + vision.getX(visionDetections) + " Y:" + vision.getY(visionDetections) + " Z:" + vision.getZ(visionDetections) + " Heading:" + vision.getHeading(visionDetections);
+    return thing;
   }
 
   // weighted average 
