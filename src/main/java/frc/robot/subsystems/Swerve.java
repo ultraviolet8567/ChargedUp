@@ -2,12 +2,10 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.CAN;
@@ -49,37 +47,10 @@ public class Swerve extends SubsystemBase {
         DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
         DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
-    private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    public Swerve() {}
 
-
-    public Swerve() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                gyro.calibrate();
-                resetGyro();
-            } catch (Exception e) {
-            }
-        });
-    }
-
-    public void resetGyro() {
-        gyro.reset();
-    }
-
-    public double getHeading() {
-        // Negate the reading because the navX has CCW- and we need CCW+
-        return Math.IEEEremainder(-gyro.getAngle(), 360);
-    }
-
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
-    }
-
+    @Override
     public void periodic() {
-        // CCW+
-        Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
-
         // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
         Logger.getInstance().recordOutput("SwerveModuleStates/Measured", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
 
@@ -96,13 +67,22 @@ public class Swerve extends SubsystemBase {
         Logger.getInstance().recordOutput("SwerveModuleStates/Setpoints", desiredStates);
     }
 
+    public SwerveModulePosition[] getModulePositions() {
+        return new SwerveModulePosition[] {
+            frontLeft.getModulePosition(), 
+            frontRight.getModulePosition(), 
+            backLeft.getModulePosition(), 
+            backRight.getModulePosition()
+        };
+    }
+
     public void resetEncoders() {
         frontLeft.resetEncoders();
         frontRight.resetEncoders();
         backLeft.resetEncoders();
         backRight.resetEncoders();
     }
-    
+
     public void stopModules() {
         frontLeft.stop();
         frontRight.stop();

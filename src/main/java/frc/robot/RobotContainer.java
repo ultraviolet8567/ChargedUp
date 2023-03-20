@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.*;
+import frc.robot.odometry.*;
 import frc.robot.commands.AutoCommands.AutoDriveOut;
 import frc.robot.subsystems.*;
 import frc.robot.util.ControllerIO;
@@ -16,18 +17,20 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Arms arms = new Arms();
-    // private final Vision vision = new Vision();
-    
-    public static final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
-    public static final Joystick armJoystick = new Joystick(OIConstants.kToggleControllerPort);
+    private final VisionOdometry vision = new VisionOdometry();
+    private final GyroOdometry gyro = new GyroOdometry(swerve);
+    private final Odometry odometry = new Odometry(gyro, vision);
+    private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
+    private static final Joystick armJoystick = new Joystick(OIConstants.kToggleControllerPort);
 
-    public final static ShuffleboardTab cameraTab = Shuffleboard.getTab("Camera");
+    public final static ShuffleboardTab tabOdometry = Shuffleboard.getTab("Odometry");
 
     private String gamePiece = "Cone";
 
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
             swerve,
+            gyro,
             () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getY()),
             () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getX()),
             () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
@@ -45,7 +48,9 @@ public class RobotContainer {
 
     public void configureButtonBindings() {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
-        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(swerve));
+        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
+
+        new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new GetValues(odometry));
         
         new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake, getGamePiece()));
         new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake, getGamePiece()));
