@@ -46,7 +46,7 @@ public class RobotContainer {
 
     public void configureButtonBindings() {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
-        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(swerve));
+        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
 
         new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new GetValues(odometry));
         
