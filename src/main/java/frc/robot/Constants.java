@@ -33,7 +33,7 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
 
-    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.2);
+    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
     public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
     public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.1);
 

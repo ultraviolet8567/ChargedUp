@@ -1,31 +1,25 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake;
 
 public class Drop extends CommandBase {
     private Intake intake;
-    private String gamePiece;
+    private RobotContainer container;
     
-    public Drop(Intake intake, String gamePiece) {
+    public Drop(Intake intake, RobotContainer container) {
         this.intake = intake;
-        this.gamePiece = gamePiece;
+        this.container = container;
     }
-
-    @Override 
-    public void initialize() { }
 
     @Override
     public void execute() {
-        intake.drop(gamePiece);
+        intake.drop(container.getGamePiece());
     }
 
     @Override
     public void end(boolean interrupted) {
         intake.stop();
     }
-
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() { return false; }
 }

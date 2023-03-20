@@ -1,10 +1,7 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Arms;
 
 public class ManipulateArms extends CommandBase {
@@ -13,8 +10,6 @@ public class ManipulateArms extends CommandBase {
   private String direction;
   private double elbowSpeed;
   private double shoulderSpeed;
-  private boolean stop;
-  private Joystick controller;
   
   public ManipulateArms(Arms arms, String joint, String direction) {
     this.arms = arms;
@@ -25,14 +20,6 @@ public class ManipulateArms extends CommandBase {
 
     elbowSpeed = 0;
     shoulderSpeed = 0;
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    controller = RobotContainer.driverJoystick;
-
-    stop = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -53,10 +40,6 @@ public class ManipulateArms extends CommandBase {
           arms.runShoulder(shoulderSpeed);
           arms.runElbow(elbowSpeed);
 
-          if (!controller.getRawButton(XboxController.Button.kX.value)) {
-            stop = true;
-          }
-
         //run shoulder backward
         } else if (direction == "backward" && arms.checkShoulderLocationBackward()) {
           
@@ -67,10 +50,6 @@ public class ManipulateArms extends CommandBase {
           //set shoulder and elbow to determined speeds
           arms.runShoulder(shoulderSpeed);
           arms.runElbow(elbowSpeed);
-
-          if (!controller.getRawButton(XboxController.Button.kY.value)) {
-            stop = true;
-          }
 
         //in case something goes wrong
         } else {
@@ -92,10 +71,6 @@ public class ManipulateArms extends CommandBase {
             arms.runElbow(elbowSpeed);
           }
 
-          if (!controller.getRawButton(XboxController.Button.kB.value)) {
-            stop = true;
-          }
-
           //run elbow backward
         } else if (direction == "backward" && arms.checkElbowLocationBackward()) {
           
@@ -108,10 +83,6 @@ public class ManipulateArms extends CommandBase {
           } else {
             elbowSpeed = -Constants.kMaxElbowSpeed.get();
             arms.runElbow(elbowSpeed);
-          }
-
-          if (!controller.getRawButton(XboxController.Button.kA.value)) {
-            stop = true;
           }
 
         //in case something goes wrong
@@ -127,13 +98,4 @@ public class ManipulateArms extends CommandBase {
     arms.stop();
   }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    if (stop) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 }
