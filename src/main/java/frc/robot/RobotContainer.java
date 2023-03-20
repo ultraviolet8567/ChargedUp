@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ControllerType;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.AutoDriveOut;
 import frc.robot.odometry.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.ControllerIO;
-import frc.robot.util.ControllerIO.ControllerType;
 
 public class RobotContainer {
     private final Swerve swerve = new Swerve();
