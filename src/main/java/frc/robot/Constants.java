@@ -21,30 +21,37 @@ public final class Constants {
      *  - Counterclockwise = z-
      */
 
-    public static final Mode currentMode = Mode.SIM;
-    public static final ModuleType powerDistributionType = ModuleType.kCTRE;
+    public static final Mode currentMode = Mode.REAL;
+    public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
 
     public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.2);
-    public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
-    public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
-    
+    public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
+    public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.1);
+
+    public static final LoggedTunableNumber armP = new LoggedTunableNumber("arm p constant", 0.05);
+     
     //arm absolute encoder ports
     public static final int kShoulderEncoderPort = 0;
     public static final int kElbowEncoderPort = 1;
 
     //arm absolute encoder offset
-    public static final double kShoulderOffset = 0.668;
-    public static final double kElbowOffset = 0.183;
+    public static final double kShoulderOffset = 0.753;
+    public static final double kElbowOffset = 0.658;
  
     //stopping point for shoulder
-    public static final double kStopShoulderForward = 5 * Math.PI / 6;
-    public static final double kStopShoulderBackward = -5 * Math.PI / 6;
-    public static final double kStopShoulderMid = Math.PI;
+    public static final double kShoulderBackLimit = -2.23;
 
-    public static final double kStopElbowBackward = 5 * Math.PI / 6;
-    public static final double kStopElbowForward = -5 * Math.PI / 6;
+    public static final double kStopShoulderForward = 5 * Math.PI / 6;
+    public static final double kStopShoulderMid = Math.PI;
+    public static final double kStopShoulderBackward = -5 * Math.PI / 6;
+
+    public static final double kStopElbowForward = 5 * Math.PI / 6;
     public static final double kStopElbowMid = Math.PI;
+    public static final double kStopElbowBackward = -5 * Math.PI / 6;
+
+    // Arm to elebow gear ratio coefficient
+    public static final double kArmsToElbow = -296 / 322;
 
     //arm preset points TODO: find these points
     public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};

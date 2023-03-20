@@ -13,7 +13,19 @@ public class Drop extends CommandBase {
     }
 
     @Override 
-    public void initialize() {  
+    public void initialize() { }
+
+    @Override
+    public void execute() {
         intake.drop(gamePiece);
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        intake.stop();
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() { return false; }
 }
