@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -17,9 +19,9 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Arms arms = new Arms();
-    private final VisionOdometry vision = new VisionOdometry();
-    private final GyroOdometry gyro = new GyroOdometry(swerve);
-    private final Odometry odometry = new Odometry(gyro, vision);
+    // private final VisionOdometry vision = new VisionOdometry();
+    // private final GyroOdometry gyro = new GyroOdometry(swerve);
+    // private final Odometry odometry = new Odometry(gyro, vision);
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriverControllerPort);
     private static final Joystick armJoystick = new Joystick(OIConstants.kToggleControllerPort);
 
@@ -28,17 +30,19 @@ public class RobotContainer {
     private String gamePiece = "Cone";
 
     public RobotContainer() {
-        swerve.setDefaultCommand(new SwerveTeleOp(
-            swerve,
-            gyro,
-            () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getY()),
-            () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getX()),
-            () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
-            () -> driverJoystick.getRawButton(ControllerIO.getTrigger()),
-            () -> Constants.fieldOriented));
-            // () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonId)));
+        // swerve.setDefaultCommand(new SwerveTeleOp(
+        //     swerve,
+        //     odometry,
+        //     () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getY()),
+        //     () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getX()),
+        //     () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
+        //     () -> driverJoystick.getRawButton(ControllerIO.getTrigger()),
+        //     () -> Constants.fieldOriented));
+        //     // () -> !driverJoystick.getRawButton(OIConstants.kDriverFieldOrientedButtonId)));
 
         arms.setDefaultCommand(new MoveToPreset(arms));
+        
+        Logger.getInstance().recordOutput("GamePiece", "Cone");
 
         configureButtonBindings();
     }
@@ -48,12 +52,10 @@ public class RobotContainer {
 
     public void configureButtonBindings() {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
-        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
-
-        new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new GetValues(odometry));
+        // new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
         
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake, getGamePiece()));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake, getGamePiece()));
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake, this));
+        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake, this));
 
         new JoystickButton(driverJoystick, XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(this, "Cone"));
         new JoystickButton(driverJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(this, "Cube"));
@@ -75,7 +77,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return (new AutoDriveOut(swerve));
+        return null;
+        // return new AutoDriveOut(swerve, odometry);
     }
 
     public String getGamePiece() {

@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
@@ -13,15 +15,15 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         intake = new CANSparkMax(CAN.kIntakePort, MotorType.kBrushless);
-        // gamePiece = RobotContainer.getGamePiece();
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        Logger.getInstance().recordOutput("Speeds/Intake", intake.get());
+    }
 
     public void pickup(String gamePiece) {
         // TODO: Find out which should be negative (cone or cube)
-        
         switch (gamePiece) {
             case "Cone":
                 intake.set(-Constants.intakeSpeed.get());
