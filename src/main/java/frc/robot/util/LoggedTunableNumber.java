@@ -11,7 +11,7 @@ import frc.robot.Constants.Mode;
  */
 public class LoggedTunableNumber {
   private static final String tableKey = "TunableNumbers";
-  private static final boolean tuningMode = (Constants.currentMode == Mode.TUNING);
+  private static final boolean tuningMode = (Constants.currentMode == Mode.TUNING || Constants.currentMode == Mode.REAL);
 
   private final String key;
   private boolean hasDefault = false;

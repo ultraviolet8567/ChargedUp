@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
@@ -11,6 +13,8 @@ public class ManipulateArms extends CommandBase {
   private String direction;
   private double elbowSpeed;
   private double shoulderSpeed;
+  private boolean stop;
+  private Joystick controller;
   
   public ManipulateArms(Arms arms, String joint, String direction) {
     this.arms = arms;
@@ -25,7 +29,11 @@ public class ManipulateArms extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    controller = RobotContainer.driverJoystick;
+
+    stop = false;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
@@ -38,23 +46,31 @@ public class ManipulateArms extends CommandBase {
         if (direction == "forward" && arms.checkShoulderLocationForward()) {
           
           //determine speeds for shoulder and elbow
-          shoulderSpeed = Constants.shoulderSpeed.get();
+          shoulderSpeed = Constants.kMaxShoulderSpeed.get();
           elbowSpeed = -4/5 * shoulderSpeed;
 
           //set shoulder and elbow to determined speeds
           arms.runShoulder(shoulderSpeed);
           arms.runElbow(elbowSpeed);
+
+          if (!controller.getRawButton(XboxController.Button.kX.value)) {
+            stop = true;
+          }
 
         //run shoulder backward
         } else if (direction == "backward" && arms.checkShoulderLocationBackward()) {
           
           //determine speeds for shoulder and elbow
-          shoulderSpeed = -Constants.shoulderSpeed.get();
+          shoulderSpeed = -Constants.kMaxShoulderSpeed.get();
           elbowSpeed = -4/5 * shoulderSpeed;
 
           //set shoulder and elbow to determined speeds
           arms.runShoulder(shoulderSpeed);
           arms.runElbow(elbowSpeed);
+
+          if (!controller.getRawButton(XboxController.Button.kY.value)) {
+            stop = true;
+          }
 
         //in case something goes wrong
         } else {
@@ -67,13 +83,17 @@ public class ManipulateArms extends CommandBase {
           
           //determine and set elbow speed if shoulder is running
           if (arms.shoulderRunning) {
-            elbowSpeed = (-4/5 * shoulderSpeed) + Constants.elbowSpeed.get();
+            elbowSpeed = (-4/5 * shoulderSpeed) + Constants.kMaxElbowSpeed.get();
             arms.runElbow(elbowSpeed);
 
           //determine and set elbow speed if shoulder is NOT running
           } else {
-            elbowSpeed = Constants.elbowSpeed.get();
+            elbowSpeed = Constants.kMaxElbowSpeed.get();
             arms.runElbow(elbowSpeed);
+          }
+
+          if (!controller.getRawButton(XboxController.Button.kB.value)) {
+            stop = true;
           }
 
           //run elbow backward
@@ -81,13 +101,17 @@ public class ManipulateArms extends CommandBase {
           
           //determine and set elbow speed if shoulder is running
           if (arms.shoulderRunning) {
-            elbowSpeed = (-4/5 * shoulderSpeed) - Constants.elbowSpeed.get();
+            elbowSpeed = (-4/5 * shoulderSpeed) - Constants.kMaxElbowSpeed.get();
             arms.runElbow(elbowSpeed);
 
           //determine and set elbow speed if shoulder is NOT running
           } else {
-            elbowSpeed = -Constants.elbowSpeed.get();
+            elbowSpeed = -Constants.kMaxElbowSpeed.get();
             arms.runElbow(elbowSpeed);
+          }
+
+          if (!controller.getRawButton(XboxController.Button.kA.value)) {
+            stop = true;
           }
 
         //in case something goes wrong
@@ -95,15 +119,21 @@ public class ManipulateArms extends CommandBase {
           arms.stopElbow();
         }
       }
-  }
+    }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    arms.stop();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (stop) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

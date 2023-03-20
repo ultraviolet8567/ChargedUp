@@ -16,4 +16,18 @@ public class Pickup extends CommandBase {
     public void initialize() {  
         intake.pickup(gamePiece);
     }
+
+    @Override
+    public void execute() {
+        intake.pickup(gamePiece);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        intake.stop();
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() { return false; }
 }
