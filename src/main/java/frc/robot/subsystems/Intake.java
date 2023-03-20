@@ -5,13 +5,14 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.spline.CubicHermiteSpline;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.GamePiece;
 
 public class Intake extends SubsystemBase {
     CANSparkMax intake;
-    // String gamePiece;
 
     public Intake() {
         intake = new CANSparkMax(CAN.kIntakePort, MotorType.kBrushless);
@@ -20,15 +21,15 @@ public class Intake extends SubsystemBase {
     @Override
     public void periodic() {
         Logger.getInstance().recordOutput("Speeds/Intake", intake.get());
+        Logger.getInstance().recordOutput("Encoders/Intake", intake.getEncoder().getVelocity());
     }
 
-    public void pickup(String gamePiece) {
-        // TODO: Find out which should be negative (cone or cube)
+    public void pickup(GamePiece gamePiece) {
         switch (gamePiece) {
-            case "Cone":
+            case CONE:
                 intake.set(-Constants.intakeSpeed.get());
                 break;
-            case "Cube":
+            case CUBE:
                 intake.set(Constants.intakeSpeed.get());
                 break;
             default:
@@ -36,14 +37,12 @@ public class Intake extends SubsystemBase {
         }
     }
 
-    public void drop(String gamePiece) {
-        // TODO: Find out which should be negative (cone or cube)
-        
+    public void drop(GamePiece gamePiece) {
         switch (gamePiece) {
-            case "Cone":
+            case CONE:
                 intake.set(Constants.intakeSpeed.get());
                 break;
-            case "Cube":
+            case CUBE:
                 intake.set(-Constants.intakeSpeed.get());
                 break;
             default:

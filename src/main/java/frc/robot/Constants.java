@@ -32,8 +32,10 @@ public final class Constants {
     public static final boolean fieldOriented = true;
 
     public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
-    public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
-    public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.1);
+    public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.2);
+    public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
+    public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
+    public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
 
     public static final LoggedTunableNumber armP = new LoggedTunableNumber("arm p constant", 0.05);
      
@@ -134,8 +136,8 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -7.378 + 1.319 - 1.651 - 2.979 - 0.141 + 0.253 - 1.694;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724 - 2.476 + 2.4375 + 0.032;
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -7.378 + 1.319 - 1.651 - 2.979 - 0.141 + 0.253 - 1.694 - 1.506 - 3.103;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724 - 2.476 + 2.4375 + 0.032 - 0.242;
         public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262 - 3.772 - 0.634 - 1.889 + 0.0932 - 0.037;
         public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542 - 2.192 + 3.053 - 0.913 - 0.010 - 0.058;
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
@@ -176,13 +178,10 @@ public final class Constants {
     public static enum Mode {
         // Running on a real robot
         REAL,
-
         // Running a simulator
         SIM,
-
         // In tuning mode
         TUNING,
-
         // Replaying from a log file
         REPLAY
     }
@@ -193,6 +192,10 @@ public final class Constants {
         JOYSTICK
     }
     
+    public static enum GamePiece {
+        CONE,
+        CUBE
+    }
 
     public static final class Camera {
         // Update these constants when cameras are mounted

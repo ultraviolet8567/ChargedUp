@@ -6,7 +6,7 @@ import frc.robot.Constants.OIConstants;
 public final class ControllerIO {
     private static final ControllerType controllerDrive = OIConstants.controllerTypeDrive;
 
-    public static int getY() {
+    public static int getLeftY() {
         switch (controllerDrive) {
             case XBOX:
                 return 1;
@@ -19,7 +19,7 @@ public final class ControllerIO {
         }
     }
 
-    public static int getX() {
+    public static int getLeftX() {
         switch (controllerDrive) {
             case XBOX:
                 return 0;
@@ -29,6 +29,19 @@ public final class ControllerIO {
                 return 0;
             default:
                 return 0;
+        }
+    }
+
+    public static int getRightY() {
+        switch (controllerDrive) {
+            case XBOX:
+                return 5;
+            case LOGITECH:
+                return 5;
+            case JOYSTICK:
+                return 5;
+            default:
+                return 5;
         }
     }
 

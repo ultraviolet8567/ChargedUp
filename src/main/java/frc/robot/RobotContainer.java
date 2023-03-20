@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ControllerType;
+import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.*;
 import frc.robot.commands.auto.AutoDriveOut;
@@ -28,19 +29,20 @@ public class RobotContainer {
 
     public final static ShuffleboardTab tabOdometry = Shuffleboard.getTab("Odometry");
 
-    private String gamePiece = "Cone";
-
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
             swerve,
             gyro,
-            () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getY()),
-            () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getX()),
+            () -> ControllerIO.inversionY() * driverJoystick.getRawAxis(ControllerIO.getLeftY()),
+            () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getLeftX()),
             () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
             () -> OIConstants.controllerTypeDrive == ControllerType.JOYSTICK ? driverJoystick.getRawButton(ControllerIO.getTrigger()) : true,
             () -> Constants.fieldOriented));
 
-        // arms.setDefaultCommand(new MoveToPreset(arms));
+        arms.setDefaultCommand(new ManipulateArmsJoysticks(
+            arms,
+            () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
+            () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
         
         Logger.getInstance().recordOutput("GamePiece", "Cone");
 
@@ -49,21 +51,21 @@ public class RobotContainer {
 
     public void configureButtonBindings() {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
-        // new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
+        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
         
         // Commands to pickup and drop game pieces
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake, this));
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake, this));
+        new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));
+        new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake));
 
         // Commands to change the global game piece value (temporary)
-        new JoystickButton(driverJoystick, XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(this, "Cone"));
-        new JoystickButton(driverJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(this, "Cube"));
+        new JoystickButton(armJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(GamePiece.CONE));
+        new JoystickButton(armJoystick , XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(GamePiece.CUBE));
                 
         // Manual movement
-        new JoystickButton(driverJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
-        new JoystickButton(driverJoystick, XboxController.Button.kY.value).whileTrue(new ManipulateArms(arms, "shoulder", "backward"));   
-        new JoystickButton(driverJoystick, XboxController.Button.kB.value).whileTrue(new ManipulateArms(arms, "elbow", "forward"));   
-        new JoystickButton(driverJoystick, XboxController.Button.kA.value).whileTrue(new ManipulateArms(arms, "elbow", "backward"));
+        new JoystickButton(armJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
+        new JoystickButton(armJoystick, XboxController.Button.kY.value).whileTrue(new ManipulateArms(arms, "shoulder", "backward"));   
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).whileTrue(new ManipulateArms(arms, "elbow", "forward"));   
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).whileTrue(new ManipulateArms(arms, "elbow", "backward"));
     
         // Change preset target
         // new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, "high node"));
@@ -79,12 +81,4 @@ public class RobotContainer {
         return null;
         // return new AutoDriveOut(swerve, odometry);
     }
-
-    public String getGamePiece() {
-        return gamePiece;
-    }
-
-    public void setGamePiece(String gamePiece) {
-        this.gamePiece = gamePiece;
-    } 
 }

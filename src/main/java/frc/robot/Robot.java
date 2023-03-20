@@ -9,10 +9,13 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.GamePiece;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
     private RobotContainer m_robotContainer;
+
+    private static GamePiece gamePiece;
 
     @Override
     public void robotInit() {
@@ -39,11 +42,11 @@ public class Robot extends LoggedRobot {
         switch (Constants.currentMode) {
             case TUNING:
             case REAL:
-                logger.addDataReceiver(new WPILOGWriter("C:/Users/Wellesley FRC 8567/Desktop/Logs"));
+                logger.addDataReceiver(new WPILOGWriter("C:\\Users\\Wellesley FRC 8567\\Desktop\\Logs"));
                 logger.addDataReceiver(new NT4Publisher());
                 break;
             case SIM:
-                logger.addDataReceiver(new WPILOGWriter("C:/Users/kaldr/OneDrive/Documents/FRCProjects/Logging/Simulator logs"));
+                logger.addDataReceiver(new WPILOGWriter("C:\\Users\\kaldr\\OneDrive\\Documents\\FRCProjects\\Logging\\Simulator logs"));
                 logger.addDataReceiver(new NT4Publisher());
                 break;
             case REPLAY:
@@ -59,8 +62,7 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer
         m_robotContainer = new RobotContainer();
 
-        // Testing
-        Logger.getInstance().recordOutput("Scheduled", false);
+        gamePiece = GamePiece.CONE;
     }
 
     @Override
@@ -117,4 +119,13 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void simulationPeriodic() {}
+
+    // Global gamepiece mechanism
+    public static GamePiece getGamePiece() {
+        return gamePiece;
+    }
+
+    public static void setGamePiece(GamePiece gp) {
+        gamePiece = gp;
+    }
 }
