@@ -83,9 +83,9 @@ public class GyroOdometry {
     public void slopeCalc() {
         estimator.update(getRotation2d(), swerve.getModulePositions());
         double pΔX = getX() - lastX;
-        double aΔX = pΔX * Math.cos(getHeading().getX());
+        double aΔX = pΔX * Math.cos(getHeading().getY());
         double aCurrentX = lastX + aΔX;
-        Pose2d updatedPose = new Pose2d(new Translation2d(getY(), aCurrentX), getRotation2d());
+        Pose2d updatedPose = new Pose2d(new Translation2d(aCurrentX, getY()), getRotation2d());
         // hope and pray that this sets the current position to the updatedPose and doesn't just break things
         estimator.resetPosition(gyro.getRotation2d(), modulePositions, updatedPose);
     }
