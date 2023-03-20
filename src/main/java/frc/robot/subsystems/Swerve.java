@@ -8,11 +8,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.CAN;
 
 public class Swerve extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
-        DriveConstants.kFrontLeftDriveMotorPort,
-        DriveConstants.kFrontLeftTurningMotorPort,
+        CAN.kFrontLeftDriveMotorPort,
+        CAN.kFrontLeftTurningMotorPort,
         DriveConstants.kFrontLeftDriveEncoderReversed,
         DriveConstants.kFrontLeftTurningEncoderReversed,
         DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
@@ -20,8 +21,8 @@ public class Swerve extends SubsystemBase {
         DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
 
     private final SwerveModule frontRight = new SwerveModule(
-        DriveConstants.kFrontRightDriveMotorPort,
-        DriveConstants.kFrontRightTurningMotorPort,
+        CAN.kFrontRightDriveMotorPort,
+        CAN.kFrontRightTurningMotorPort,
         DriveConstants.kFrontRightDriveEncoderReversed,
         DriveConstants.kFrontRightTurningEncoderReversed,
         DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
@@ -29,8 +30,8 @@ public class Swerve extends SubsystemBase {
         DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
     
     private final SwerveModule backLeft = new SwerveModule(
-        DriveConstants.kBackLeftDriveMotorPort,
-        DriveConstants.kBackLeftTurningMotorPort,
+        CAN.kBackLeftDriveMotorPort,
+        CAN.kBackLeftTurningMotorPort,
         DriveConstants.kBackLeftDriveEncoderReversed,
         DriveConstants.kBackLeftTurningEncoderReversed,
         DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
@@ -38,8 +39,8 @@ public class Swerve extends SubsystemBase {
         DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
     
     private final SwerveModule backRight = new SwerveModule(
-        DriveConstants.kBackRightDriveMotorPort,
-        DriveConstants.kBackRightTurningMotorPort,
+        CAN.kBackRightDriveMotorPort,
+        CAN.kBackRightTurningMotorPort,
         DriveConstants.kBackRightDriveEncoderReversed,
         DriveConstants.kBackRightTurningEncoderReversed,
         DriveConstants.kBackRightDriveAbsoluteEncoderPort,
@@ -52,6 +53,8 @@ public class Swerve extends SubsystemBase {
     public void periodic() {
         // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
         Logger.getInstance().recordOutput("SwerveModuleStates/Measured", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
+
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
     }
     
     public void setModuleStates(SwerveModuleState[] desiredStates) {

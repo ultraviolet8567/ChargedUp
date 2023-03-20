@@ -2,35 +2,52 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.CAN;
 
 public class Intake extends SubsystemBase {
-    
     CANSparkMax intake;
-    double intakeSpeed;
+    // String gamePiece;
 
     public Intake() {
-        // TODO: find ID
-        // intake = new CANSparkMax(98, MotorType.kBrushless);
-        // intakeSpeed = 4.0;
+        intake = new CANSparkMax(CAN.kIntakePort, MotorType.kBrushless);
+        // gamePiece = RobotContainer.getGamePiece();
     }
 
     @Override
-    public void periodic() { 
+    public void periodic() {}
+
+    public void pickup(String gamePiece) {
+        // TODO: Find out which should be negative (cone or cube)
         
+        switch (gamePiece) {
+            case "Cone":
+                intake.set(-Constants.intakeSpeed.get());
+                break;
+            case "Cube":
+                intake.set(Constants.intakeSpeed.get());
+                break;
+            default:
+                break;
+        }
     }
 
-    public void pickupCone(double intakeSpeed) {
-        // intake.set(intakeSpeed);
+    public void drop(String gamePiece) {
+        // TODO: Find out which should be negative (cone or cube)
+        
+        switch (gamePiece) {
+            case "Cone":
+                intake.set(Constants.intakeSpeed.get());
+                break;
+            case "Cube":
+                intake.set(-Constants.intakeSpeed.get());
+                break;
+            default:
+                break;
+        }
     }
 
-    public void pickupCube(double intakeSpeed) {
-        //TODO: Find out which motor is negative
-        // intake.set(-1 * intakeSpeed);
+    public void stop() {
+        intake.stopMotor();
     }
-
-    public double getSpd() {
-        // return intakeSpeed;
-        return 0.0;
-    }
-
 }

@@ -15,6 +15,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.ControllerIO.ControllerType;
 
 public final class Constants {
     /** General info
@@ -28,10 +29,56 @@ public final class Constants {
      *  - Counterclockwise = z-
      */
 
-    public static final Mode currentMode = Mode.REAL;
+    public static final Mode currentMode = Mode.SIM;
     public static final ModuleType powerDistributionType = ModuleType.kCTRE;
     public static final boolean fieldOriented = true;
+
+    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.2);
+    public static final LoggedTunableNumber shoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.1);
+    public static final LoggedTunableNumber elbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
     
+    //arm absolute encoder ports
+    public static final int kShoulderEncoderPort = 0;
+    public static final int kElbowEncoderPort = 1;
+
+    //arm absolute encoder offset
+    public static final double kShoulderOffset = 0.668;
+    public static final double kElbowOffset = 0.183;
+ 
+    //stopping point for shoulder
+    public static final double kStopShoulderForward = 5 * Math.PI / 6;
+    public static final double kStopShoulderBackward = -5 * Math.PI / 6;
+    public static final double kStopShoulderMid = Math.PI;
+
+    public static final double kStopElbowBackward = 5 * Math.PI / 6;
+    public static final double kStopElbowForward = -5 * Math.PI / 6;
+    public static final double kStopElbowMid = Math.PI;
+
+    //arm preset points TODO: find these points
+    public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
+    public static final double[] kMidNodeSetpoints = new double[] { 0, 0 };
+    public static final double[] kHybridNodeSetpoints = new double[] { -Math.PI / 2, -Math.PI / 2 };
+    public static final double[] kGroundIntakeSetpoints = new double[] { 0, 0 };
+    public static final double[] kHighIntakeSetpoints = new double[] { 0, 0 };
+    public static final double[] kStartingSetpoints = new double[] { 0, 0 };
+    public static final double[] kTaxiSetpoints = new double[] { 0, 0 };
+
+    public static final class CAN {
+        public static final int kIntakePort = 3;
+        public static final int kElbowPort = 2;
+        public static final int kShoulderPort = 4;
+
+        public static final int kFrontLeftDriveMotorPort = 11;
+        public static final int kFrontRightDriveMotorPort = 12;
+        public static final int kBackLeftDriveMotorPort = 14;
+        public static final int kBackRightDriveMotorPort = 13;
+
+        public static final int kFrontLeftTurningMotorPort = 21;
+        public static final int kFrontRightTurningMotorPort = 22;
+        public static final int kBackLeftTurningMotorPort = 24;
+        public static final int kBackRightTurningMotorPort = 23;
+    }
+
     public static final class ModuleConstants {
         // Have to calculate using specs for the MK4i
         public static final double kWheelDiameterMeters = Units.inchesToMeters(3.75);
@@ -59,18 +106,7 @@ public final class Constants {
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
                 new Translation2d(-kWheelBase / 2, kTrackWidth / 2), // Back left (-/+)
                 new Translation2d(-kWheelBase / 2, -kTrackWidth / 2)); // Back right (-/-)
-
-        // Edit to use the right CAN ports
-        public static final int kFrontLeftDriveMotorPort = 11;
-        public static final int kFrontRightDriveMotorPort = 12;
-        public static final int kBackLeftDriveMotorPort = 13;
-        public static final int kBackRightDriveMotorPort = 14;
-
-        public static final int kFrontLeftTurningMotorPort = 21;
-        public static final int kFrontRightTurningMotorPort = 22;
-        public static final int kBackLeftTurningMotorPort = 23;
-        public static final int kBackRightTurningMotorPort = 24;
-
+                
         // Edit depending on specs of MK4i
         public static final boolean kFrontLeftTurningEncoderReversed = true;
         public static final boolean kFrontRightTurningEncoderReversed = true;
@@ -93,16 +129,15 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 4.305 + 2.600 - 2.149;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.172 - 2.892 + 2.485;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 0.268 - 1.794 + 1.865;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 0.610 + 2.111 - 2.119;
-
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -7.378 + 1.319 - 1.651 - 2.979 - 0.141 + 0.253 - 1.694;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724 - 2.476 + 2.4375 + 0.032;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262 - 3.772 - 0.634 - 1.889 + 0.0932 - 0.037;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542 - 2.192 + 3.053 - 0.913 - 0.010 - 0.058;
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 4;
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 4;
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 2;
+        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 2 * 0.4;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }
@@ -124,13 +159,11 @@ public final class Constants {
     }
 
     public static final class OIConstants {
-        public static final ControllerType controllerType = ControllerType.XBOX;
+        public static final ControllerType controllerType = ControllerType.JOYSTICK;
         
         public static final int kDriverControllerPort = 0;
+        public static final int kToggleControllerPort = 1;
 
-        public static final int kDriverYAxis = 1;
-        public static final int kDriverXAxis = 0;
-        public static final int kDriverRotAxis = controllerType == ControllerType.XBOX ? 4 : 2;
         public static final int kDriverFieldOrientedButtonId = XboxController.Button.kStart.value;
 
         public static final double kDeadband = 0.15;
@@ -148,11 +181,6 @@ public final class Constants {
 
         // Replaying from a log file
         REPLAY
-    }
-
-    public static enum ControllerType {
-        XBOX,
-        LOGITECH
     }
 
     // fx = camera horizontal focal length (pixels)

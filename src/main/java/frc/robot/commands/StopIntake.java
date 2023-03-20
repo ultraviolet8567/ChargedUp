@@ -3,16 +3,15 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
 
-public class Cone extends CommandBase {
+public class StopIntake extends CommandBase {
     private Intake intake;
-    
-    public Cone(Intake intake) {
+
+    public StopIntake(Intake intake) {
         this.intake = intake;
     }
 
-    @Override 
+    @Override
     public void initialize() {
-        intake.pickupCone(intake.getSpd());
+        intake.stop();
     }
-
 }

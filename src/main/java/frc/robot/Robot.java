@@ -58,6 +58,9 @@ public class Robot extends LoggedRobot {
 
         // Instantiate our RobotContainer
         m_robotContainer = new RobotContainer();
+
+        // Testing
+        Logger.getInstance().recordOutput("Scheduled", false);
     }
 
     @Override
@@ -82,6 +85,10 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
+
+        // Testing
+        
+        Logger.getInstance().recordOutput("Scheduled", m_autonomousCommand.isScheduled());
     }
 
     @Override
