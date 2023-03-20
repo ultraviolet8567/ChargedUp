@@ -10,44 +10,44 @@
 
 package frc.robot.odometry;
 
-// import java.util.ArrayList;
-// import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Optional;
 
-// import org.littletonrobotics.junction.Logger;
-// import org.photonvision.EstimatedRobotPose;
+import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
-// import edu.wpi.first.math.MathUtil;
-// import edu.wpi.first.math.geometry.Pose3d;
-// import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.geometry.Rotation3d;
-// import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Odometry extends SubsystemBase {
 
-//   GyroOdometry gyro;
-//   VisionOdometry vision;
+  GyroOdometry gyro;
+  VisionOdometry vision;
 
-//   int count = 0;
-//   ArrayList<Optional<EstimatedRobotPose>> visionDetections;
+  int count = 0;
+  ArrayList<Optional<EstimatedRobotPose>> visionDetections;
 
 //   // TODO: find the actual value
-//   private double framerate = 30;
+  private final double framerate = 30;
 
-//   private double maxHeadingError = 0.02 * 2 * Math.PI; // number before * 2 * Math.PI is the maximum percent error allowed, tweak it
+  private final double maxHeadingError = 0.02 * 2 * Math.PI; // number before * 2 * Math.PI is the maximum percent error allowed, tweak it
 
-//   public Odometry(GyroOdometry gyro, VisionOdometry vision) {
-//     this.gyro = gyro;
-//     this.vision = vision;
-//   }
+  public Odometry(GyroOdometry gyro, VisionOdometry vision) {
+    this.gyro = gyro;
+    this.vision = vision;
+  }
 
-//   @Override
-//   public void periodic() {
+  @Override
+  public void periodic() {
 //     // updates gyro
 //     gyro.updateGyroOdometry();
 
 //     // CCW+
-//     Logger.getInstance().recordOutput("Odometry/Heading", getHeading().toRotation2d().getRadians());
+    // Logger.getInstance().recordOutput("Odometry/Heading", getHeading2d().getRadians());
     // Logger.getInstance().recordOutput("Vision/Values", getValuesVision());
   
 //     if (count <= 2) {
@@ -55,7 +55,7 @@ public class Odometry extends SubsystemBase {
 //     } else {
 //         visionDetections = vision.updateVisionOdometry();
 //     }
-// }
+  }
 
 //   // i have no idea what this does
 //   public double calculateVisionPercent() {

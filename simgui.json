@@ -3,6 +3,13 @@
     "types": {
       "/AdvantageKit/RealOutputs/Mechanisms": "Mechanism2d",
       "/FMSInfo": "FMSInfo"
+    },
+    "windows": {
+      "/AdvantageKit/RealOutputs/Mechanisms": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {

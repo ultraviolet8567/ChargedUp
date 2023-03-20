@@ -1,51 +1,59 @@
 package frc.robot.odometry;
 
-// import com.kauailabs.navx.frc.AHRS;
+import org.littletonrobotics.junction.Logger;
 
-// import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-// import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.geometry.Rotation3d;
-// import edu.wpi.first.math.geometry.Translation2d;
-// import edu.wpi.first.math.kinematics.SwerveModulePosition;
-// import edu.wpi.first.wpilibj.SPI;
-// import frc.robot.Constants.DriveConstants;
-// import frc.robot.subsystems.Swerve;
+import com.kauailabs.navx.frc.AHRS;
 
-public class GyroOdometry {
-//     Swerve swerve;
-//     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-//     SwerveModulePosition[] modulePositions;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.Swerve;
+
+public class GyroOdometry extends SubsystemBase {
+    Swerve swerve;
+    private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    SwerveModulePosition[] modulePositions;
   
-//     boolean onSlope;
-//     private double lastX;
-//     // private double slopeY;
+    boolean onSlope;
+    private double lastX;
+    // private double slopeY;
     
-//     private static double minimumAngle = 0.03; // minimum angle for slope in radians
+    private static double minimumAngle = 0.03; // minimum angle for slope in radians
 
 //     // the pose2d is the starting pose estimate of the robot 
 //     // TODO: (find initial position)
 //     // the pose2d says 'constructs a pose at origin facing towards the positive x axis' --> x is forwards? 
-//     public SwerveDrivePoseEstimator estimator;
+    public SwerveDrivePoseEstimator estimator;
 
-//     public GyroOdometry(Swerve swerve) {
-//         this.swerve = swerve;
-//         modulePositions = swerve.getModulePositions();
-//         onSlope = false;
-//         estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
-//         new Thread(() -> {
-//             try {
-//                 Thread.sleep(100);
-//                 gyro.calibrate();
-//                 resetGyro();
-//             } catch (Exception e) { }
-//         });
-//     }
+    public GyroOdometry(Swerve swerve) {
+        this.swerve = swerve;
+        modulePositions = swerve.getModulePositions();
+        onSlope = false;
+        estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
+        new Thread(() -> {
+            try {
+                Thread.sleep(100);
+                gyro.calibrate();
+                resetGyro();
+            } catch (Exception e) { }
+        });
+    }
+
+    @Override
+    public void periodic() {
+        Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
+    }
 
 //     // on pit setup day, take robot to corner of field and record as 0
-//     public void resetGyro() {
-//         gyro.reset();
-//     }
+    public void resetGyro() {
+        gyro.reset();
+    }
 
 //     // updates the pose estimator, runs in periodic
 //     public void updateGyroOdometry() {
@@ -103,10 +111,10 @@ public class GyroOdometry {
 //             toRadians(gyro.getYaw()));
 //     } 
 
-//     public Rotation2d getRotation2d() {
-//         // Negate the reading because the navX has CCW- and we need CCW+
-//         return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
-//     }
+    public Rotation2d getRotation2d() {
+        // Negate the reading because the navX has CCW- and we need CCW+
+        return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
+    }
 
 //     // gets X-translational value
 //     public double getX() {

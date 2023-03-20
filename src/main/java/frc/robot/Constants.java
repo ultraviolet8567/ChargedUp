@@ -12,7 +12,6 @@ import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.ControllerIO.ControllerType;
@@ -59,7 +58,7 @@ public final class Constants {
     public static final double kStopElbowBackward = -5 * Math.PI / 6;
 
     // Arm to elebow gear ratio coefficient
-    public static final double kArmsToElbow = -296 / 322;
+    public static final double kArmsToElbow = -296.0 / 322.0;
 
     //arm preset points TODO: find these points
     public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
@@ -166,12 +165,11 @@ public final class Constants {
     }
 
     public static final class OIConstants {
-        public static final ControllerType controllerType = ControllerType.JOYSTICK;
+        public static final ControllerType controllerTypeDrive = ControllerType.XBOX;
+        public static final ControllerType controllerTypeArms = ControllerType.XBOX;
         
-        public static final int kDriverControllerPort = 0;
-        public static final int kToggleControllerPort = 1;
-
-        public static final int kDriverFieldOrientedButtonId = XboxController.Button.kStart.value;
+        public static final int kDriveControllerPort = 0;
+        public static final int kArmControllerPort = 1;
 
         public static final double kDeadband = 0.15;
     }
@@ -190,23 +188,26 @@ public final class Constants {
         REPLAY
     }
 
-    // fx = camera horizontal focal length (pixels)
-    public static final Double fx = 384.922;
-    // fy = camera vertical focal length (pixels)
-    public static final Double fy = 384.922;
-    // cx = camera horizontal focal center (pixels)
-    public static final Double cx = 318.720;
-    // cy = camera vertical focal center (pixels)
-    public static final Double cy = 238.373;
+    public static final class AprilTagDimensions {
+        // fx = camera horizontal focal length (pixels)
+        public static final Double fx = 384.922;
+        // fy = camera vertical focal length (pixels)
+        public static final Double fy = 384.922;
+        // cx = camera horizontal focal center (pixels)
+        public static final Double cx = 318.720;
+        // cy = camera vertical focal center (pixels)
+        public static final Double cy = 238.373;
 
-    // size of AprilTag
-    public static final Double tagSize = Units.inchesToMeters(8);
-    // height of AprilTag at dropoff stations
-    public static final Double tagHeight = Units.inchesToMeters(12 + (11 / 4));
-    // size of AprilTag image on Sid's computer with the pdf open in firefox at 100% zoom
-    public static final Double testTagSize = Units.inchesToMeters(4 + (9/16));
+        // size of AprilTag
+        public static final Double tagSize = Units.inchesToMeters(8);
+        // height of AprilTag at dropoff stations
+        public static final Double tagHeight = Units.inchesToMeters(12 + (11 / 4));
+        // size of AprilTag image on Sid's computer with the pdf open in firefox at 100% zoom
+        public static final Double testTagSize = Units.inchesToMeters(4 + (9/16));
+    }
 
-    public static final class CameraConstants {
+    public static final class Camera {
+        // Update these constants when cameras are mounted
 
         public static final Rotation3d[] cameraDirections = new Rotation3d[] { // camera mount directions
             new Rotation3d(0, 0, 0), 
@@ -226,150 +227,8 @@ public final class Constants {
             new Transform3d(cameraDisplacements[1], cameraDirections[1]), 
             new Transform3d(cameraDisplacements[2], cameraDirections[2])
         };
-        
-        // bad test values. update when actually mounted.
     }
 
-    public static final class LoadingZone {
-    // Region dimensions
-    public static final double width = Units.inchesToMeters(99.0);
-    public static final double innerX = FieldConstants.fieldLength;
-    public static final double midX = FieldConstants.fieldLength - Units.inchesToMeters(132.25);
-    public static final double outerX = FieldConstants.fieldLength - Units.inchesToMeters(264.25);
-    public static final double leftY = FieldConstants.fieldWidth;
-    public static final double midY = leftY - Units.inchesToMeters(50.5);
-    public static final double rightY = leftY - width;
-    public static final Translation2d[] regionCorners =
-        new Translation2d[] {
-          new Translation2d(
-              midX, rightY), // Start at lower left next to border with opponent community
-          new Translation2d(midX, midY),
-          new Translation2d(outerX, midY),
-          new Translation2d(outerX, leftY),
-          new Translation2d(innerX, leftY),
-          new Translation2d(innerX, rightY),
-        };
-
-    // Double substation dimensions
-    public static final double doubleSubstationLength = Units.inchesToMeters(14.0);
-    public static final double doubleSubstationX = innerX - doubleSubstationLength;
-    public static final double doubleSubstationShelfZ = Units.inchesToMeters(37.375);
-    public static final double doubleSubstationCenterY = FieldConstants.fieldWidth - Units.inchesToMeters(49.76);
-
-    // Single substation dimensions
-    public static final double singleSubstationWidth = Units.inchesToMeters(22.75);
-    public static final double singleSubstationLeftX =
-        FieldConstants.fieldLength - doubleSubstationLength - Units.inchesToMeters(88.77);
-    public static final double singleSubstationCenterX =
-        singleSubstationLeftX + (singleSubstationWidth / 2.0);
-    public static final double singleSubstationRightX =
-        singleSubstationLeftX + singleSubstationWidth;
-    public static final Translation2d singleSubstationTranslation =
-        new Translation2d(singleSubstationCenterX, leftY);
-
-    public static final double singleSubstationHeight = Units.inchesToMeters(18.0);
-    public static final double singleSubstationLowZ = Units.inchesToMeters(27.125);
-    public static final double singleSubstationCenterZ =
-        singleSubstationLowZ + (singleSubstationHeight / 2.0);
-    public static final double singleSubstationHighZ =
-        singleSubstationLowZ + singleSubstationHeight;
-  }
-
-      public static final class Grids {
-        // X layout
-        public static final double outerX = Units.inchesToMeters(54.25);
-        public static final double lowX =
-            outerX - (Units.inchesToMeters(14.25) / 2.0); // Centered when under cube nodes
-        public static final double midX = outerX - Units.inchesToMeters(22.75);
-        public static final double highX = outerX - Units.inchesToMeters(39.75);
-
-        // Y layout
-        public static final int nodeRowCount = 9;
-        public static final double[] nodeY =
-            FieldConstants.isWPIField
-                ? new double[] {
-                Units.inchesToMeters(20.19 + 22.0 * 0),
-                Units.inchesToMeters(20.19 + 22.0 * 1),
-                Units.inchesToMeters(20.19 + 22.0 * 2),
-                Units.inchesToMeters(20.19 + 22.0 * 3),
-                Units.inchesToMeters(20.19 + 22.0 * 4),
-                Units.inchesToMeters(20.19 + 22.0 * 5),
-                Units.inchesToMeters(20.19 + 22.0 * 6),
-                Units.inchesToMeters(20.19 + 22.0 * 7),
-                Units.inchesToMeters(20.19 + 22.0 * 8 + 2.5)
-                }
-                : new double[] {
-                Units.inchesToMeters(20.19 + 22.0 * 0),
-                Units.inchesToMeters(20.19 + 22.0 * 1),
-                Units.inchesToMeters(20.19 + 22.0 * 2),
-                Units.inchesToMeters(20.19 + 22.0 * 3),
-                Units.inchesToMeters(20.19 + 22.0 * 4),
-                Units.inchesToMeters(20.19 + 22.0 * 5),
-                Units.inchesToMeters(20.19 + 22.0 * 6),
-                Units.inchesToMeters(20.19 + 22.0 * 7),
-                Units.inchesToMeters(20.19 + 22.0 * 8)
-                };
-
-        // Z layout
-        public static final double cubeEdgeHigh = Units.inchesToMeters(3.0);
-        public static final double highCubeZ = Units.inchesToMeters(35.5) - cubeEdgeHigh;
-        public static final double midCubeZ = Units.inchesToMeters(23.5) - cubeEdgeHigh;
-        public static final double highConeZ = Units.inchesToMeters(46.0);
-        public static final double midConeZ = Units.inchesToMeters(34.0);
-
-        // Translations (all nodes in the same column/row have the same X/Y coordinate)
-        public static final Translation2d[] lowTranslations = new Translation2d[nodeRowCount];
-        public static final Translation3d[] low3dTranslations = new Translation3d[nodeRowCount];
-        public static final Translation2d[] midTranslations = new Translation2d[nodeRowCount];
-        public static final Translation3d[] mid3dTranslations = new Translation3d[nodeRowCount];
-        public static final Translation2d[] highTranslations = new Translation2d[nodeRowCount];
-        public static final Translation3d[] high3dTranslations = new Translation3d[nodeRowCount];
-
-        static {
-        for (int i = 0; i < nodeRowCount; i++) {
-            boolean isCube = i == 1 || i == 4 || i == 7;
-            lowTranslations[i] = new Translation2d(lowX, nodeY[i]);
-            low3dTranslations[i] = new Translation3d(lowX, nodeY[i], 0.0);
-            midTranslations[i] = new Translation2d(midX, nodeY[i]);
-            mid3dTranslations[i] = new Translation3d(midX, nodeY[i], isCube ? midCubeZ : midConeZ);
-            highTranslations[i] = new Translation2d(highX, nodeY[i]);
-            high3dTranslations[i] = new Translation3d(highX, nodeY[i], isCube ? highCubeZ : highConeZ);
-        }
-        }
-        // Complex low layout (shifted to account for cube vs cone rows and wide edge nodes)
-        public static final double complexLowXCones =
-            outerX - Units.inchesToMeters(16.0) / 2.0; // Centered X under cone nodes
-        public static final double complexLowXCubes = lowX; // Centered X under cube nodes
-        public static final double complexLowOuterYOffset =
-            nodeY[0] - (Units.inchesToMeters(3.0) + (Units.inchesToMeters(25.75) / 2.0));
-
-        public static final Translation2d[] complexLowTranslations =
-            new Translation2d[] {
-            new Translation2d(complexLowXCones, nodeY[0] - complexLowOuterYOffset),
-            new Translation2d(complexLowXCubes, nodeY[1]),
-            new Translation2d(complexLowXCones, nodeY[2]),
-            new Translation2d(complexLowXCones, nodeY[3]),
-            new Translation2d(complexLowXCubes, nodeY[4]),
-            new Translation2d(complexLowXCones, nodeY[5]),
-            new Translation2d(complexLowXCones, nodeY[6]),
-            new Translation2d(complexLowXCubes, nodeY[7]),
-            new Translation2d(complexLowXCones, nodeY[8] + complexLowOuterYOffset),
-            };
-
-        public static final Translation3d[] complexLow3dTranslations =
-            new Translation3d[] {
-            new Translation3d(complexLowXCones, nodeY[0] - complexLowOuterYOffset, 0.0),
-            new Translation3d(complexLowXCubes, nodeY[1], 0.0),
-            new Translation3d(complexLowXCones, nodeY[2], 0.0),
-            new Translation3d(complexLowXCones, nodeY[3], 0.0),
-            new Translation3d(complexLowXCubes, nodeY[4], 0.0),
-            new Translation3d(complexLowXCones, nodeY[5], 0.0),
-            new Translation3d(complexLowXCones, nodeY[6], 0.0),
-            new Translation3d(complexLowXCubes, nodeY[7], 0.0),
-            new Translation3d(complexLowXCones, nodeY[8] + complexLowOuterYOffset, 0.0),
-            };
-    }
-    
     public static final class FieldConstants {
         public static final boolean isWPIField = false; // Red alliance
         public static final double fieldLength = Units.inchesToMeters(651.25);
@@ -497,5 +356,145 @@ public final class Constants {
                           new Rotation3d()))),
               fieldLength,
               fieldWidth);
+    }
+
+    public static final class LoadingZone {
+        // Region dimensions
+        public static final double width = Units.inchesToMeters(99.0);
+        public static final double innerX = FieldConstants.fieldLength;
+        public static final double midX = FieldConstants.fieldLength - Units.inchesToMeters(132.25);
+        public static final double outerX = FieldConstants.fieldLength - Units.inchesToMeters(264.25);
+        public static final double leftY = FieldConstants.fieldWidth;
+        public static final double midY = leftY - Units.inchesToMeters(50.5);
+        public static final double rightY = leftY - width;
+        public static final Translation2d[] regionCorners =
+            new Translation2d[] {
+              new Translation2d(
+                  midX, rightY), // Start at lower left next to border with opponent community
+              new Translation2d(midX, midY),
+              new Translation2d(outerX, midY),
+              new Translation2d(outerX, leftY),
+              new Translation2d(innerX, leftY),
+              new Translation2d(innerX, rightY),
+            };
+    
+        // Double substation dimensions
+        public static final double doubleSubstationLength = Units.inchesToMeters(14.0);
+        public static final double doubleSubstationX = innerX - doubleSubstationLength;
+        public static final double doubleSubstationShelfZ = Units.inchesToMeters(37.375);
+        public static final double doubleSubstationCenterY = FieldConstants.fieldWidth - Units.inchesToMeters(49.76);
+    
+        // Single substation dimensions
+        public static final double singleSubstationWidth = Units.inchesToMeters(22.75);
+        public static final double singleSubstationLeftX =
+            FieldConstants.fieldLength - doubleSubstationLength - Units.inchesToMeters(88.77);
+        public static final double singleSubstationCenterX =
+            singleSubstationLeftX + (singleSubstationWidth / 2.0);
+        public static final double singleSubstationRightX =
+            singleSubstationLeftX + singleSubstationWidth;
+        public static final Translation2d singleSubstationTranslation =
+            new Translation2d(singleSubstationCenterX, leftY);
+    
+        public static final double singleSubstationHeight = Units.inchesToMeters(18.0);
+        public static final double singleSubstationLowZ = Units.inchesToMeters(27.125);
+        public static final double singleSubstationCenterZ =
+            singleSubstationLowZ + (singleSubstationHeight / 2.0);
+        public static final double singleSubstationHighZ =
+            singleSubstationLowZ + singleSubstationHeight;
+      }
+
+      public static final class Grids {
+        // X layout
+        public static final double outerX = Units.inchesToMeters(54.25);
+        public static final double lowX =
+            outerX - (Units.inchesToMeters(14.25) / 2.0); // Centered when under cube nodes
+        public static final double midX = outerX - Units.inchesToMeters(22.75);
+        public static final double highX = outerX - Units.inchesToMeters(39.75);
+
+        // Y layout
+        public static final int nodeRowCount = 9;
+        public static final double[] nodeY =
+            FieldConstants.isWPIField
+                ? new double[] {
+                Units.inchesToMeters(20.19 + 22.0 * 0),
+                Units.inchesToMeters(20.19 + 22.0 * 1),
+                Units.inchesToMeters(20.19 + 22.0 * 2),
+                Units.inchesToMeters(20.19 + 22.0 * 3),
+                Units.inchesToMeters(20.19 + 22.0 * 4),
+                Units.inchesToMeters(20.19 + 22.0 * 5),
+                Units.inchesToMeters(20.19 + 22.0 * 6),
+                Units.inchesToMeters(20.19 + 22.0 * 7),
+                Units.inchesToMeters(20.19 + 22.0 * 8 + 2.5)
+                }
+                : new double[] {
+                Units.inchesToMeters(20.19 + 22.0 * 0),
+                Units.inchesToMeters(20.19 + 22.0 * 1),
+                Units.inchesToMeters(20.19 + 22.0 * 2),
+                Units.inchesToMeters(20.19 + 22.0 * 3),
+                Units.inchesToMeters(20.19 + 22.0 * 4),
+                Units.inchesToMeters(20.19 + 22.0 * 5),
+                Units.inchesToMeters(20.19 + 22.0 * 6),
+                Units.inchesToMeters(20.19 + 22.0 * 7),
+                Units.inchesToMeters(20.19 + 22.0 * 8)
+                };
+
+        // Z layout
+        public static final double cubeEdgeHigh = Units.inchesToMeters(3.0);
+        public static final double highCubeZ = Units.inchesToMeters(35.5) - cubeEdgeHigh;
+        public static final double midCubeZ = Units.inchesToMeters(23.5) - cubeEdgeHigh;
+        public static final double highConeZ = Units.inchesToMeters(46.0);
+        public static final double midConeZ = Units.inchesToMeters(34.0);
+
+        // Translations (all nodes in the same column/row have the same X/Y coordinate)
+        public static final Translation2d[] lowTranslations = new Translation2d[nodeRowCount];
+        public static final Translation3d[] low3dTranslations = new Translation3d[nodeRowCount];
+        public static final Translation2d[] midTranslations = new Translation2d[nodeRowCount];
+        public static final Translation3d[] mid3dTranslations = new Translation3d[nodeRowCount];
+        public static final Translation2d[] highTranslations = new Translation2d[nodeRowCount];
+        public static final Translation3d[] high3dTranslations = new Translation3d[nodeRowCount];
+
+        static {
+        for (int i = 0; i < nodeRowCount; i++) {
+            boolean isCube = i == 1 || i == 4 || i == 7;
+            lowTranslations[i] = new Translation2d(lowX, nodeY[i]);
+            low3dTranslations[i] = new Translation3d(lowX, nodeY[i], 0.0);
+            midTranslations[i] = new Translation2d(midX, nodeY[i]);
+            mid3dTranslations[i] = new Translation3d(midX, nodeY[i], isCube ? midCubeZ : midConeZ);
+            highTranslations[i] = new Translation2d(highX, nodeY[i]);
+            high3dTranslations[i] = new Translation3d(highX, nodeY[i], isCube ? highCubeZ : highConeZ);
+        }
+        }
+        // Complex low layout (shifted to account for cube vs cone rows and wide edge nodes)
+        public static final double complexLowXCones =
+            outerX - Units.inchesToMeters(16.0) / 2.0; // Centered X under cone nodes
+        public static final double complexLowXCubes = lowX; // Centered X under cube nodes
+        public static final double complexLowOuterYOffset =
+            nodeY[0] - (Units.inchesToMeters(3.0) + (Units.inchesToMeters(25.75) / 2.0));
+
+        public static final Translation2d[] complexLowTranslations =
+            new Translation2d[] {
+            new Translation2d(complexLowXCones, nodeY[0] - complexLowOuterYOffset),
+            new Translation2d(complexLowXCubes, nodeY[1]),
+            new Translation2d(complexLowXCones, nodeY[2]),
+            new Translation2d(complexLowXCones, nodeY[3]),
+            new Translation2d(complexLowXCubes, nodeY[4]),
+            new Translation2d(complexLowXCones, nodeY[5]),
+            new Translation2d(complexLowXCones, nodeY[6]),
+            new Translation2d(complexLowXCubes, nodeY[7]),
+            new Translation2d(complexLowXCones, nodeY[8] + complexLowOuterYOffset),
+            };
+
+        public static final Translation3d[] complexLow3dTranslations =
+            new Translation3d[] {
+            new Translation3d(complexLowXCones, nodeY[0] - complexLowOuterYOffset, 0.0),
+            new Translation3d(complexLowXCubes, nodeY[1], 0.0),
+            new Translation3d(complexLowXCones, nodeY[2], 0.0),
+            new Translation3d(complexLowXCones, nodeY[3], 0.0),
+            new Translation3d(complexLowXCubes, nodeY[4], 0.0),
+            new Translation3d(complexLowXCones, nodeY[5], 0.0),
+            new Translation3d(complexLowXCones, nodeY[6], 0.0),
+            new Translation3d(complexLowXCubes, nodeY[7], 0.0),
+            new Translation3d(complexLowXCones, nodeY[8] + complexLowOuterYOffset, 0.0),
+            };
     }
 }

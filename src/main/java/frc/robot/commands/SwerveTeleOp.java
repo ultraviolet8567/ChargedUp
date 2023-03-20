@@ -8,20 +8,21 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.odometry.GyroOdometry;
 import frc.robot.odometry.Odometry;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveTeleOp extends CommandBase {
     private final Swerve swerve;
-    private final Odometry odometry;
+    private final GyroOdometry gyro;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
     private final Supplier<Boolean> rotationOnFunction, fieldOrientedFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
     // First supplier is the forward velocity, then its horizontal velocity, then rotational velocity
-    public SwerveTeleOp(Swerve swerve, Odometry odometry, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> fieldOrientedFunction) {
+    public SwerveTeleOp(Swerve swerve, GyroOdometry gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> fieldOrientedFunction) {
         this.swerve = swerve;
-        this.odometry = odometry;
+        this.gyro = gyro;
         this.xSpdFunction = xSpdFunction;
         this.ySpdFunction = ySpdFunction;
         this.turningSpdFunction = turningSpdFunction;
@@ -54,14 +55,13 @@ public class SwerveTeleOp extends CommandBase {
         ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxSpeedMetersPerSecond;
         turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleDriveMaxAngularSpeedRadiansPerSecond;
 
-        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
-        // ChassisSpeeds chassisSpeeds;
-        // if (fieldOrientedFunction.get()) {
-        //     chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed, odometry.getHeading2d());
-        // }
-        // else {
-        //     chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
-        // }
+        ChassisSpeeds chassisSpeeds;
+        if (fieldOrientedFunction.get()) {
+            chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed, gyro.getRotation2d());
+        }
+        else {
+            chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+        }
         
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
 

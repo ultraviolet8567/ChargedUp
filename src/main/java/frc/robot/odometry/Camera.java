@@ -23,7 +23,7 @@ public class Camera {
 
     camera = new PhotonCamera("camera" + cameraID);
 
-    estimator = new PhotonPoseEstimator(Constants.FieldConstants.aprilTags, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.CameraConstants.cameraDistances[ID]);
+    estimator = new PhotonPoseEstimator(Constants.FieldConstants.aprilTags, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.Camera.cameraDistances[ID]);
   }
 
   // updates pose estimator, used for odometry updates

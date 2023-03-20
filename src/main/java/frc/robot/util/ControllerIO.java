@@ -3,7 +3,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants.OIConstants;
 
 public final class ControllerIO {
-    private static final ControllerType controller = OIConstants.controllerType;
+    private static final ControllerType controllerDrive = OIConstants.controllerTypeDrive;
 
     public static enum ControllerType {
         XBOX,
@@ -12,7 +12,7 @@ public final class ControllerIO {
     }
 
     public static int getY() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return 1;
             case LOGITECH:
@@ -25,7 +25,7 @@ public final class ControllerIO {
     }
 
     public static int getX() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return 0;
             case LOGITECH:
@@ -38,7 +38,7 @@ public final class ControllerIO {
     }
 
     public static int getRot() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return 4;
             case LOGITECH:
@@ -51,7 +51,7 @@ public final class ControllerIO {
     }
 
     public static int inversionY() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return 1;
             case LOGITECH:
@@ -64,7 +64,7 @@ public final class ControllerIO {
     }
 
     public static int inversionX() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return 1;
             case LOGITECH:
@@ -77,7 +77,7 @@ public final class ControllerIO {
     }
 
     public static int inversionRot() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return 1;
             case LOGITECH:
@@ -90,7 +90,7 @@ public final class ControllerIO {
     }
 
     public static int getTrigger() {
-        switch (controller) {
+        switch (controllerDrive) {
             case XBOX:
                 return XboxController.Button.kBack.value;
             case LOGITECH:

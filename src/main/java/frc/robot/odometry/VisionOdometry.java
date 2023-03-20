@@ -1,5 +1,7 @@
 package frc.robot.odometry;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 // import java.util.ArrayList;
 // import java.util.Optional;
 
@@ -7,7 +9,7 @@ package frc.robot.odometry;
 
 // import edu.wpi.first.math.geometry.Rotation3d;
 
-public class VisionOdometry {
+public class VisionOdometry extends SubsystemBase {
 //   private final Camera camera1 = new Camera(0);
 //   private final Camera camera2 = new Camera(1);
 //   private final Camera camera3 = new Camera(2);
@@ -18,7 +20,7 @@ public class VisionOdometry {
 //     camera3
 //   };
 
-//   public VisionOdometry() {}
+  public VisionOdometry() {}
 
 //   // counts the number of cameras that have detected something
 //   public int checkCameras() {
