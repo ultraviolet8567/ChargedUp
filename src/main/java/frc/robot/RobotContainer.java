@@ -14,7 +14,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
 import frc.robot.commands.*;
 import frc.robot.commands.ToggleArmIdleMode;
-import frc.robot.commands.auto.AutoDriveOut;
+import frc.robot.commands.auto.*;
 import frc.robot.odometry.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.ControllerIO;
