@@ -2,6 +2,7 @@ package frc.robot.util;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 
@@ -11,7 +12,7 @@ import frc.robot.Constants.Mode;
  */
 public class LoggedTunableNumber {
   private static final String tableKey = "TunableNumbers";
-  private static final boolean tuningMode = (Constants.currentMode == Mode.TUNING || Constants.currentMode == Mode.REAL);
+  private static final boolean tuningMode = Constants.currentMode == Mode.TUNING;
 
   private final String key;
   private boolean hasDefault = false;
@@ -37,6 +38,10 @@ public class LoggedTunableNumber {
   public LoggedTunableNumber(String dashboardKey, double defaultValue) {
     this(dashboardKey);
     initDefault(defaultValue);
+
+    if (tuningMode) {
+      Shuffleboard.getTab("TunableNumbers");
+    }
   }
 
   /**

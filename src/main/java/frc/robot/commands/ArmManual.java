@@ -8,12 +8,12 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Arms;
 
-public class ManipulateArmsJoysticks extends CommandBase {
+public class ArmManual extends CommandBase {
     private Arms arms;
     private Supplier<Double> leftJoystickSupplier, rightJoystickSupplier;
     private SlewRateLimiter shoulderLimiter, elbowLimiter;
 
-    public ManipulateArmsJoysticks(Arms arms, Supplier<Double> leftJoystickSupplier, Supplier<Double> rightJoystickSupplier) {
+    public ArmManual(Arms arms, Supplier<Double> leftJoystickSupplier, Supplier<Double> rightJoystickSupplier) {
         this.arms = arms;
         this.leftJoystickSupplier = leftJoystickSupplier;
         this.rightJoystickSupplier = rightJoystickSupplier;
@@ -40,15 +40,16 @@ public class ManipulateArmsJoysticks extends CommandBase {
         double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeed.get();
         double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeed.get();
 
+        // Turn the speed a bit more to account for the shoulder rotation
         elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
 
         // Invert the elbow speed because the motor turns in the opposite direction
         elbowSpeed *= -1;
 
-        if (shoulderSpeed < 0 && arms.checkShoulderLocationBackward() || shoulderSpeed > 0 && arms.checkElbowLocationBackward()) {
+        if (shoulderSpeed < 0 && arms.withinShoulderBackLimit() || shoulderSpeed > 0 && arms.withinShoulderFrontLimit()) {
             arms.runShoulder(shoulderSpeed);
         }
-        if (elbowSpeed < 0 && arms.checkElbowLocationBackward() || elbowSpeed > 0 && arms.checkElbowLocationForward()) {
+        if (elbowSpeed < 0 && arms.withinElbowBackLimit() || elbowSpeed > 0 && arms.withinElbowFrontLimit()) {
             arms.runElbow(elbowSpeed);
         }
         else {
@@ -61,5 +62,4 @@ public class ManipulateArmsJoysticks extends CommandBase {
     public void end(boolean interrupted) {
         arms.stop();
     }
-
 }

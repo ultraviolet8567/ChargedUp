@@ -27,42 +27,36 @@ public final class Constants {
      *  - Counterclockwise = z-
      */
 
-    public static final Mode currentMode = Mode.REAL;
+    public static final Mode currentMode = Mode.TUNING;
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
         public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.4);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
         public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.4);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
         public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
 
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("arm p constant", 0.05);
+        // PID controllers
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.05);
         public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
-        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("arm p constant", 0.05);
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.05);
         public static final double kElbowPidTolerance = 5 * Math.PI / 600;
     
-        //arm absolute encoder ports
+        // Arm absolute encoders
         public static final int kShoulderEncoderPort = 0;
         public static final int kElbowEncoderPort = 1;
-
-        //arm absolute encoder offset
         public static final double kShoulderOffset = 0.753;
         public static final double kElbowOffset = 0.658;
     
-        //stopping point for shoulder
-        public static final double kShoulderBackLimit = -2.23;
+        // Rotation boundaries for arm joints point
+        public static final double kShoulderFrontLimit = 0;
+        public static final double kShoulderBackLimit = 0;
+        public static final double kElbowFrontLimit = 0;
+        public static final double kElbowBackLimit = 0;
 
-        public static final double kStopShoulderForward = 5 * Math.PI / 6;
-        public static final double kStopShoulderMid = Math.PI;
-        public static final double kStopShoulderBackward = -5 * Math.PI / 6;
-
-        public static final double kStopElbowForward = 5 * Math.PI / 6;
-        public static final double kStopElbowMid = Math.PI;
-        public static final double kStopElbowBackward = -5 * Math.PI / 6;
-
-        // Arm to elebow gear ratio coefficient
+        // Arm to elbow gear ratio coefficient
         public static final double kArmsToElbow = -296.0 / 322.0;
 
         //arm preset points TODO: find these points

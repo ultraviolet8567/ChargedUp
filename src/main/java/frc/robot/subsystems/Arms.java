@@ -95,17 +95,17 @@ public class Arms extends SubsystemBase {
         shoulder.set(speed);
     }
 
-    public void runShoulderSim(double speed) {
-        shoulderSimEncoder += speed * 5;
-    }
+    // public void runShoulderSim(double speed) {
+    //     shoulderSimEncoder += speed * 5;
+    // }
     
     public void runElbow(double speed) {
         elbow.set(speed);
     }
 
-    public void runElbowSim(double speed) {
-        elbowSimEncoder += speed * 5;
-    }
+    // public void runElbowSim(double speed) {
+    //     elbowSimEncoder += speed * 5;
+    // }
 
     public double shoulderAngle() {
         double angle = shoulderEncoder.getAbsolutePosition();
@@ -113,9 +113,9 @@ public class Arms extends SubsystemBase {
         return angle;
     }
 
-    public double shoulderAngleSim() {
-        return shoulderSimEncoder;
-    }
+    // public double shoulderAngleSim() {
+    //     return shoulderSimEncoder;
+    // }
 
     public double elbowAngle() {
         double angle = elbowEncoder.getAbsolutePosition();
@@ -123,117 +123,115 @@ public class Arms extends SubsystemBase {
         return angle;
     }
 
-    public double elbowAngleSim() {
-        return elbowSimEncoder;
-    }
+    // public double elbowAngleSim() {
+    //     return elbowSimEncoder;
+    // }
     
     public double[] calculateMotorSpeeds(double shoulderSetpoint, double elbowSetpoint) {
         double shoulderSpeed = shoulderPidController.calculate(shoulderAngle(), shoulderSetpoint);
-        double elbowSpeed = shoulderSpeed * ArmConstants.kArmsToElbow;
+        double elbowSpeed = elbowPidController.calculate(elbowAngle(), elbowSetpoint);
         
-        elbowSpeed += elbowPidController.calculate(elbowAngle(), elbowSetpoint);
+        // Make sure the elbow turns with the shoulder
+        elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
         
-        // Clamp the speeds for safety
-        shoulderSpeed = MathUtil.clamp(shoulderSpeed, -ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderSpeed.get());
-        elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeed.get(), ArmConstants.kMaxElbowSpeed.get());
-
-        // TODO: Don't move the motors if it's past the boundary
-        // Code here
+        // Clamp the speeds between -100% and 100%
+        shoulderSpeed = MathUtil.clamp(shoulderSpeed, -1, 1);
+        elbowSpeed = MathUtil.clamp(elbowSpeed, -1, 1);
 
         return new double[] {shoulderSpeed, elbowSpeed};
     }
 
     // This code does not work
-    public double[] calculateMotorSpeedsSim(double shoulderSetpoint, double elbowSetpoint) {
-        double shoulderSpeed = 0;
-        double elbowSpeed = 0;
+    // public double[] calculateMotorSpeedsSim(double shoulderSetpoint, double elbowSetpoint) {
+    //     double shoulderSpeed = 0;
+    //     double elbowSpeed = 0;
 
-        boolean movingShoulder = !(Math.abs(shoulderAngleSim() - Units.radiansToDegrees(shoulderSetpoint)) <= 5);
-        boolean movingElbow = !(Math.abs(elbowAngleSim() - Units.radiansToDegrees(elbowSetpoint)) <= 5);
+    //     boolean movingShoulder = !(Math.abs(shoulderAngleSim() - Units.radiansToDegrees(shoulderSetpoint)) <= 5);
+    //     boolean movingElbow = !(Math.abs(elbowAngleSim() - Units.radiansToDegrees(elbowSetpoint)) <= 5);
 
-        if (movingShoulder) {
-            if (shoulderAngleSim() > Units.radiansToDegrees(ArmConstants.kStopShoulderBackward) && shoulderAngleSim() < Units.radiansToDegrees(ArmConstants.kStopShoulderForward)) {
-                if (shoulderAngleSim() > Units.radiansToDegrees(shoulderSetpoint)) {
-                    shoulderSpeed = -0.2;
-                } else if (shoulderAngleSim() < Units.radiansToDegrees(shoulderSetpoint)) {
-                    shoulderSpeed = 0.2;
-                } else {
-                    shoulderSpeed = 0;
-                }
+    //     if (movingShoulder) {
+    //         if (shoulderAngleSim() > Units.radiansToDegrees(ArmConstants.kStopShoulderBackward) && shoulderAngleSim() < Units.radiansToDegrees(ArmConstants.kStopShoulderForward)) {
+    //             if (shoulderAngleSim() > Units.radiansToDegrees(shoulderSetpoint)) {
+    //                 shoulderSpeed = -0.2;
+    //             } else if (shoulderAngleSim() < Units.radiansToDegrees(shoulderSetpoint)) {
+    //                 shoulderSpeed = 0.2;
+    //             } else {
+    //                 shoulderSpeed = 0;
+    //             }
 
-                if (!movingElbow) {
-                    elbowSpeed = ArmConstants.kArmsToElbow * shoulderSpeed;
-                }
-            } else {
-                shoulderSpeed = 0;
-            }
-        } 
-        if (movingElbow) {
-            if (elbowAngleSim() > Units.radiansToDegrees(ArmConstants.kStopElbowBackward) && elbowAngleSim() < Units.radiansToDegrees(ArmConstants.kStopElbowForward)) {
-                if (elbowAngleSim() > Units.radiansToDegrees(elbowSetpoint)) {
-                    elbowSpeed = -0.2;
-                } else if (elbowAngleSim() < Units.radiansToDegrees(elbowSetpoint)) {
-                    elbowSpeed = 0.2;
-                } else {
-                    elbowSpeed = 0;
-                }
+    //             if (!movingElbow) {
+    //                 elbowSpeed = ArmConstants.kArmsToElbow * shoulderSpeed;
+    //             }
+    //         } else {
+    //             shoulderSpeed = 0;
+    //         }
+    //     } 
+    //     if (movingElbow) {
+    //         if (elbowAngleSim() > Units.radiansToDegrees(ArmConstants.kStopElbowBackward) && elbowAngleSim() < Units.radiansToDegrees(ArmConstants.kStopElbowForward)) {
+    //             if (elbowAngleSim() > Units.radiansToDegrees(elbowSetpoint)) {
+    //                 elbowSpeed = -0.2;
+    //             } else if (elbowAngleSim() < Units.radiansToDegrees(elbowSetpoint)) {
+    //                 elbowSpeed = 0.2;
+    //             } else {
+    //                 elbowSpeed = 0;
+    //             }
 
-                if (movingShoulder) {
-                    elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
-                } 
-            } else {
-                elbowSpeed = 0;
-            }
-        } else if (!movingElbow && !movingShoulder) {
-            elbowSpeed = 0;
-            shoulderSpeed = 0;
-        }
+    //             if (movingShoulder) {
+    //                 elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
+    //             } 
+    //         } else {
+    //             elbowSpeed = 0;
+    //         }
+    //     } else if (!movingElbow && !movingShoulder) {
+    //         elbowSpeed = 0;
+    //         shoulderSpeed = 0;
+    //     }
 
-        // Clamp the speeds for safety
-        shoulderSpeed = MathUtil.clamp(shoulderSpeed, -ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderSpeed.get());
-        elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeed.get(), ArmConstants.kMaxElbowSpeed.get());
+    //     // Clamp the speeds for safety
+    //     shoulderSpeed = MathUtil.clamp(shoulderSpeed, -ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderSpeed.get());
+    //     elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeed.get(), ArmConstants.kMaxElbowSpeed.get());
 
-        // TODO: Don't move the motors past the boundary
-        // Code here
+    //     // TODO: Don't move the motors past the boundary
+    //     // Code here
 
-        return new double[] {shoulderSpeed, elbowSpeed};   
+    //     return new double[] {shoulderSpeed, elbowSpeed};   
+    // }
+
+    // Check if the bicep has rotated too far backward (and could hit the superstructure)
+    public boolean withinShoulderBackLimit() {
+        return (shoulderAngle() > ArmConstants.kShoulderBackLimit);
     }
 
-    // Check if the bicep is past the limit of 300 degrees moving backward
-    public boolean checkShoulderLocationBackward() {
-        return !(shoulderAngle() >= ArmConstants.kStopShoulderMid && shoulderAngle() <= -ArmConstants.kStopShoulderBackward);
+    // public boolean checkShoulderLocationBackwardSim() {
+    //     return !(shoulderAngleSim() >= Units.radiansToDegrees(-ArmConstants.kStopShoulderMid) && shoulderAngleSim() <= Units.radiansToDegrees(ArmConstants.kStopShoulderBackward));
+    // }
+
+    // Check if the bicep has rotated too far forward (and could hit the bumpers)
+    public boolean withinShoulderFrontLimit() {
+        return (shoulderAngle() < ArmConstants.kShoulderFrontLimit);
     }
 
-    public boolean checkShoulderLocationBackwardSim() {
-        return !(shoulderAngleSim() >= Units.radiansToDegrees(-ArmConstants.kStopShoulderMid) && shoulderAngleSim() <= Units.radiansToDegrees(ArmConstants.kStopShoulderBackward));
-    }
-
-    // Check if the bicep is past the limit of 220 degrees moving forward
-    public boolean checkShoulderLocationForward() {
-        return !(shoulderAngle() <= ArmConstants.kStopShoulderMid && shoulderAngle() >= ArmConstants.kStopShoulderForward);
-    }
-
-    public boolean checkShoulderLocationForwardSim() {
-        return !(shoulderAngle() <= Units.radiansToDegrees(ArmConstants.kStopShoulderMid) && shoulderAngle() >= Units.radiansToDegrees(ArmConstants.kStopShoulderForward));
-    }
+    // public boolean checkShoulderLocationForwardSim() {
+    //     return !(shoulderAngle() <= Units.radiansToDegrees(ArmConstants.kStopShoulderMid) && shoulderAngle() >= Units.radiansToDegrees(ArmConstants.kStopShoulderForward));
+    // }
 
     // Check if the forearm is past the limit of 225 degrees moving backward
-    public boolean checkElbowLocationBackward() {
-        return !(elbowAngle() <= ArmConstants.kStopElbowBackward && elbowAngle() >= -ArmConstants.kStopElbowMid);
+    public boolean withinElbowBackLimit() {
+        return (shoulderAngle() > ArmConstants.kElbowBackLimit);
     }
 
-    public boolean checkElbowLocationBackwardSim() {
-        return !(elbowAngle() <= Units.radiansToDegrees(ArmConstants.kStopElbowBackward) && elbowAngle() >= Units.radiansToDegrees(-ArmConstants.kStopElbowMid));
-    }
+    // public boolean checkElbowLocationBackwardSim() {
+    //     return !(elbowAngle() <= Units.radiansToDegrees(ArmConstants.kStopElbowBackward) && elbowAngle() >= Units.radiansToDegrees(-ArmConstants.kStopElbowMid));
+    // }
 
     // Check if the forearm is past the limit of 135 degrees moving forward
-    public boolean checkElbowLocationForward() {
-        return !(elbowAngle() >= ArmConstants.kStopElbowForward && elbowAngle() <= ArmConstants.kStopElbowMid);
+    public boolean withinElbowFrontLimit() {
+        return (elbowAngle() < ArmConstants.kElbowFrontLimit);
     }
 
-    public boolean checkElbowLocationForwardSim() {
-        return !(elbowAngle() >= Units.radiansToDegrees(ArmConstants.kStopElbowForward) && elbowAngle() <= Units.radiansToDegrees(ArmConstants.kStopElbowMid));
-    }
+    // public boolean checkElbowLocationForwardSim() {
+    //     return !(elbowAngle() >= Units.radiansToDegrees(ArmConstants.kStopElbowForward) && elbowAngle() <= Units.radiansToDegrees(ArmConstants.kStopElbowMid));
+    // }
 
     public double[] getPreset() {
         switch (presetValue) {
