@@ -51,13 +51,18 @@ public final class Constants {
         public static final double kElbowOffset = 0.658;
     
         // Rotation boundaries for arm joints point
-        public static final double kShoulderFrontLimit = 0;
-        public static final double kShoulderBackLimit = 0;
-        public static final double kElbowFrontLimit = 0;
-        public static final double kElbowBackLimit = 0;
+        public static final double kShoulderFrontLimit = 1.208;
+        public static final double kShoulderFrontMechanicalStop = 1.392;
+        public static final double kShoulderBackLimit = 2.466;
+        public static final double kShoulderBackMechanicalStop = 2.230;
+        public static final double kElbowFrontLimit = 2.778;
+        public static final double kElbowFrontMechanicalStop = 2.823;
+        public static final double kElbowBackLimit = 4.077;
+        public static final double kElbowBackMechanicalStop = 4.007;
+        
 
         // Arm to elbow gear ratio coefficient
-        public static final double kArmsToElbow = -296.0 / 322.0;
+        public static final double kArmsToElbow = -152.0 / 322.0;
 
         //arm preset points TODO: find these points
         public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};

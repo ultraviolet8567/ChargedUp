@@ -40,20 +40,25 @@ public class ArmManual extends CommandBase {
         double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeed.get();
         double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeed.get();
 
-        // Turn the speed a bit more to account for the shoulder rotation
-        elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
-
-        // Invert the elbow speed because the motor turns in the opposite direction
-        elbowSpeed *= -1;
-
-        if (shoulderSpeed < 0 && arms.withinShoulderBackLimit() || shoulderSpeed > 0 && arms.withinShoulderFrontLimit()) {
+        if (!(arms.shoulderPastBackLimit() && shoulderSpeed < 0) && !(arms.shoulderPastFrontLimit() && shoulderSpeed > 0)) {
             arms.runShoulder(shoulderSpeed);
+
+            // Turn the speed a bit more to account for the shoulder rotation
+            elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
         }
-        if (elbowSpeed < 0 && arms.withinElbowBackLimit() || elbowSpeed > 0 && arms.withinElbowFrontLimit()) {
+        else {
+            arms.stopShoulder();
+        }
+        
+        // TODO: Include consideration for chain tensioners
+        if (!(arms.elbowPastBackLimit() && elbowSpeed < 0) && !(arms.elbowPastFrontLimit() && elbowSpeed > 0)) {
+            // Invert the elbow speed because the motor turns in the opposite direction
+            elbowSpeed *= -1;
+
             arms.runElbow(elbowSpeed);
         }
         else {
-            arms.stop();
+            arms.stopElbow();
         }
     }
 

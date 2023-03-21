@@ -13,6 +13,7 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
 import frc.robot.commands.*;
+import frc.robot.commands.ToggleArmIdleMode;
 import frc.robot.commands.auto.AutoDriveOut;
 import frc.robot.odometry.*;
 import frc.robot.subsystems.*;
@@ -59,6 +60,9 @@ public class RobotContainer {
         // Commands to change the global game piece value (temporary)
         new JoystickButton(armJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(GamePiece.CONE));
         new JoystickButton(armJoystick , XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(GamePiece.CUBE));
+
+        // Temporary command to allow for software arm loosening if we lock the chains
+        new JoystickButton(armJoystick , XboxController.Button.kStart.value).onTrue(new ToggleArmIdleMode(arms));
                 
         // Manual movement (deprecated)
         // new JoystickButton(armJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
