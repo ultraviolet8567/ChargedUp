@@ -31,44 +31,60 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
 
-    public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
-    public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.2);
-    public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
-    public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.2);
-    public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
+    public static final class ArmConstants {
+        public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.4);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
+        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.4);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
 
-    public static final LoggedTunableNumber armP = new LoggedTunableNumber("arm p constant", 0.05);
-     
-    //arm absolute encoder ports
-    public static final int kShoulderEncoderPort = 0;
-    public static final int kElbowEncoderPort = 1;
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("arm p constant", 0.05);
+        public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("arm p constant", 0.05);
+        public static final double kElbowPidTolerance = 5 * Math.PI / 600;
+    
+        //arm absolute encoder ports
+        public static final int kShoulderEncoderPort = 0;
+        public static final int kElbowEncoderPort = 1;
 
-    //arm absolute encoder offset
-    public static final double kShoulderOffset = 0.753;
-    public static final double kElbowOffset = 0.658;
- 
-    //stopping point for shoulder
-    public static final double kShoulderBackLimit = -2.23;
+        //arm absolute encoder offset
+        public static final double kShoulderOffset = 0.753;
+        public static final double kElbowOffset = 0.658;
+    
+        //stopping point for shoulder
+        public static final double kShoulderBackLimit = -2.23;
 
-    public static final double kStopShoulderForward = 5 * Math.PI / 6;
-    public static final double kStopShoulderMid = Math.PI;
-    public static final double kStopShoulderBackward = -5 * Math.PI / 6;
+        public static final double kStopShoulderForward = 5 * Math.PI / 6;
+        public static final double kStopShoulderMid = Math.PI;
+        public static final double kStopShoulderBackward = -5 * Math.PI / 6;
 
-    public static final double kStopElbowForward = 5 * Math.PI / 6;
-    public static final double kStopElbowMid = Math.PI;
-    public static final double kStopElbowBackward = -5 * Math.PI / 6;
+        public static final double kStopElbowForward = 5 * Math.PI / 6;
+        public static final double kStopElbowMid = Math.PI;
+        public static final double kStopElbowBackward = -5 * Math.PI / 6;
 
-    // Arm to elebow gear ratio coefficient
-    public static final double kArmsToElbow = -296.0 / 322.0;
+        // Arm to elebow gear ratio coefficient
+        public static final double kArmsToElbow = -296.0 / 322.0;
 
-    //arm preset points TODO: find these points
-    public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
-    public static final double[] kMidNodeSetpoints = new double[] { 0, 0 };
-    public static final double[] kHybridNodeSetpoints = new double[] { -Math.PI / 2, -Math.PI / 2 };
-    public static final double[] kGroundIntakeSetpoints = new double[] { 0, 0 };
-    public static final double[] kHighIntakeSetpoints = new double[] { 0, 0 };
-    public static final double[] kStartingSetpoints = new double[] { 0, 0 };
-    public static final double[] kTaxiSetpoints = new double[] { 0, 0 };
+        //arm preset points TODO: find these points
+        public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
+        public static final double[] kMidNodeSetpoints = new double[] { 0, 0 };
+        public static final double[] kHybridNodeSetpoints = new double[] { -Math.PI / 2, -Math.PI / 2 };
+        public static final double[] kGroundIntakeSetpoints = new double[] { 0, 0 };
+        public static final double[] kSubstationIntakeSetpoints = new double[] { 0, 0 };
+        public static final double[] kStartSetpoints = new double[] { 0, 0 };
+        public static final double[] kTaxiSetpoints = new double[] { 0, 0 };
+        public static final double[] kIdleSetPoints = new double[] { 0, 0 };
+    }
+
+    public static final class OIConstants {
+        public static final ControllerType controllerTypeDrive = ControllerType.XBOX;
+        public static final ControllerType controllerTypeArms = ControllerType.XBOX;
+        
+        public static final int kDriveControllerPort = 0;
+        public static final int kArmControllerPort = 1;
+
+        public static final double kDeadband = 0.15;
+    }
 
     public static final class CAN {
         public static final int kIntakePort = 3;
@@ -163,38 +179,6 @@ public final class Constants {
                 new TrapezoidProfile.Constraints(
                         kMaxAngularSpeedRadiansPerSecond,
                         kMaxAngularAccelerationRadiansPerSecondSquared);
-    }
-
-    public static final class OIConstants {
-        public static final ControllerType controllerTypeDrive = ControllerType.XBOX;
-        public static final ControllerType controllerTypeArms = ControllerType.XBOX;
-        
-        public static final int kDriveControllerPort = 0;
-        public static final int kArmControllerPort = 1;
-
-        public static final double kDeadband = 0.15;
-    }
-
-    public static enum Mode {
-        // Running on a real robot
-        REAL,
-        // Running a simulator
-        SIM,
-        // In tuning mode
-        TUNING,
-        // Replaying from a log file
-        REPLAY
-    }
-
-    public static enum ControllerType {
-        XBOX,
-        LOGITECH,
-        JOYSTICK
-    }
-    
-    public static enum GamePiece {
-        CONE,
-        CUBE
     }
 
     public static final class Camera {
@@ -492,4 +476,37 @@ public final class Constants {
                 fieldLength,
                 fieldWidth);
     } 
+
+    public static enum Mode {
+        // Running on a real robot
+        REAL,
+        // Running a simulator
+        SIM,
+        // In tuning mode
+        TUNING,
+        // Replaying from a log file
+        REPLAY
+    }
+
+    public static enum ControllerType {
+        XBOX,
+        LOGITECH,
+        JOYSTICK
+    }
+    
+    public static enum GamePiece {
+        CONE,
+        CUBE
+    }
+
+    public static enum Preset {
+        HIGH_NODE,
+        MID_NODE,
+        HYBRID_NODE,
+        GROUND_INTAKE,
+        SUBSTATION_INTAKE,
+        START,
+        TAXI,
+        IDLE
+    }
 }

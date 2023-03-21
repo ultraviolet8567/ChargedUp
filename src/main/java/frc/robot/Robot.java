@@ -63,6 +63,7 @@ public class Robot extends LoggedRobot {
         m_robotContainer = new RobotContainer();
 
         gamePiece = GamePiece.CONE;
+        Logger.getInstance().recordOutput("GamePiece", "Cone");
     }
 
     @Override
@@ -87,10 +88,6 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
-
-        // Testing
-        
-        Logger.getInstance().recordOutput("Scheduled", m_autonomousCommand.isScheduled());
     }
 
     @Override
@@ -120,7 +117,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {}
 
-    // Global gamepiece mechanism
+    // Global gamepiece switch
     public static GamePiece getGamePiece() {
         return gamePiece;
     }

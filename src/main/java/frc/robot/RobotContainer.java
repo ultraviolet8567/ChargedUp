@@ -44,7 +44,6 @@ public class RobotContainer {
             () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
             () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
         
-        Logger.getInstance().recordOutput("GamePiece", "Cone");
 
         configureButtonBindings();
     }
@@ -68,8 +67,8 @@ public class RobotContainer {
         new JoystickButton(armJoystick, XboxController.Button.kA.value).whileTrue(new ManipulateArms(arms, "elbow", "backward"));
     
         // Change preset target
-        // new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, "high node"));
-        // new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, "mid node"));
+        // new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, HIGH_NODE));
+        // new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, MID_NODE));
         // new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, "hybrid node"));
         // new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new SetPresetValue(arms, "ground intake"));
         // new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new SetPresetValue(arms, "high intake"));

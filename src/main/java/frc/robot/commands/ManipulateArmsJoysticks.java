@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.Arms;
 
@@ -18,8 +18,8 @@ public class ManipulateArmsJoysticks extends CommandBase {
         this.leftJoystickSupplier = leftJoystickSupplier;
         this.rightJoystickSupplier = rightJoystickSupplier;
 
-        shoulderLimiter = new SlewRateLimiter(Constants.kMaxShoulderAcceleration.get());
-        elbowLimiter = new SlewRateLimiter(Constants.kMaxElbowAcceleration.get());
+        shoulderLimiter = new SlewRateLimiter(ArmConstants.kMaxShoulderAcceleration.get());
+        elbowLimiter = new SlewRateLimiter(ArmConstants.kMaxElbowAcceleration.get());
 
         addRequirements(arms);
     }
@@ -37,16 +37,15 @@ public class ManipulateArmsJoysticks extends CommandBase {
 
         // Make the driving smoother by using a slew rate limiter to minimize acceleration
         // And scale joystick input to m/s
-        double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * Constants.kMaxShoulderSpeed.get();
-        double elbowSpeed = elbowLimiter.calculate(rightJoystick) * Constants.kMaxElbowSpeed.get();
+        double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeed.get();
+        double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeed.get();
 
-        elbowSpeed += Constants.kArmsToElbow * shoulderSpeed;
+        elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
 
         // Invert the elbow speed because the motor turns in the opposite direction
         elbowSpeed *= -1;
 
         if (shoulderSpeed < 0 && arms.checkShoulderLocationBackward() || shoulderSpeed > 0 && arms.checkElbowLocationBackward()) {
-            arms.shoulderRunning = true;
             arms.runShoulder(shoulderSpeed);
         }
         if (elbowSpeed < 0 && arms.checkElbowLocationBackward() || elbowSpeed > 0 && arms.checkElbowLocationForward()) {

@@ -36,18 +36,7 @@ public class MoveToPreset extends CommandBase {
         else {
             setpoints = arms.getPreset();
 
-            shoulderSetpoint = setpoints[0];
-            elbowSetpoint = setpoints[1];
-
-            if (Constants.currentMode == Mode.REAL) {
-                shoulderSet = (Math.abs(arms.shoulderAngle() - shoulderSetpoint) <= 5 * Math.PI / 600);
-                elbowSet = (Math.abs(arms.elbowAngle() - elbowSetpoint) <= 5 * Math.PI / 600);
-            } else if (Constants.currentMode == Mode.SIM) {
-                shoulderSet = (Math.abs(arms.shoulderAngle() - Units.radiansToDegrees(shoulderSetpoint)) <= 5);
-                elbowSet = (Math.abs(arms.elbowAngle() - Units.radiansToDegrees(elbowSetpoint)) <= 5);
-            }
-
-            speeds = arms.calculateMotorSpeeds(shoulderSetpoint, elbowSetpoint, !shoulderSet, !elbowSet);
+            speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
             arms.runShoulder(speeds[0]);
             arms.runElbow(speeds[1]);
         }    

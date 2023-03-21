@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.Arms;
 
 public class ManipulateArms extends CommandBase {
@@ -27,13 +27,12 @@ public class ManipulateArms extends CommandBase {
   public void execute() {
     // System.out.println(joint + " " + direction);
       if (joint == "shoulder") {
-        arms.shoulderRunning = true;
         
         //run shoulder forward
         if (direction == "forward" && arms.checkShoulderLocationForward()) {
           
           //determine speeds for shoulder and elbow
-          shoulderSpeed = Constants.kMaxShoulderSpeed.get();
+          shoulderSpeed = ArmConstants.kMaxShoulderSpeed.get();
           elbowSpeed = -4/5 * shoulderSpeed;
 
           //set shoulder and elbow to determined speeds
@@ -44,7 +43,7 @@ public class ManipulateArms extends CommandBase {
         } else if (direction == "backward" && arms.checkShoulderLocationBackward()) {
           
           //determine speeds for shoulder and elbow
-          shoulderSpeed = -Constants.kMaxShoulderSpeed.get();
+          shoulderSpeed = -ArmConstants.kMaxShoulderSpeed.get();
           elbowSpeed = -4/5 * shoulderSpeed;
 
           //set shoulder and elbow to determined speeds
@@ -61,29 +60,15 @@ public class ManipulateArms extends CommandBase {
         if (direction == "forward" && arms.checkElbowLocationForward()) {
           
           //determine and set elbow speed if shoulder is running
-          if (arms.shoulderRunning) {
-            elbowSpeed = (-4/5 * shoulderSpeed) + Constants.kMaxElbowSpeed.get();
-            arms.runElbow(elbowSpeed);
-
-          //determine and set elbow speed if shoulder is NOT running
-          } else {
-            elbowSpeed = Constants.kMaxElbowSpeed.get();
-            arms.runElbow(elbowSpeed);
-          }
-
+          elbowSpeed = ArmConstants.kMaxElbowSpeed.get();
+          arms.runElbow(elbowSpeed);
+          
           //run elbow backward
         } else if (direction == "backward" && arms.checkElbowLocationBackward()) {
           
           //determine and set elbow speed if shoulder is running
-          if (arms.shoulderRunning) {
-            elbowSpeed = (-4/5 * shoulderSpeed) - Constants.kMaxElbowSpeed.get();
-            arms.runElbow(elbowSpeed);
-
-          //determine and set elbow speed if shoulder is NOT running
-          } else {
-            elbowSpeed = -Constants.kMaxElbowSpeed.get();
-            arms.runElbow(elbowSpeed);
-          }
+          elbowSpeed = (-4/5 * shoulderSpeed) - ArmConstants.kMaxElbowSpeed.get();
+          arms.runElbow(elbowSpeed);
 
         //in case something goes wrong
         } else {

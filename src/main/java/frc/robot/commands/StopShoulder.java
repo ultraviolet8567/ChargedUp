@@ -12,7 +12,6 @@ public class StopShoulder extends CommandBase {
 
     @Override
     public void initialize() {
-        arms.shoulderRunning = false;
         arms.stopShoulder();
     }
 }
