@@ -179,17 +179,15 @@ public final class Constants {
         // Update these constants when cameras are mounted
 
         public static final Rotation3d[] cameraDirections = new Rotation3d[] { // camera mount directions
-            new Rotation3d(0, 0, 0), 
-            new Rotation3d(0, 0, Units.degreesToRadians(90)), 
-            new Rotation3d(0, 0, Units.degreesToRadians(180))
+            new Rotation3d(0, 0, Units.degreesToRadians(-135)), // front camera
+            new Rotation3d(0, 0, Units.degreesToRadians(-46)), // right camera
+            new Rotation3d(0, 0, 0) // left camera
         }; 
-        // 1's are values we need to find
-        // TODO: somebody other than chaerin with a working mechanical brain think about this, please?
-        // please :()
+        // height values are from the ground not from center of robot but others are from center of robot
         public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from flat center
-            new Translation3d(1, 1, 1), 
-            new Translation3d(1, 1, 0), 
-            new Translation3d(1, 1, 0) // height values are from the ground not from center of robot but others are from center of robot
+            new Translation3d(Units.inchesToMeters(6.5), Units.inchesToMeters(2.6875), Units.inchesToMeters(13.5)), // front camera
+            new Translation3d(Units.inchesToMeters(9.75), Units.inchesToMeters(9.25), Units.inchesToMeters(5.35)), // right camera
+            new Translation3d(1, 1, 0) // left camera
         }; 
         public static final Transform3d[] cameraDistances = new Transform3d[] { 
             new Transform3d(cameraDisplacements[0], cameraDirections[0]), 

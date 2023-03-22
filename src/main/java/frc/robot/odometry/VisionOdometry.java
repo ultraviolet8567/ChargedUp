@@ -32,23 +32,13 @@ public class VisionOdometry {
   // causes loop overrun errors :(
 //   public ArrayList<Optional<EstimatedRobotPose>> updateVisionOdometry() {
 //     ArrayList<Optional<EstimatedRobotPose>> results = new ArrayList<>();
-//     for (int i = 0; i <= 2; i++) {
-//         try {
-//             Thread.sleep(20);
-//             for (Camera camera : cameras) {
-//                 if (camera.checkDetections()) {
-//                     results.add(camera.getEstimate());
-//                 } else {
-//                     results.add(null);
-//                 }
-//             }
-//         } catch (InterruptedException e) {
-
+//         for (Camera camera : cameras) {
+//             if (camera.checkDetections()) {
+//                 results.add(camera.getEstimate());
+//             } else {
+//                 results.add(null);
 //         }
 //     }
-
-//     return results;
-//   }
 
   // gets X-translational values from cameras that have detections and averages them
   public double getX() {

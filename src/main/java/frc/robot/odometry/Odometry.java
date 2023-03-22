@@ -48,6 +48,10 @@ public class Odometry extends SubsystemBase {
     // CCW+
     Logger.getInstance().recordOutput("Odometry/Heading", getHeading().toRotation2d().getRadians());
 
+    // visionDetections.addAll(vision.updateVisionOdometry());
+    // while (visionDetections.size() > 9) {
+    //   visionDetections.remove(0);
+    // }
 }
 
   // i have no idea what this does
