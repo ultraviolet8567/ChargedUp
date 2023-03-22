@@ -118,6 +118,7 @@ public class Arms extends SubsystemBase {
     public double shoulderAngle() {
         double angle = shoulderEncoder.getAbsolutePosition();
         angle *= 2 * Math.PI;
+        angle = translateEncoderAngle(angle);
         return angle;
     }
 
@@ -128,17 +129,28 @@ public class Arms extends SubsystemBase {
     public double elbowAngle() {
         double angle = elbowEncoder.getAbsolutePosition();
         angle *= 2 * Math.PI;
+        angle = translateEncoderAngle(angle);
         return angle;
     }
 
     // public double elbowAngleSim() {
     //     return elbowSimEncoder;
     // }
+
+    // Translates the absolute encoder readings to make future calculations easier
+    public double translateEncoderAngle(double angle) {
+        angle = (angle + ArmConstants.kEncoderTranslation) % (2 * Math.PI);
+        angle = (angle + Math.PI / 2) % Math.PI;
+        if (angle >= Math.PI / 2 && angle <= 3 * Math.PI / 2) {
+            angle -= Math.PI;
+        }
+        return angle;
+    }
     
     public double[] calculateMotorSpeeds(double shoulderSetpoint, double elbowSetpoint) {
         double shoulderSpeed = shoulderPidController.calculate(shoulderAngle(), shoulderSetpoint);
         double elbowSpeed = elbowPidController.calculate(elbowAngle(), elbowSetpoint);
-        
+
         // Make sure the elbow turns with the shoulder
         elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
         

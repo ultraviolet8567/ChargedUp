@@ -60,6 +60,8 @@ public final class Constants {
         public static final double kElbowBackLimit = 4.077;
         public static final double kElbowBackMechanicalStop = 4.007;
         
+        // Encoder translation
+        public static final double kEncoderTranslation = 0;
 
         // Arm to elbow gear ratio coefficient
         public static final double kArmsToElbow = -152.0 / 322.0;
