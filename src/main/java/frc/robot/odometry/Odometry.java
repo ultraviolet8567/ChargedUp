@@ -51,10 +51,9 @@ public class Odometry extends SubsystemBase {
     Logger.getInstance().recordOutput("Odometry/Heading", getHeading2d().getRadians());
     Logger.getInstance().recordOutput("Vision/Values", getValuesVision());
   
-    if (count <= 2) {
-        count += 1;
-    } else {
-        visionDetections = vision.updateVisionOdometry();
+    visionDetections.addAll(vision.updateVisionOdometry());
+    while (visionDetections.size() > 9) {
+      visionDetections.remove(0);
     }
   }
 
@@ -70,7 +69,7 @@ public class Odometry extends SubsystemBase {
 
   // average of X-values
   public double getX() {
-    if (visionDetections.isEmpty()) {
+    if (!visionDetections.isEmpty()) {
       double error = Math.abs((vision.getHeading(visionDetections).getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
       if (error > maxHeadingError) {
         return calculateAverage(vision.getX(visionDetections), gyro.getX()); 
@@ -84,7 +83,7 @@ public class Odometry extends SubsystemBase {
 
   // average of Y-values
   public double getY() {
-    if (visionDetections.isEmpty()) {
+    if (!visionDetections.isEmpty()) {
       double error = Math.abs((vision.getHeading(visionDetections).getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
       if (error > maxHeadingError) {
         return calculateAverage(vision.getY(visionDetections), gyro.getY()); 
@@ -98,7 +97,7 @@ public class Odometry extends SubsystemBase {
 
   // depth
   public double getZ() {
-    if (visionDetections.isEmpty()) {
+    if (!visionDetections.isEmpty()) {
       return vision.getZ(visionDetections);
     } else {
       return 0.0;
@@ -107,7 +106,7 @@ public class Odometry extends SubsystemBase {
 
   // calculates heading (angle) average
   public Rotation3d getHeading() {
-    if (visionDetections.isEmpty()) {
+    if (!visionDetections.isEmpty()) {
       double error = Math.abs((vision.getHeading(visionDetections).getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
       if (error > maxHeadingError) {
         return calculateHeadingAverage(vision.getHeading(visionDetections), gyro.getHeading()); 
