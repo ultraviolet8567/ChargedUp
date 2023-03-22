@@ -2,6 +2,7 @@
   "NTProvider": {
     "types": {
       "/AdvantageKit/RealOutputs/Mechanisms": "Mechanism2d",
+      "/AdvantageKit/RealOutputs/Simulator/Mechanisms": "Mechanism2d",
       "/FMSInfo": "FMSInfo"
     },
     "windows": {

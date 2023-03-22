@@ -8,6 +8,7 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
+import edu.wpi.first.math.geometry.Rotation3d;
 import frc.robot.Constants;
 
 public class Camera {
@@ -31,21 +32,21 @@ public class Camera {
     return estimator.update(); // creates estimated robot poses
   }
 
-//   public double getX() {
-//     return getEstimate().get().estimatedPose.getX();
-//   }
+  public double getX() {
+    return getEstimate().get().estimatedPose.getX();
+  }
 
-//   public double getY() {
-//     return getEstimate().get().estimatedPose.getY();
-//   }
+  public double getY() {
+    return getEstimate().get().estimatedPose.getY();
+  }
 
-//   public double getZ() {
-//     return getEstimate().get().estimatedPose.getZ();
-//   }
+  public double getZ() {
+    return getEstimate().get().estimatedPose.getZ();
+  }
 
-//   public Rotation3d getHeading() {
-//     return getEstimate().get().estimatedPose.getRotation();
-//   }
+  public Rotation3d getHeading() {
+    return getEstimate().get().estimatedPose.getRotation();
+  }
 
   public boolean checkDetections() {
     PhotonPipelineResult result = camera.getLatestResult();
