@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
@@ -40,7 +42,8 @@ public class ArmManual extends CommandBase {
         double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeed.get();
         double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeed.get();
 
-        System.out.println(shoulderSpeed + " " + elbowSpeed);
+        Logger.getInstance().recordOutput("Speeds/Shoulder", shoulderSpeed);
+        Logger.getInstance().recordOutput("Speeds/Elbow", elbowSpeed);
 
         if (!(arms.shoulderPastBackLimit() && shoulderSpeed < 0) && !(arms.shoulderPastFrontLimit() && shoulderSpeed > 0)) {
             arms.runShoulder(shoulderSpeed);

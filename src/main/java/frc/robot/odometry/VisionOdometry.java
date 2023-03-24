@@ -123,4 +123,8 @@ public class VisionOdometry extends SubsystemBase {
         yaw);
     }
   }
+
+  public int getTag() {
+    return camera1.getTag();
+  }
 }

@@ -49,7 +49,7 @@ public class Odometry extends SubsystemBase {
 
     // CCW+
     Logger.getInstance().recordOutput("Odometry/Heading", getHeading2d().getRadians());
-    Logger.getInstance().recordOutput("Vision/Values", getValuesVision());
+    Logger.getInstance().recordOutput("Vision/Values", vision.getTag());
   }
 
   // i have no idea what this does
@@ -117,9 +117,8 @@ public class Odometry extends SubsystemBase {
     return getHeading().toRotation2d();
   }
 
-  public String getValuesVision() {
-    String thing = "X:" + vision.getX() + " Y:" + vision.getY() + " Z:" + vision.getZ() + " Heading:" + vision.getHeading();
-    return thing;
+  public void getValuesVision() {
+    System.out.println(vision.getTag());
   }
 
   // weighted average 

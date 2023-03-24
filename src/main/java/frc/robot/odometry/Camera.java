@@ -59,4 +59,8 @@ public class Camera {
       else return false;
     }
   }
+
+  public int getTag() {
+    return camera.getLatestResult().getBestTarget().getFiducialId();
+  }
 }
