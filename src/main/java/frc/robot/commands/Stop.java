@@ -22,4 +22,9 @@ public class Stop extends CommandBase {
         intake.stop();
         arms.stop();
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

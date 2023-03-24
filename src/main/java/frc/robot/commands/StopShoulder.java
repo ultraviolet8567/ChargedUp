@@ -14,4 +14,9 @@ public class StopShoulder extends CommandBase {
     public void initialize() {
         arms.stopShoulder();
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

@@ -14,4 +14,9 @@ public class StopElbow extends CommandBase {
     public void initialize() {
         arms.stopElbow();
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }
