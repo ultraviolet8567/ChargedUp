@@ -40,7 +40,7 @@ public final class Constants {
         public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 2);
 
         // PID controllers
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.5);
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 1);
         public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
         public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
         public static final double kElbowPidTolerance = 5 * Math.PI / 600;

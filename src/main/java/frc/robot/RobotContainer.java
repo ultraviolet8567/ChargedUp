@@ -38,12 +38,19 @@ public class RobotContainer {
             () -> OIConstants.controllerTypeDrive == ControllerType.JOYSTICK ? driverJoystick.getRawButton(ControllerIO.getTrigger()) : true,
             () -> Constants.fieldOriented));
 
+        arms.setDefaultCommand(new MoveArms(
+            arms,
+            () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
+            () -> armJoystick.getRawAxis(ControllerIO.getRightY()),
+            () -> armJoystick.getRawAxis(ControllerIO.getLeftTrigger()),
+            () -> armJoystick.getRawAxis(ControllerIO.getRightTrigger())));
+
         // arms.setDefaultCommand(new ArmManual(
         //     arms,
         //     () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
         //     () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
 
-        arms.setDefaultCommand(new MoveToPreset(arms));
+        // arms.setDefaultCommand(new MoveToPreset(arms));
         
         configureButtonBindings();
     }
@@ -61,7 +68,7 @@ public class RobotContainer {
         new JoystickButton(armJoystick , XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(GamePiece.CUBE));
 
         // Temporary command to allow for software arm loosening if we lock the chains
-        new JoystickButton(armJoystick , XboxController.Button.kStart.value).onTrue(new ToggleArmIdleMode(arms));
+        // new JoystickButton(armJoystick , XboxController.Button.kStart.value).onTrue(new ToggleArmIdleMode(arms));
                 
         // Change preset target
         // TODO: Controller mapping for these presets
@@ -70,7 +77,7 @@ public class RobotContainer {
         new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
         new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
         new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
-        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.START));
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
     }
 
     public Command getAutonomousCommand() {

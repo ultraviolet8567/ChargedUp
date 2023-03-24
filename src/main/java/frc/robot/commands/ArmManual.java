@@ -20,8 +20,6 @@ public class ArmManual extends CommandBase {
 
         shoulderLimiter = new SlewRateLimiter(ArmConstants.kMaxShoulderAcceleration.get());
         elbowLimiter = new SlewRateLimiter(ArmConstants.kMaxElbowAcceleration.get());
-
-        addRequirements(arms);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

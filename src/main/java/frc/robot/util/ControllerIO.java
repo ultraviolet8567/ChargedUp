@@ -109,5 +109,31 @@ public final class ControllerIO {
                 return 1;
         }
     }
+
+    public static int getLeftTrigger() {
+        switch (controllerDrive) {
+            case XBOX:
+                return 2;
+            case LOGITECH:
+                return 2;
+            case JOYSTICK:
+                return 2;
+            default:
+                return 2;
+        }
+    }
+
+    public static int getRightTrigger() {
+        switch (controllerDrive) {
+            case XBOX:
+                return 2;
+            case LOGITECH:
+                return 2;
+            case JOYSTICK:
+                return 2;
+            default:
+                return 2;
+        }
+    }
 }
 
