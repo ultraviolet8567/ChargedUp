@@ -80,10 +80,8 @@ public class Arms extends SubsystemBase {
         Logger.getInstance().recordOutput("Measured/Shoulder", shoulder.getEncoder().getVelocity());
         Logger.getInstance().recordOutput("Measured/Elbow", elbow.getEncoder().getVelocity());
 
-        Logger.getInstance().recordOutput("Test/ShoulderFront", shoulderPastFrontLimit());
-        Logger.getInstance().recordOutput("Test/ShoulderBack", shoulderPastBackLimit());
-        Logger.getInstance().recordOutput("Test/ElbowFront", elbowPastFrontLimit());
-        Logger.getInstance().recordOutput("Test/ElbowBack", elbowPastBackLimit());
+        Logger.getInstance().recordOutput("Setpoints/Shoulder", getPreset()[0]);
+        Logger.getInstance().recordOutput("Setpoints/Elbow", getPreset()[1]);
         
         // Simulator stuff
         Logger.getInstance().recordOutput("Simulator/AbsoluteEncoders/SimShoulder", shoulderSimEncoder);
@@ -139,7 +137,7 @@ public class Arms extends SubsystemBase {
     // Translates the absolute encoder readings to make future calculations easier
     public double translateEncoderAngle(double angle, double encoderTranslation) {
         boolean makeNeg = false;
-        angle = (angle - encoderTranslation) % (2 * Math.PI);
+        angle = (angle + encoderTranslation) % (2 * Math.PI);
         if (angle >= Math.PI / 2 && angle <= 3 * Math.PI / 2) {
             makeNeg = true;
         }
@@ -165,7 +163,7 @@ public class Arms extends SubsystemBase {
         System.out.println("** " + shoulderAngle() + " " + elbowAngle() + " **");
         System.out.println(shoulderPidController.getPositionError() + " " + elbowPidController.getPositionError());
 
-        return new double[] {shoulderSpeed, elbowSpeed};
+        return new double[] {shoulderSpeed, -elbowSpeed};
     }
 
     // This code does not work
@@ -226,16 +224,13 @@ public class Arms extends SubsystemBase {
 
     // Check if the bicep is within the operable range
     public boolean shoulderWithinRange() {
-        return 0 < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontLimit ||
-            ArmConstants.kShoulderBackLimit < shoulderAngle() && shoulderAngle() < 2 * Math.PI;
-           
+        return ArmConstants.kShoulderBackLimit < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontLimit;
     }
 
     // Check if the forearm is within the operable range
     // This NEGLECTS chain tensioners, which would lock the sprocket BEFORE this becomes false
     public boolean elbowWithinRange() {
-        return 0 < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontLimit ||
-            ArmConstants.kElbowBackLimit < elbowAngle() && elbowAngle() < 2 * Math.PI;
+        return ArmConstants.kElbowBackLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontLimit;
            
     }
 

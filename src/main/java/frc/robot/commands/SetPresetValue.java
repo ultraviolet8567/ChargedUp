@@ -17,4 +17,9 @@ public class SetPresetValue extends CommandBase {
     public void initialize() {
         arms.setPresetValue(presetValue);
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

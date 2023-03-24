@@ -42,6 +42,8 @@ public class MoveToPreset extends CommandBase {
             shoulderSpeed = shoulderLimiter.calculate(shoulderSpeed) * ArmConstants.kMaxShoulderSpeed.get();
             elbowSpeed = elbowLimiter.calculate(elbowSpeed) * ArmConstants.kMaxElbowSpeed.get();
             
+            Logger.getInstance().recordOutput("SpeedElbow", speeds[1]);
+
             arms.runShoulder(speeds[0]);
             arms.runElbow(speeds[1]);
         }    

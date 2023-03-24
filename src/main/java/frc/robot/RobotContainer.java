@@ -1,7 +1,5 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -40,12 +38,12 @@ public class RobotContainer {
             () -> OIConstants.controllerTypeDrive == ControllerType.JOYSTICK ? driverJoystick.getRawButton(ControllerIO.getTrigger()) : true,
             () -> Constants.fieldOriented));
 
-        arms.setDefaultCommand(new ArmManual(
-            arms,
-            () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
-            () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
+        // arms.setDefaultCommand(new ArmManual(
+        //     arms,
+        //     () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
+        //     () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
 
-        // arms.setDefaultCommand(new MoveToPreset(arms));
+        arms.setDefaultCommand(new MoveToPreset(arms));
         
         configureButtonBindings();
     }
@@ -67,13 +65,14 @@ public class RobotContainer {
                 
         // Change preset target
         // TODO: Controller mapping for these presets
-        // new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
-        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
         // new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
         // new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
         // new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
         // new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.START));
         new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.IDLE));
     }
 
     public Command getAutonomousCommand() {

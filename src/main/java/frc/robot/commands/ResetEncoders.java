@@ -14,4 +14,9 @@ public class ResetEncoders extends CommandBase {
     public void initialize() {
         swerve.resetEncoders();
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

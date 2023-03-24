@@ -14,4 +14,9 @@ public class ResetGyro extends CommandBase {
     public void initialize() {
         gyro.resetGyro();
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }
