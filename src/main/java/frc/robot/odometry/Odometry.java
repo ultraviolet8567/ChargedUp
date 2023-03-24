@@ -1,12 +1,12 @@
-// feeds from gyro & vision
-// calculates odometry data by taking weighted average from mentioned classes
-// methods that output:
-// robot translation (x, y, z)
-// robot heading relative to the field
+// // feeds from gyro & vision
+// // calculates odometry data by taking weighted average from mentioned classes
+// // methods that output:
+// // robot translation (x, y, z)
+// // robot heading relative to the field
 
-// things to do with one camera: find the camera transform3ds
-// check odometry
-// see if the get methods actually work
+// // things to do with one camera: find the camera transform3ds
+// // check odometry
+// // see if the get methods actually work
 
 package frc.robot.odometry;
 
@@ -18,6 +18,7 @@ import org.photonvision.EstimatedRobotPose;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,14 +31,15 @@ public class Odometry extends SubsystemBase {
   int count = 0;
   ArrayList<Optional<EstimatedRobotPose>> visionDetections;
 
-  // TODO: find the actual value
-  private double framerate = 30;
+//   // TODO: find the actual value
+  private final double framerate = 30;
 
-  private double maxHeadingError = 0.02 * 2 * Math.PI; // number before * 2 * Math.PI is the maximum percent error allowed, tweak it
+  private final double maxHeadingError = 0.02 * 2 * Math.PI; // number before * 2 * Math.PI is the maximum percent error allowed, tweak it
 
   public Odometry(GyroOdometry gyro, VisionOdometry vision) {
     this.gyro = gyro;
     this.vision = vision;
+    this.visionDetections = new ArrayList<Optional<EstimatedRobotPose>>();
   }
 
   @Override
@@ -46,13 +48,9 @@ public class Odometry extends SubsystemBase {
     gyro.updateGyroOdometry();
 
     // CCW+
-    Logger.getInstance().recordOutput("Odometry/Heading", getHeading().toRotation2d().getRadians());
-
-    // visionDetections.addAll(vision.updateVisionOdometry());
-    // while (visionDetections.size() > 9) {
-    //   visionDetections.remove(0);
-    // }
-}
+    Logger.getInstance().recordOutput("Odometry/Heading", getHeading2d().getRadians());
+    Logger.getInstance().recordOutput("Vision/Values", getValuesVision());
+  }
 
   // i have no idea what this does
   public double calculateVisionPercent() {
@@ -66,69 +64,57 @@ public class Odometry extends SubsystemBase {
 
   // average of X-values
   public double getX() {
-    try {
-        if (!visionDetections.isEmpty()) {
-            double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
-            if (error > maxHeadingError) {
-              return calculateAverage(vision.getX(), gyro.getX()); 
-            } else {
-              return gyro.getX(); 
-            }
-          } else {
-            return gyro.getX();
-          }
-    } catch (NullPointerException e) {
-        return gyro.getX();
+    if (visionDetections.isEmpty()) {
+      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+      if (error > maxHeadingError) {
+        return calculateAverage(vision.getX(), gyro.getX()); 
+      } else {
+        return gyro.getX(); 
+      }
+    } else {
+      return gyro.getX();
     }
   }
 
   // average of Y-values
   public double getY() {
-    try {
-        if (!visionDetections.isEmpty()) {
-            double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
-            if (error > maxHeadingError) {
-              return calculateAverage(vision.getY(), gyro.getY()); 
-            } else {
-              return gyro.getY(); 
-            }
-          } else {
-            return gyro.getY();
-          }
-    } catch (NullPointerException e) {
-        return gyro.getY();
+    if (visionDetections.isEmpty()) {
+      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+      if (error > maxHeadingError) {
+        return calculateAverage(vision.getY(), gyro.getY()); 
+      } else {
+        return gyro.getY(); 
+      }
+    } else {
+      return gyro.getY();
     }
   }
 
   // depth
   public double getZ() {
-    try {
-        if (!visionDetections.isEmpty()) {
-            return vision.getZ();
-          } else {
-            return 0.0;
-          }
-    } catch (NullPointerException e) {
-        return 0.0;
+    if (visionDetections.isEmpty()) {
+      return vision.getZ();
+    } else {
+      return 0.0;
     }
   }
 
   // calculates heading (angle) average
   public Rotation3d getHeading() {
-    try {
-        if (!visionDetections.isEmpty()) {
-            double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
-            if (error > maxHeadingError) {
-              return calculateHeadingAverage(vision.getHeading(), gyro.getHeading()); 
-            } else {
-              return gyro.getHeading();
-            } 
-          } else {
-            return gyro.getHeading();
-          }
-    } catch (NullPointerException e) {
+    if (visionDetections.isEmpty()) {
+      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+      if (error > maxHeadingError) {
+        return calculateHeadingAverage(vision.getHeading(), gyro.getHeading()); 
+      } else {
         return gyro.getHeading();
+      } 
+    } else {
+      return gyro.getHeading();
     }
+  }
+
+  public Rotation2d getHeading2d() {
+    return getHeading().toRotation2d();
   }
 
   public String getValuesVision() {

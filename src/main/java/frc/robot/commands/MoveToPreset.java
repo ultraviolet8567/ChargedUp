@@ -4,11 +4,13 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.Arms;
+import org.littletonrobotics.junction.Logger;
 
 public class MoveToPreset extends CommandBase {
     private Arms arms;
     private double shoulderSetpoint, elbowSetpoint;
     private SlewRateLimiter shoulderLimiter, elbowLimiter;
+    private double[] setpoints;
     
     public MoveToPreset(Arms arms) {
         this.arms = arms;
@@ -20,15 +22,14 @@ public class MoveToPreset extends CommandBase {
     }
 
     @Override 
-    public void initialize() {
-        double[] setpoints = arms.getPreset();
-        shoulderSetpoint = setpoints[0];
-        elbowSetpoint = setpoints[1];
-    }
+    public void initialize() { }
 
     @Override 
     public void execute() {
         // TODO: Determine the optimal order of movement to prevent hitting edge of tensioner
+        setpoints = arms.getPreset();
+        shoulderSetpoint = setpoints[0];
+        elbowSetpoint = setpoints[1];
         
         if (arms.idle()) {
             arms.stop();

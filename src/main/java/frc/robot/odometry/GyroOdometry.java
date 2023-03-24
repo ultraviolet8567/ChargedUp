@@ -1,5 +1,7 @@
 package frc.robot.odometry;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -9,15 +11,13 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
-public class GyroOdometry {
-
+public class GyroOdometry extends SubsystemBase {
     Swerve swerve;
-
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
-
     SwerveModulePosition[] modulePositions;
   
     boolean onSlope;
@@ -26,28 +26,31 @@ public class GyroOdometry {
     
     private static double minimumAngle = 0.03; // minimum angle for slope in radians
 
-    // the pose2d is the starting pose estimate of the robot 
-    // TODO: (find initial position)
-    // the pose2d says 'constructs a pose at origin facing towards the positive x axis' --> x is forwards? 
+//     // the pose2d is the starting pose estimate of the robot 
+//     // TODO: (find initial position)
+//     // the pose2d says 'constructs a pose at origin facing towards the positive x axis' --> x is forwards? 
     public SwerveDrivePoseEstimator estimator;
 
     public GyroOdometry(Swerve swerve) {
         this.swerve = swerve;
-        this.onSlope = false;
-
         modulePositions = swerve.getModulePositions();
+        onSlope = false;
         estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
-
         new Thread(() -> {
             try {
-                  Thread.sleep(100);
-                  gyro.calibrate();
-                  resetGyro();
+                Thread.sleep(100);
+                gyro.calibrate();
+                resetGyro();
             } catch (Exception e) { }
         });
     }
 
-    // on pit setup day, take robot to corner of field and record as 0
+    @Override
+    public void periodic() {
+        Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
+    }
+
+//     // on pit setup day, take robot to corner of field and record as 0
     public void resetGyro() {
         gyro.reset();
     }
@@ -86,9 +89,9 @@ public class GyroOdometry {
     // ;󠀿
     public void slopeCalc() {
         estimator.update(getRotation2d(), swerve.getModulePositions());
-        double pΔX = getX() - lastX;
-        double aΔX = pΔX * Math.cos(getHeading().getY());
-        double aCurrentX = lastX + aΔX;
+        double pdX = getX() - lastX;
+        double adX = pdX * Math.cos(getHeading().getY());
+        double aCurrentX = lastX + adX;
         Pose2d updatedPose = new Pose2d(new Translation2d(aCurrentX, getY()), getRotation2d());
         // hope and pray that this sets the current position to the updatedPose and doesn't just break things
         estimator.resetPosition(gyro.getRotation2d(), modulePositions, updatedPose);

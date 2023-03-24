@@ -51,23 +51,30 @@ public final class Constants {
         public static final double kElbowOffset = 0.658;
     
         // Rotation boundaries for arm joints point
-        public static final double kShoulderFrontLimit = 0;
-        public static final double kShoulderBackLimit = 0;
-        public static final double kElbowFrontLimit = 0;
-        public static final double kElbowBackLimit = 0;
+        public static final double kShoulderFrontLimit = 2.693;
+        public static final double kShoulderFrontMechanicalStop = 2.968;
+        public static final double kShoulderBackLimit = -2.248;
+        public static final double kShoulderBackMechanicalStop = -2.487;
+        public static final double kElbowFrontLimit = -4.199;
+        public static final double kElbowFrontMechanicalStop = -3.745; 
+        public static final double kElbowBackLimit = 2.372;
+        public static final double kElbowBackMechanicalStop = 3.032; 
+        
+        // Encoder translation
+        public static final double kShoulderEncoderTranslation = 0;
+        public static final double kElbowEncoderTranslation = 1.705;
 
         // Arm to elbow gear ratio coefficient
-        public static final double kArmsToElbow = -296.0 / 322.0;
+        public static final double kArmsToElbow = -152.0 / 322.0;
 
         //arm preset points TODO: find these points
-        public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
-        public static final double[] kMidNodeSetpoints = new double[] { 0, 0 };
-        public static final double[] kHybridNodeSetpoints = new double[] { -Math.PI / 2, -Math.PI / 2 };
-        public static final double[] kGroundIntakeSetpoints = new double[] { 0, 0 };
-        public static final double[] kSubstationIntakeSetpoints = new double[] { 0, 0 };
-        public static final double[] kStartSetpoints = new double[] { 0, 0 };
-        public static final double[] kTaxiSetpoints = new double[] { 0, 0 };
-        public static final double[] kIdleSetPoints = new double[] { 0, 0 };
+        public static final double[] kHighNodeSetpoints = new double[] { 0.735, 0.417 };
+        public static final double[] kMidNodeSetpoints = new double[] { 0.245, 1.933 };
+        public static final double[] kHybridNodeSetpoints = new double[] { 2.796, -1.183 };
+        public static final double[] kGroundIntakeSetpoints = new double[] { 2.423, -0.821 };
+        public static final double[] kSubstationIntakeSetpoints = new double[] { -0.642, 2.012 };
+        public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
+        public static final double[] kTaxiSetpoints = new double[] { -1.249, 2.360 };
     }
 
     public static final class OIConstants {
@@ -183,12 +190,14 @@ public final class Constants {
             new Rotation3d(0, 0, Units.degreesToRadians(-46)), // right camera
             new Rotation3d(0, 0, 0) // left camera
         }; 
-        // height values are from the ground not from center of robot but others are from center of robot
+        // 1's are values we need to find
+        // TODO: somebody other than chaerin with a working mechanical brain think about this, please?
+        // please :()
         public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from flat center
             new Translation3d(Units.inchesToMeters(6.5), Units.inchesToMeters(2.6875), Units.inchesToMeters(13.5)), // front camera
             new Translation3d(Units.inchesToMeters(9.75), Units.inchesToMeters(9.25), Units.inchesToMeters(5.35)), // right camera
             new Translation3d(1, 1, 0) // left camera
-        }; 
+        };
         public static final Transform3d[] cameraDistances = new Transform3d[] { 
             new Transform3d(cameraDisplacements[0], cameraDirections[0]), 
             new Transform3d(cameraDisplacements[1], cameraDirections[1]), 

@@ -13,7 +13,7 @@ import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
 import frc.robot.commands.*;
-import frc.robot.commands.auto.AutoDriveOut;
+import frc.robot.commands.auto.*;
 import frc.robot.odometry.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.ControllerIO;
@@ -44,6 +44,8 @@ public class RobotContainer {
             arms,
             () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
             () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
+
+        // arms.setDefaultCommand(new MoveToPreset(arms));
         
         configureButtonBindings();
     }
@@ -59,22 +61,19 @@ public class RobotContainer {
         // Commands to change the global game piece value (temporary)
         new JoystickButton(armJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(GamePiece.CONE));
         new JoystickButton(armJoystick , XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(GamePiece.CUBE));
+
+        // Temporary command to allow for software arm loosening if we lock the chains
+        new JoystickButton(armJoystick , XboxController.Button.kStart.value).onTrue(new ToggleArmIdleMode(arms));
                 
-        // Manual movement (deprecated)
-        // new JoystickButton(armJoystick, XboxController.Button.kX.value).whileTrue(new ManipulateArms(arms, "shoulder", "forward"));   
-        // new JoystickButton(armJoystick, XboxController.Button.kY.value).whileTrue(new ManipulateArms(arms, "shoulder", "backward"));   
-        // new JoystickButton(armJoystick, XboxController.Button.kB.value).whileTrue(new ManipulateArms(arms, "elbow", "forward"));   
-        // new JoystickButton(armJoystick, XboxController.Button.kA.value).whileTrue(new ManipulateArms(arms, "elbow", "backward"));
-    
         // Change preset target
         // TODO: Controller mapping for these presets
-        // new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
-        // new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
+        // new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
         // new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
         // new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
         // new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
         // new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.START));
-        // new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
+        new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
     }
 
     public Command getAutonomousCommand() {
