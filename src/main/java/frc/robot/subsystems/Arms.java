@@ -202,7 +202,7 @@ public class Arms extends SubsystemBase {
                 return ArmConstants.kTaxiSetpoints;
             case IDLE:
             default:
-                return ArmConstants.kStartSetpoints;
+                return ArmConstants.kTaxiSetpoints;
         } 
     }
 

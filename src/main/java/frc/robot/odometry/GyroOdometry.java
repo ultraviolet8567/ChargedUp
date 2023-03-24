@@ -14,8 +14,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
 public class GyroOdometry extends SubsystemBase {
-    Swerve swerve;
-    private AHRS gyro = new AHRS(SPI.Port.kMXP);
+    private Swerve swerve;
+    private AHRS gyro;
     SwerveModulePosition[] modulePositions;
   
     boolean onSlope;
@@ -25,29 +25,34 @@ public class GyroOdometry extends SubsystemBase {
     private static double minimumAngle = 0.03; // minimum angle for slope in radians
 
     // the pose2d is the starting pose estimate of the robot 
+
     // TODO: (find initial position, may vary based on match)
+    
     public SwerveDrivePoseEstimator estimator;
 
     public GyroOdometry(Swerve swerve) {
         this.swerve = swerve;
+        gyro = new AHRS(SPI.Port.kMXP);
+
         modulePositions = swerve.getModulePositions();
-        onSlope = false;
         estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
+        
+        onSlope = false;
+        
         new Thread(() -> {
             try {
                 Thread.sleep(100);
                 gyro.calibrate();
-                resetGyro();
             } catch (Exception e) { }
         });
     }
 
-    // on pit setup day, take robot to corner of field and reset (set 0, 0)
+    // On pit setup day, take robot to corner of field and reset (set 0, 0)
     public void resetGyro() {
         gyro.reset();
     }
 
-    // updates the pose estimator, runs in periodic
+    // Updates the pose estimator, runs in periodic
     public void updateGyroOdometry() {
         if (!onSlope) { //if not on slope at start of tick
             if (getHeading().getY() > -minimumAngle && getHeading().getY() < minimumAngle) { //check if on slope

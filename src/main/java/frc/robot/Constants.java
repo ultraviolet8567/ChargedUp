@@ -73,7 +73,7 @@ public final class Constants {
         public static final double[] kGroundIntakeSetpoints = new double[] { 2.423, -0.821 };
         public static final double[] kSubstationIntakeSetpoints = new double[] { -0.642, 2.012 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
-        public static final double[] kTaxiSetpoints = new double[] { -1.249, 2.360 };
+        public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
     }
 
     public static final class OIConstants {

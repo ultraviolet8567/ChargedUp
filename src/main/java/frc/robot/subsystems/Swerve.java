@@ -58,14 +58,9 @@ public class Swerve extends SubsystemBase {
             try {
                 Thread.sleep(1000);
                 gyro.calibrate();
-                resetGyro();
             } catch (Exception e) {
             }
         });
-    }
-
-    public void resetGyro() {
-        gyro.reset();
     }
 
     public double getHeading() {

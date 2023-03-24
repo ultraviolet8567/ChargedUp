@@ -31,13 +31,18 @@ public class MoveArms extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (leftTriggerSupplier.get() > 0.5 && rightTriggerSupplier.get() > 0.5) {
-            // Manual arm movement
-            manual.execute();
+        if (arms.idle()) {
+            arms.stop();
         }
         else {
-            // Preset automatic movement
-            preset.execute();
+            if (leftTriggerSupplier.get() > 0.5 && rightTriggerSupplier.get() > 0.5) {
+                // Manual arm movement
+                manual.execute();
+            }
+            else {
+                // Preset automatic movement
+                preset.execute();
+            }
         }
     }
 

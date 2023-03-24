@@ -21,18 +21,15 @@ public class MoveToPreset extends CommandBase {
         // TODO: Determine the optimal order of movement to prevent hitting edge of tensioner
         double[] setpoints = arms.getPreset();
         
-        if (arms.idle()) {
-            arms.stop();
-        }
-        else {
-            double[] speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
+        double[] speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
 
-            double shoulderSpeed = shoulderLimiter.calculate(speeds[0]) * ArmConstants.kMaxShoulderSpeed.get();
-            double elbowSpeed = elbowLimiter.calculate(speeds[1]) * ArmConstants.kMaxElbowSpeed.get();
+        double shoulderSpeed = shoulderLimiter.calculate(speeds[0]) * ArmConstants.kMaxShoulderSpeed.get();
+        double elbowSpeed = elbowLimiter.calculate(speeds[1]) * ArmConstants.kMaxElbowSpeed.get();
 
+        if (arms.shoulderMovable(shoulderSpeed))
             arms.runShoulder(shoulderSpeed);
-            arms.runElbow(elbowSpeed);
-        }    
+        if (arms.elbowMovable(elbowSpeed))
+            arms.runElbow(elbowSpeed);    
     }
 
     @Override
