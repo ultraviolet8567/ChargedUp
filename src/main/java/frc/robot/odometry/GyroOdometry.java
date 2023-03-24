@@ -42,7 +42,7 @@ public class GyroOdometry extends SubsystemBase {
         });
     }
 
-//     // on pit setup day, take robot to corner of field and record as 0
+    // on pit setup day, take robot to corner of field and reset (set 0, 0)
     public void resetGyro() {
         gyro.reset();
     }

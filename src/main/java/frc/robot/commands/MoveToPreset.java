@@ -4,7 +4,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.Arms;
-import org.littletonrobotics.junction.Logger;
 
 public class MoveToPreset extends CommandBase {
     private Arms arms;
