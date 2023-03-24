@@ -1,7 +1,5 @@
 package frc.robot.odometry;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -26,9 +24,8 @@ public class GyroOdometry extends SubsystemBase {
     
     private static double minimumAngle = 0.03; // minimum angle for slope in radians
 
-//     // the pose2d is the starting pose estimate of the robot 
-//     // TODO: (find initial position)
-//     // the pose2d says 'constructs a pose at origin facing towards the positive x axis' --> x is forwards? 
+    // the pose2d is the starting pose estimate of the robot 
+    // TODO: (find initial position, may vary based on match)
     public SwerveDrivePoseEstimator estimator;
 
     public GyroOdometry(Swerve swerve) {
@@ -43,11 +40,6 @@ public class GyroOdometry extends SubsystemBase {
                 resetGyro();
             } catch (Exception e) { }
         });
-    }
-
-    @Override
-    public void periodic() {
-        Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
     }
 
 //     // on pit setup day, take robot to corner of field and record as 0
