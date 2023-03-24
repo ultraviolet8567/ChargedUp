@@ -33,15 +33,15 @@ public final class Constants {
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
-        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.4);
-        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.4);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
-        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.7);
+        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.7);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 2);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 2);
 
         // PID controllers
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.05);
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.5);
         public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
-        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.05);
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
         public static final double kElbowPidTolerance = 5 * Math.PI / 600;
     
         // Arm absolute encoders
@@ -55,14 +55,18 @@ public final class Constants {
         public static final double kShoulderFrontMechanicalStop = 2.968;
         public static final double kShoulderBackLimit = -2.248;
         public static final double kShoulderBackMechanicalStop = -2.487;
-        public static final double kElbowFrontLimit = -4.199;
-        public static final double kElbowFrontMechanicalStop = -3.745; 
-        public static final double kElbowBackLimit = 2.372;
-        public static final double kElbowBackMechanicalStop = 3.032; 
+        public static final double kElbowFrontLimit = 2.438;
+        // public static final double kElbowFrontLimit = -4.199;
+        public static final double kElbowFrontMechanicalStop = 2.647; 
+        // public static final double kElbowFrontMechanicalStop = -3.745; 
+        public static final double kElbowBackLimit = -2.581;
+        // public static final double kElbowBackLimit = 2.372;
+        public static final double kElbowBackMechanicalStop = -2.792; 
+        // public static final double kElbowBackMechanicalStop = 3.032; 
         
         // Encoder translation
         public static final double kShoulderEncoderTranslation = 0;
-        public static final double kElbowEncoderTranslation = 1.705;
+        public static final double kElbowEncoderTranslation = -1.705;
 
         // Arm to elbow gear ratio coefficient
         public static final double kArmsToElbow = -152.0 / 322.0;
