@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.geometry.Rotation3d;
 
 public class VisionOdometry extends SubsystemBase {
+  // TODO: check if the IDs are correct at all (or just find them)
+  // also, connect the camera to NetworkTables so that they work?
   private final Camera camera1 = new Camera(0);
   private final Camera camera2 = new Camera(1);
   private final Camera camera3 = new Camera(2);

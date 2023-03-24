@@ -49,7 +49,13 @@ public class Odometry extends SubsystemBase {
 
     // CCW+
     Logger.getInstance().recordOutput("Odometry/Heading", getHeading2d().getRadians());
-    Logger.getInstance().recordOutput("Vision/Values", vision.getTag());
+
+    try {
+      Logger.getInstance().recordOutput("Odometry/Values", vision.getTag());
+    } catch (NullPointerException e) {
+      // heyyy nothing's being detected!
+      Logger.getInstance().recordOutput("Odometry/Values", 23);
+    }
   }
 
   // i have no idea what this does
@@ -64,61 +70,73 @@ public class Odometry extends SubsystemBase {
 
   // average of X-values
   public double getX() {
-    if (visionDetections.isEmpty()) {
-      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
-      if (error > maxHeadingError) {
-        return calculateAverage(vision.getX(), gyro.getX()); 
+    try {
+      if (vision.checkCameras() >= 1) {
+        double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+        if (error > maxHeadingError) {
+          return calculateAverage(vision.getX(), gyro.getX()); 
+        } else {
+          return gyro.getX(); 
+        }
       } else {
-        return gyro.getX(); 
+        return gyro.getX();
       }
-    } else {
+    } catch (NullPointerException e) {
       return gyro.getX();
     }
   }
 
   // average of Y-values
   public double getY() {
-    if (visionDetections.isEmpty()) {
-      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
-      if (error > maxHeadingError) {
-        return calculateAverage(vision.getY(), gyro.getY()); 
+    try {
+      if (vision.checkCameras() >= 1) {
+        double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+        if (error > maxHeadingError) {
+          return calculateAverage(vision.getY(), gyro.getY()); 
+        } else {
+          return gyro.getY(); 
+        }
       } else {
-        return gyro.getY(); 
+        return gyro.getY();
       }
-    } else {
+    } catch (NullPointerException e) {
       return gyro.getY();
     }
   }
 
   // depth
   public double getZ() {
-    if (visionDetections.isEmpty()) {
-      return vision.getZ();
-    } else {
+    try {
+      if (vision.checkCameras() >= 1) {
+        return vision.getZ();
+      } else {
+        return 0.0;
+      }
+    } catch (NullPointerException e) {
       return 0.0;
     }
   }
 
   // calculates heading (angle) average
   public Rotation3d getHeading() {
-    if (visionDetections.isEmpty()) {
-      double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
-      if (error > maxHeadingError) {
-        return calculateHeadingAverage(vision.getHeading(), gyro.getHeading()); 
+    try {
+      if (vision.checkCameras() >= 1) {
+        double error = Math.abs((vision.getHeading().getZ() - gyro.getHeading().getZ()) / gyro.getHeading().getZ());
+        if (error > maxHeadingError) {
+          return calculateHeadingAverage(vision.getHeading(), gyro.getHeading()); 
+        } else {
+          return gyro.getHeading();
+        } 
       } else {
         return gyro.getHeading();
-      } 
-    } else {
+      }
+    } catch (NullPointerException e) {
       return gyro.getHeading();
     }
   }
 
   public Rotation2d getHeading2d() {
     return getHeading().toRotation2d();
-  }
-
-  public void getValuesVision() {
-    System.out.println(vision.getTag());
   }
 
   // weighted average 
