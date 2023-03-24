@@ -30,6 +30,7 @@ public final class Constants {
     public static final Mode currentMode = Mode.TUNING;
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
+    public static final String logpath = "C:/Users/Wellesley FRC 8567/Desktop/Logs";
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
@@ -47,8 +48,6 @@ public final class Constants {
         // Arm absolute encoders
         public static final int kShoulderEncoderPort = 0;
         public static final int kElbowEncoderPort = 1;
-        public static final double kShoulderOffset = 0.753;
-        public static final double kElbowOffset = 0.658;
     
         // Rotation boundaries for arm joints point
         public static final double kShoulderFrontLimit = 2.693;
@@ -56,17 +55,13 @@ public final class Constants {
         public static final double kShoulderBackLimit = -2.248;
         public static final double kShoulderBackMechanicalStop = -2.487;
         public static final double kElbowFrontLimit = 2.438;
-        // public static final double kElbowFrontLimit = -4.199;
         public static final double kElbowFrontMechanicalStop = 2.647; 
-        // public static final double kElbowFrontMechanicalStop = -3.745; 
         public static final double kElbowBackLimit = -2.581;
-        // public static final double kElbowBackLimit = 2.372;
-        public static final double kElbowBackMechanicalStop = -2.792; 
-        // public static final double kElbowBackMechanicalStop = 3.032; 
+        public static final double kElbowBackMechanicalStop = -2.792;
         
-        // Encoder translation
-        public static final double kShoulderEncoderTranslation = 0;
-        public static final double kElbowEncoderTranslation = -1.705;
+        // Encoder offsets
+        public static final double kShoulderEncoderOffset = 0;
+        public static final double kElbowEncoderOffset = -1.705;
 
         // Arm to elbow gear ratio coefficient
         public static final double kArmsToElbow = -152.0 / 322.0;

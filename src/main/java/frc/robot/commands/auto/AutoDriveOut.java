@@ -2,14 +2,14 @@ package frc.robot.commands.auto;
 
 import org.littletonrobotics.junction.Logger;
 
-// import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-// import frc.robot.RobotContainer;
+import frc.robot.RobotContainer;
 import frc.robot.commands.SwerveTeleOp;
 import frc.robot.odometry.Odometry;
 import frc.robot.subsystems.Swerve;
-// import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 
 public class AutoDriveOut extends CommandBase {

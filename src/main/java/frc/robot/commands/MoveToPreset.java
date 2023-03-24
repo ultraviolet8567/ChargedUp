@@ -4,13 +4,10 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.Arms;
-import org.littletonrobotics.junction.Logger;
 
 public class MoveToPreset extends CommandBase {
     private Arms arms;
-    private double shoulderSetpoint, elbowSetpoint;
     private SlewRateLimiter shoulderLimiter, elbowLimiter;
-    private double[] setpoints;
     
     public MoveToPreset(Arms arms) {
         this.arms = arms;
@@ -27,26 +24,19 @@ public class MoveToPreset extends CommandBase {
     @Override 
     public void execute() {
         // TODO: Determine the optimal order of movement to prevent hitting edge of tensioner
-        setpoints = arms.getPreset();
-        shoulderSetpoint = setpoints[0];
-        elbowSetpoint = setpoints[1];
+        double[] setpoints = arms.getPreset();
         
         if (arms.idle()) {
             arms.stop();
         }
         else {
-            double[] speeds = arms.calculateMotorSpeeds(shoulderSetpoint, elbowSetpoint);
+            double[] speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
 
-            double shoulderSpeed = speeds[0];
-            double elbowSpeed = speeds[1];
+            double shoulderSpeed = shoulderLimiter.calculate(speeds[0]) * ArmConstants.kMaxShoulderSpeed.get();
+            double elbowSpeed = elbowLimiter.calculate(speeds[1]) * ArmConstants.kMaxElbowSpeed.get();
 
-            shoulderSpeed = shoulderLimiter.calculate(shoulderSpeed) * ArmConstants.kMaxShoulderSpeed.get();
-            elbowSpeed = elbowLimiter.calculate(elbowSpeed) * ArmConstants.kMaxElbowSpeed.get();
-            
-            Logger.getInstance().recordOutput("SpeedElbow", speeds[1]);
-
-            arms.runShoulder(speeds[0]);
-            arms.runElbow(speeds[1]);
+            arms.runShoulder(shoulderSpeed);
+            arms.runElbow(elbowSpeed);
         }    
     }
 

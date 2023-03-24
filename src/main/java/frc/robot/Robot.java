@@ -42,11 +42,10 @@ public class Robot extends LoggedRobot {
         switch (Constants.currentMode) {
             case TUNING:
             case REAL:
-                logger.addDataReceiver(new WPILOGWriter("C:/Users/Wellesley FRC 8567/Desktop/Logs"));
+                logger.addDataReceiver(new WPILOGWriter(Constants.logpath));
                 logger.addDataReceiver(new NT4Publisher());
                 break;
             case SIM:
-                logger.addDataReceiver(new WPILOGWriter("C:/Users/kaldr/OneDrive/Documents/FRCProjects/Logging/Simulator logs"));
                 logger.addDataReceiver(new NT4Publisher());
                 break;
             case REPLAY:

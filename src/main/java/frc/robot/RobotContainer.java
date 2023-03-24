@@ -20,9 +20,9 @@ public class RobotContainer {
     private final Swerve swerve = new Swerve();
     private final Intake intake = new Intake();
     private final Arms arms = new Arms();
-    private final VisionOdometry vision = new VisionOdometry();
+    // private final VisionOdometry vision = new VisionOdometry();
     private final GyroOdometry gyro = new GyroOdometry(swerve);
-    private final Odometry odometry = new Odometry(gyro, vision);
+    // private final Odometry odometry = new Odometry(gyro, vision);
     private final Joystick driverJoystick = new Joystick(OIConstants.kDriveControllerPort);
     private static final Joystick armJoystick = new Joystick(OIConstants.kArmControllerPort);
 
@@ -65,14 +65,12 @@ public class RobotContainer {
                 
         // Change preset target
         // TODO: Controller mapping for these presets
-        new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
-        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
-        // new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
-        // new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
-        // new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
-        // new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.START));
-        new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
-        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.IDLE));
+        new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kX.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
+        new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.START));
     }
 
     public Command getAutonomousCommand() {

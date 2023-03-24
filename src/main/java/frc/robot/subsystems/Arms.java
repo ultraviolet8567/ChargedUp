@@ -6,21 +6,18 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.CAN;
-import frc.robot.Constants.GamePiece;
-import frc.robot.Constants.Mode;
-import frc.robot.Constants.Preset;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.CAN;
+import frc.robot.Constants.Preset;
 
 public class Arms extends SubsystemBase {
     
@@ -48,17 +45,17 @@ public class Arms extends SubsystemBase {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
         elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
 
+        // Invert the elbow speed because otherwise positive moves towards the battery
+        elbow.setInverted(true);
 
         shoulderEncoder = new DutyCycleEncoder(ArmConstants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(ArmConstants.kElbowEncoderPort);
 
         shoulderPidController = new PIDController(ArmConstants.kPShoulder.get(), 0, 0);
         shoulderPidController.setTolerance(ArmConstants.kShoulderPidTolerance);
-        // shoulderPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         elbowPidController = new PIDController(ArmConstants.kPElbow.get(), 0, 0);
         elbowPidController.setTolerance(ArmConstants.kElbowPidTolerance);
-        // elbowPidController.enableContinuousInput(-Math.PI, Math.PI);
         
         presetValue = Preset.IDLE;
 
@@ -77,12 +74,16 @@ public class Arms extends SubsystemBase {
     public void periodic() {
         Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderAngle());
         Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", elbowAngle());
-        Logger.getInstance().recordOutput("Measured/Shoulder", shoulder.getEncoder().getVelocity());
-        Logger.getInstance().recordOutput("Measured/Elbow", elbow.getEncoder().getVelocity());
+
+        Logger.getInstance().recordOutput("Speeds/Shoulder", shoulder.getEncoder().getVelocity());
+        Logger.getInstance().recordOutput("Speeds/Elbow", elbow.getEncoder().getVelocity());
 
         Logger.getInstance().recordOutput("Setpoints/Shoulder", getPreset()[0]);
         Logger.getInstance().recordOutput("Setpoints/Elbow", getPreset()[1]);
+    }
         
+    @Override
+    public void simulationPeriodic() {
         // Simulator stuff
         Logger.getInstance().recordOutput("Simulator/AbsoluteEncoders/SimShoulder", shoulderSimEncoder);
         Logger.getInstance().recordOutput("Simulator/AbsoluteEncoders/SimElbow", elbowSimEncoder);
@@ -92,59 +93,37 @@ public class Arms extends SubsystemBase {
         elbowMech.setAngle(elbowSimEncoder);
     }
 
-    public boolean idle() {
-        return presetValue == Preset.IDLE;
-    }
-
     public void runShoulder(double speed) {
         shoulder.set(speed);
     }
-
-    // public void runShoulderSim(double speed) {
-    //     shoulderSimEncoder += speed * 5;
-    // }
     
     public void runElbow(double speed) {
         elbow.set(speed);
     }
 
-    // public void runElbowSim(double speed) {
-    //     elbowSimEncoder += speed * 5;
-    // }
-
     public double shoulderAngle() {
         double angle = shoulderEncoder.getAbsolutePosition();
         angle *= 2 * Math.PI;
-        angle = translateEncoderAngle(angle, ArmConstants.kShoulderEncoderTranslation);
+        angle = translateEncoderAngle(angle, ArmConstants.kShoulderEncoderOffset);
         return angle;
     }
-
-    // public double shoulderAngleSim() {
-    //     return shoulderS eimEncoder;
-    // }
 
     public double elbowAngle() {
         double angle = elbowEncoder.getAbsolutePosition();
         angle *= 2 * Math.PI;
-        angle = translateEncoderAngle(angle, ArmConstants.kElbowEncoderTranslation);
+        angle = translateEncoderAngle(angle, ArmConstants.kElbowEncoderOffset);
         return angle;
     }
 
-    // public double elbowAngleSim() {
-    //     return elbowSimEncoder;
-    // }
-
     // Translates the absolute encoder readings to make future calculations easier
     public double translateEncoderAngle(double angle, double encoderTranslation) {
-        boolean makeNeg = false;
         angle = (angle + encoderTranslation) % (2 * Math.PI);
-        if (angle >= Math.PI / 2 && angle <= 3 * Math.PI / 2) {
-            makeNeg = true;
-        }
+        boolean makeNegative = (angle >= Math.PI / 2 && angle <= 3 * Math.PI / 2);
+        
         angle = (angle + Math.PI / 2) % Math.PI;
-        if (makeNeg) {
+        if (makeNegative)
             angle -= Math.PI;
-        }
+
         return angle;
     }
     
@@ -158,13 +137,128 @@ public class Arms extends SubsystemBase {
         // Clamp the speeds between -100% and 100%
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -1, 1);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -1, 1);
+        
+        Logger.getInstance().recordOutput("PIDError/Shoulder", shoulderPidController.getPositionError());
+        Logger.getInstance().recordOutput("PIDError/Shoulder", elbowPidController.getPositionError());
 
-        System.out.println("{ " + shoulderSetpoint + " " + elbowSetpoint + " }");
-        System.out.println("** " + shoulderAngle() + " " + elbowAngle() + " **");
-        System.out.println(shoulderPidController.getPositionError() + " " + elbowPidController.getPositionError());
-
-        return new double[] {shoulderSpeed, -elbowSpeed};
+        return new double[] {shoulderSpeed, elbowSpeed};
     }
+    
+    // Check if the shoulder can be moved
+    public boolean shoulderMovable(double shoulderSpeed) {
+        return !(shoulderPastBackLimit() && shoulderSpeed < 0) && !(shoulderPastFrontLimit() && shoulderSpeed > 0);
+    }
+
+    // Check if the elbow can be moved
+    public boolean elbowMovable(double elbowSpeed) {
+        return !(elbowPastBackLimit() && elbowSpeed < 0) && !(elbowPastFrontLimit() && elbowSpeed > 0);
+    }
+
+    // Check if the bicep is within the operable range
+    public boolean shoulderWithinRange() {
+        return ArmConstants.kShoulderBackLimit < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontLimit;
+    }
+
+    // Check if the forearm is within the operable range
+    public boolean elbowWithinRange() {
+        return ArmConstants.kElbowBackLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontLimit;
+    }
+
+    // Check if the bicep has rotated too far backward (and could hit the superstructure)
+    public boolean shoulderPastBackLimit() {
+        return ArmConstants.kShoulderBackMechanicalStop < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderBackLimit;
+    }
+    
+    // Check if the bicep has rotated too far forward (and could hit the bumpers)
+    public boolean shoulderPastFrontLimit() {
+        return ArmConstants.kShoulderFrontLimit < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontMechanicalStop;
+    }
+
+    // Check if the forearm has rotated too far backward and could hit the top of the bicep
+    public boolean elbowPastBackLimit() {
+        return ArmConstants.kElbowBackMechanicalStop < elbowAngle() && elbowAngle() < ArmConstants.kElbowBackLimit;
+    }
+
+    // Check if the forearm has rotated too far forward and could hit the bottom of the bicep
+    public boolean elbowPastFrontLimit() {
+        return ArmConstants.kElbowFrontLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontMechanicalStop;
+    }
+
+    public double[] getPreset() {
+        switch (presetValue) {
+            case HIGH_NODE:
+                return ArmConstants.kHighNodeSetpoints;
+            case MID_NODE:
+                return ArmConstants.kMidNodeSetpoints;
+            case HYBRID_NODE:
+                return ArmConstants.kHybridNodeSetpoints;
+            case SUBSTATION_INTAKE:
+                return ArmConstants.kSubstationIntakeSetpoints;
+            case GROUND_INTAKE:
+                return ArmConstants.kGroundIntakeSetpoints;
+            case START:
+                return ArmConstants.kStartSetpoints;
+            case TAXI:
+                return ArmConstants.kTaxiSetpoints;
+            case IDLE:
+            default:
+                return ArmConstants.kStartSetpoints;
+        } 
+    }
+
+    public void setPresetValue(Preset preset) {
+        presetValue = preset;
+    }
+
+    public boolean idle() {
+        return presetValue == Preset.IDLE;
+    }
+
+    public void toggleArmIdleMode() {
+        if (shoulder.getIdleMode() == IdleMode.kBrake) {
+            shoulder.setIdleMode(IdleMode.kCoast);
+            elbow.setIdleMode(IdleMode.kCoast);
+        }
+        else {
+            shoulder.setIdleMode(IdleMode.kBrake);
+            elbow.setIdleMode(IdleMode.kBrake);
+        }
+    }
+
+    public void stop() {
+        shoulder.stopMotor();
+        elbow.stopMotor();
+    }
+
+    public void stopShoulder() {
+        shoulder.stopMotor();
+    }
+
+    public void stopElbow() {
+        elbow.stopMotor();
+    }
+
+    public void resetAbsoluteEncoders() {
+        shoulderEncoder.reset();
+        elbowEncoder.reset();
+    }
+
+
+    // public void runShoulderSim(double speed) {
+    //     shoulderSimEncoder += speed * 5;
+    // }
+
+    // public void runElbowSim(double speed) {
+    //     elbowSimEncoder += speed * 5;
+    // }
+
+    // public double shoulderAngleSim() {
+    //     return shoulderS eimEncoder;
+    // }
+
+    // public double elbowAngleSim() {
+    //     return elbowSimEncoder;
+    // }
 
     // This code does not work
     // public double[] calculateMotorSpeedsSim(double shoulderSetpoint, double elbowSetpoint) {
@@ -222,108 +316,19 @@ public class Arms extends SubsystemBase {
     //     return new double[] {shoulderSpeed, elbowSpeed};   
     // }
 
-    // Check if the bicep is within the operable range
-    public boolean shoulderWithinRange() {
-        return ArmConstants.kShoulderBackLimit < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontLimit;
-    }
-
-    // Check if the forearm is within the operable range
-    // This NEGLECTS chain tensioners, which would lock the sprocket BEFORE this becomes false
-    public boolean elbowWithinRange() {
-        return ArmConstants.kElbowBackLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontLimit;
-           
-    }
-
-    // Check if the bicep has rotated too far backward (and could hit the superstructure)
-    public boolean shoulderPastBackLimit() {
-        return ArmConstants.kShoulderBackMechanicalStop < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderBackLimit;
-    }
-
     // public boolean checkShoulderLocationBackwardSim() {
     //     return !(shoulderAngleSim() >= Units.radiansToDegrees(-ArmConstants.kStopShoulderMid) && shoulderAngleSim() <= Units.radiansToDegrees(ArmConstants.kStopShoulderBackward));
     // }
-
-    // Check if the bicep has rotated too far forward (and could hit the bumpers)
-    public boolean shoulderPastFrontLimit() {
-        return ArmConstants.kShoulderFrontLimit < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontMechanicalStop;
-    }
 
     // public boolean checkShoulderLocationForwardSim() {
     //     return !(shoulderAngle() <= Units.radiansToDegrees(ArmConstants.kStopShoulderMid) && shoulderAngle() >= Units.radiansToDegrees(ArmConstants.kStopShoulderForward));
     // }
 
-    // Check if the forearm has rotated too far backward and could hit the top of the bicep
-    // This NEGLECTS chain tensioners, which would lock the sprocket BEFORE this becomes true
-    public boolean elbowPastBackLimit() {
-        return ArmConstants.kElbowBackMechanicalStop < elbowAngle() && elbowAngle() < ArmConstants.kElbowBackLimit;
-    }
-
     // public boolean checkElbowLocationBackwardSim() {
     //     return !(elbowAngle() <= Units.radiansToDegrees(ArmConstants.kStopElbowBackward) && elbowAngle() >= Units.radiansToDegrees(-ArmConstants.kStopElbowMid));
     // }
 
-    // Check if the forearm has rotated too far forward and could hit the bottom of the bicep
-    // This NEGLECTS chain tensioners, which would lock the sprocket BEFORE this becomes true
-    public boolean elbowPastFrontLimit() {
-        return ArmConstants.kElbowFrontLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontMechanicalStop;
-    }
-
     // public boolean checkElbowLocationForwardSim() {
     //     return !(elbowAngle() >= Units.radiansToDegrees(ArmConstants.kStopElbowForward) && elbowAngle() <= Units.radiansToDegrees(ArmConstants.kStopElbowMid));
     // }
-
-    public double[] getPreset() {
-        switch (presetValue) {
-            case HIGH_NODE:
-                return ArmConstants.kHighNodeSetpoints;
-            case MID_NODE:
-                return ArmConstants.kMidNodeSetpoints;
-            case HYBRID_NODE:
-                return ArmConstants.kHybridNodeSetpoints;
-            case SUBSTATION_INTAKE:
-                return ArmConstants.kSubstationIntakeSetpoints;
-            case GROUND_INTAKE:
-                return ArmConstants.kGroundIntakeSetpoints;
-            case START:
-                return ArmConstants.kStartSetpoints;
-            case TAXI:
-                return ArmConstants.kTaxiSetpoints;
-            case IDLE:
-            default:
-                return ArmConstants.kStartSetpoints;
-        } 
-    }
-
-    public void setPresetValue(Preset preset) {
-        presetValue = preset;
-    }
-
-    public void toggleArmIdleMode() {
-        if (shoulder.getIdleMode() == IdleMode.kBrake) {
-            shoulder.setIdleMode(IdleMode.kCoast);
-            elbow.setIdleMode(IdleMode.kCoast);
-        }
-        else {
-            shoulder.setIdleMode(IdleMode.kBrake);
-            elbow.setIdleMode(IdleMode.kBrake);
-        }
-    }
-
-    public void stop() {
-        shoulder.stopMotor();
-        elbow.stopMotor();
-    }
-
-    public void stopShoulder() {
-        shoulder.stopMotor();
-    }
-
-    public void stopElbow() {
-        elbow.stopMotor();
-    }
-
-    public void resetAbsoluteEncoders() {
-        shoulderEncoder.reset();
-        elbowEncoder.reset();
-    }
 }
