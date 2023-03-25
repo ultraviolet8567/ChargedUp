@@ -2,8 +2,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ControllerType;
@@ -28,6 +30,9 @@ public class RobotContainer {
 
     public final static ShuffleboardTab tabMain = Shuffleboard.getTab("Main");
 
+    // Autonomous chooser
+    SendableChooser<Command> autoChooser = new SendableChooser<>();
+
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
             swerve,
@@ -44,15 +49,15 @@ public class RobotContainer {
             () -> armJoystick.getRawAxis(ControllerIO.getRightY()),
             () -> armJoystick.getRawAxis(ControllerIO.getLeftTrigger()),
             () -> armJoystick.getRawAxis(ControllerIO.getRightTrigger())));
-
-        // arms.setDefaultCommand(new ArmManual(
-        //     arms,
-        //     () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
-        //     () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
-
-        // arms.setDefaultCommand(new MoveToPreset(arms));
         
-        configureButtonBindings();
+        // Configure autonomous sendable chooser and send to Shuffleboard
+        autoChooser.setDefaultOption("Drive out auto", new AutoDriveOut(swerve, gyro));
+        // autoChooser.setDefaultOption("Charging station engage auto", new AutoEngage(swerve, gyro));
+        tabMain.add("Auto mode", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser)
+            .withSize(2, 1)
+            .withPosition(6, 0);
+        
+            configureButtonBindings();
     }
 
     public void configureButtonBindings() {
@@ -74,10 +79,10 @@ public class RobotContainer {
         // TODO: Controller mapping for these presets
         new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
         new JoystickButton(armJoystick, XboxController.Button.kX.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
-        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
+        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));
         new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
         new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
-        new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
+        new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
     }
 
     public Command getAutonomousCommand() {

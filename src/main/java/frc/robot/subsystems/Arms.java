@@ -15,8 +15,10 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.Preset;
 
 public class Arms extends SubsystemBase {
@@ -139,7 +141,7 @@ public class Arms extends SubsystemBase {
         elbowSpeed = MathUtil.clamp(elbowSpeed, -1, 1);
         
         Logger.getInstance().recordOutput("PIDError/Shoulder", shoulderPidController.getPositionError());
-        Logger.getInstance().recordOutput("PIDError/Shoulder", elbowPidController.getPositionError());
+        Logger.getInstance().recordOutput("PIDError/Elbow", elbowPidController.getPositionError());
 
         return new double[] {shoulderSpeed, elbowSpeed};
     }
@@ -187,15 +189,15 @@ public class Arms extends SubsystemBase {
     public double[] getPreset() {
         switch (presetValue) {
             case HIGH_NODE:
-                return ArmConstants.kHighNodeSetpoints;
+                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kHighNodeConeSetpoints : ArmConstants.kHighNodeCubeSetpoints;
             case MID_NODE:
-                return ArmConstants.kMidNodeSetpoints;
+                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kMidNodeConeSetpoints : ArmConstants.kMidNodeCubeSetpoints;
             case HYBRID_NODE:
-                return ArmConstants.kHybridNodeSetpoints;
+                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kHybridNodeConeSetpoints : ArmConstants.kHybridNodeCubeSetpoints;
             case SUBSTATION_INTAKE:
-                return ArmConstants.kSubstationIntakeSetpoints;
+                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kSubstationIntakeConeSetpoints : ArmConstants.kSubstationIntakeCubeSetpoints;
             case GROUND_INTAKE:
-                return ArmConstants.kGroundIntakeSetpoints;
+                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kGroundIntakeConeSetpoints : ArmConstants.kGroundIntakeCubeSetpoints;
             case START:
                 return ArmConstants.kStartSetpoints;
             case TAXI:
@@ -208,6 +210,10 @@ public class Arms extends SubsystemBase {
 
     public void setPresetValue(Preset preset) {
         presetValue = preset;
+    }
+
+    public Preset getPresetValue() {
+        return presetValue;
     }
 
     public boolean idle() {

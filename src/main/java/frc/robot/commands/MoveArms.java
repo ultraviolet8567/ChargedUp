@@ -3,16 +3,19 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.Preset;
 import frc.robot.subsystems.Arms;
 
 public class MoveArms extends CommandBase {
     private Arms arms;
     private ArmManual manual;
     private MoveToPreset preset;
-    private Supplier<Double> leftTriggerSupplier, rightTriggerSupplier;
+    private Supplier<Double> leftJoystickSupplier, rightJoystickSupplier, leftTriggerSupplier, rightTriggerSupplier;
 
     public MoveArms(Arms arms, Supplier<Double> leftJoystickSupplier, Supplier<Double> rightJoystickSupplier, Supplier<Double> leftTriggerSupplier, Supplier<Double> rightTriggerSupplier) {
         this.arms = arms;
+        this.leftJoystickSupplier = leftJoystickSupplier;
+        this.rightJoystickSupplier = rightJoystickSupplier;
         this.leftTriggerSupplier = leftTriggerSupplier;
         this.rightTriggerSupplier = rightTriggerSupplier;
 
@@ -35,9 +38,10 @@ public class MoveArms extends CommandBase {
             arms.stop();
         }
         else {
-            if (leftTriggerSupplier.get() > 0.5 && rightTriggerSupplier.get() > 0.5) {
+            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || leftJoystickSupplier.get() > 0.2 || rightJoystickSupplier.get() > 0.2) {
                 // Manual arm movement
                 manual.execute();
+                arms.setPresetValue(Preset.MANUAL_OVERRIDE);
             }
             else {
                 // Preset automatic movement

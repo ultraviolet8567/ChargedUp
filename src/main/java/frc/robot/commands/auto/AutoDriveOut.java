@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.commands.SwerveTeleOp;
+import frc.robot.odometry.GyroOdometry;
 import frc.robot.odometry.Odometry;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,44 +15,42 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class AutoDriveOut extends CommandBase {
     private Swerve swerve;
-    private Odometry odometry;
+    private GyroOdometry odometry;
     private Timer timer;
     private SwerveTeleOp runSwerve;
 
-    public AutoDriveOut(Swerve swerve, Odometry odometry) {
+    public AutoDriveOut(Swerve swerve, GyroOdometry odometry) {
         this.swerve = swerve;
         this.odometry = odometry;
     }
   
-    // @Override 
-    // public void initialize() {
-    //     timer = new Timer();
-    //     timer.start();
+    @Override 
+    public void initialize() {
+        timer = new Timer();
+        timer.start();
 
-    //     runSwerve = new SwerveTeleOp(
-    //         swerve,
-    //         odometry,
-    //         () -> 2.0,
-    //         () -> 0.0,
-    //         () -> 0.0,
-    //         () -> false,
-    //         () -> true);
-    //     runSwerve.initialize();
-    // }
+        runSwerve = new SwerveTeleOp(
+            swerve,
+            odometry,
+            () -> 0.25,
+            () -> 0.0,
+            () -> 0.0,
+            () -> false,
+            () -> true);
+        runSwerve.initialize();
+    }
 
-    // @Override
-    // public void execute() {
-        
-        
-    //     if (timer.get() > 1) { 
-    //         runSwerve.execute();
-    //         // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(2.0, 0.0, 0.0, new Rotation2d(0));
-    //     }
-    //     Logger.getInstance().recordOutput("timer", timer.get());
-    // }
-    // public void end(boolean interrupted) {
-    //     // chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0.0, 0.0, 0.0, new Rotation2d(0));
-    //     timer.stop();
-    //     runSwerve.end(false);
-    // }
+    @Override
+    public void execute() {
+        if (timer.get() < 5) { 
+            runSwerve.execute();
+        }
+        else {
+            swerve.stopModules();
+        }
+    }
+    public void end(boolean interrupted) {
+        timer.stop();
+        runSwerve.end(false);
+    }
 }

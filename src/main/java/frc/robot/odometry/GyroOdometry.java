@@ -1,5 +1,7 @@
 package frc.robot.odometry;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -52,6 +54,12 @@ public class GyroOdometry extends SubsystemBase {
         gyro.reset();
     }
 
+    public void periodic() {
+        Logger.getInstance().recordOutput("Odometry/X", getX());
+        Logger.getInstance().recordOutput("Odometry/Y", getY());
+    }
+
+
     // Updates the pose estimator, runs in periodic
     public void updateGyroOdometry() {
         if (!onSlope) { //if not on slope at start of tick
@@ -83,7 +91,6 @@ public class GyroOdometry extends SubsystemBase {
         slopeCalc();
     }
 
-    // ;󠀿
     public void slopeCalc() {
         estimator.update(getRotation2d(), swerve.getModulePositions());
         double pdX = getX() - lastX;

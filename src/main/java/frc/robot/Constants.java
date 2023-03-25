@@ -67,11 +67,16 @@ public final class Constants {
         public static final double kArmsToElbow = -152.0 / 322.0;
 
         //arm preset points TODO: find these points
-        public static final double[] kHighNodeSetpoints = new double[] { 0.735, 0.417 };
-        public static final double[] kMidNodeSetpoints = new double[] { 0.245, 1.933 };
-        public static final double[] kHybridNodeSetpoints = new double[] { 2.796, -1.183 };
-        public static final double[] kGroundIntakeSetpoints = new double[] { 2.423, -0.821 };
-        public static final double[] kSubstationIntakeSetpoints = new double[] { -0.642, 2.012 };
+        public static final double[] kHighNodeConeSetpoints = new double[] { 0.735, 0.417 };
+        public static final double[] kHighNodeCubeSetpoints = new double[] { 0.715, 0.608 };
+        public static final double[] kMidNodeConeSetpoints = new double[] { 0.245, 1.933 };
+        public static final double[] kMidNodeCubeSetpoints = new double[] { -0.380, 1.949 };
+        public static final double[] kHybridNodeConeSetpoints = new double[] { 2.796, -1.183 };
+        public static final double[] kHybridNodeCubeSetpoints = new double[] { 2.796, -1.183 };
+        public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.423, -0.821 };
+        public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.736, -0.97 };
+        public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.642, 2.012 };
+        public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
         public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
     }
@@ -507,6 +512,7 @@ public final class Constants {
         SUBSTATION_INTAKE,
         START,
         TAXI,
-        IDLE
+        IDLE,
+        MANUAL_OVERRIDE
     }
 }
