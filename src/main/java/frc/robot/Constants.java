@@ -34,10 +34,10 @@ public final class Constants {
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
-        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.7);
-        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.7);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 2);
-        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 2);
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
+        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 2.5);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 2.5);
 
         // PID controllers
         public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 1);
@@ -69,7 +69,7 @@ public final class Constants {
         //arm preset points TODO: find these points
         public static final double[] kHighNodeConeSetpoints = new double[] { 0.735, 0.417 };
         public static final double[] kHighNodeCubeSetpoints = new double[] { 0.715, 0.608 };
-        public static final double[] kMidNodeConeSetpoints = new double[] { 0.245, 1.933 };
+        public static final double[] kMidNodeConeSetpoints = new double[] { -0.405, 1.967 };
         public static final double[] kMidNodeCubeSetpoints = new double[] { -0.380, 1.949 };
         public static final double[] kHybridNodeConeSetpoints = new double[] { 2.796, -1.183 };
         public static final double[] kHybridNodeCubeSetpoints = new double[] { 2.796, -1.183 };
@@ -164,8 +164,8 @@ public final class Constants {
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 2;
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 2 * 0.4;
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
+        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond * 0.2 * 1.3;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }

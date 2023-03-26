@@ -2,22 +2,19 @@ package frc.robot.commands.auto;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.SwerveTeleOp;
 import frc.robot.odometry.GyroOdometry;
-import frc.robot.odometry.Odometry;
 import frc.robot.subsystems.Swerve;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.Timer;
 
 public class AutoDriveOut extends CommandBase {
     private Swerve swerve;
     private GyroOdometry odometry;
     private Timer timer;
-    private SwerveTeleOp runSwerve;
 
     public AutoDriveOut(Swerve swerve, GyroOdometry odometry) {
         this.swerve = swerve;
@@ -29,28 +26,38 @@ public class AutoDriveOut extends CommandBase {
         timer = new Timer();
         timer.start();
 
-        runSwerve = new SwerveTeleOp(
-            swerve,
-            odometry,
-            () -> 0.25,
-            () -> 0.0,
-            () -> 0.0,
-            () -> false,
-            () -> true);
-        runSwerve.initialize();
+        Logger.getInstance().recordOutput("AutoStatus", "Initialize");
     }
 
     @Override
     public void execute() {
-        if (timer.get() < 5) { 
-            runSwerve.execute();
-        }
-        else {
-            swerve.stopModules();
-        }
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(-0.3, 0, 0);
+        SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        // swerve.setModuleStates(moduleStates);
+
+        Logger.getInstance().recordOutput("Auto/Timer", timer.get());
+        Logger.getInstance().recordOutput("AutoStatus", "Executing");
+        Logger.getInstance().recordOutput("Auto/SwerveModuleStates", moduleStates);
+
+        // if (timer.get() < 5) {
+        //     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0.25, 0, 0, odometry.getRotation2d());
+        //     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        //     swerve.setModuleStates(moduleStates);
+        // }
+        // else if (timer.get() < 6) {
+        //     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0.25, odometry.getRotation2d());
+        //     SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        //     swerve.setModuleStates(moduleStates);
+        // }
+        // else {
+        //     swerve.stopModules();
+        // }
     }
+
     public void end(boolean interrupted) {
+        Logger.getInstance().recordOutput("Auto/Timer", 0);
+        Logger.getInstance().recordOutput("AutoStatus", "Done");
         timer.stop();
-        runSwerve.end(false);
+        // swerve.stopModules();
     }
 }

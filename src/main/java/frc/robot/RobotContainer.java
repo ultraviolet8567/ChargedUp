@@ -52,12 +52,12 @@ public class RobotContainer {
         
         // Configure autonomous sendable chooser and send to Shuffleboard
         autoChooser.setDefaultOption("Drive out auto", new AutoDriveOut(swerve, gyro));
-        // autoChooser.setDefaultOption("Charging station engage auto", new AutoEngage(swerve, gyro));
+        autoChooser.addOption("Charging station engage auto", new AutoBalance(swerve, gyro));
         tabMain.add("Auto mode", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser)
             .withSize(2, 1)
             .withPosition(6, 0);
         
-            configureButtonBindings();
+        configureButtonBindings();
     }
 
     public void configureButtonBindings() {
@@ -86,7 +86,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
-        // return new AutoDriveOut(swerve, odometry);
+        return autoChooser.getSelected();
     }
 }

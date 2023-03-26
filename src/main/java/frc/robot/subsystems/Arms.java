@@ -147,12 +147,12 @@ public class Arms extends SubsystemBase {
     }
     
     // Check if the shoulder can be moved
-    public boolean shoulderMovable(double shoulderSpeed) {
+    public boolean shoulderMoveable(double shoulderSpeed) {
         return !(shoulderPastBackLimit() && shoulderSpeed < 0) && !(shoulderPastFrontLimit() && shoulderSpeed > 0);
     }
 
     // Check if the elbow can be moved
-    public boolean elbowMovable(double elbowSpeed) {
+    public boolean elbowMoveable(double elbowSpeed) {
         return !(elbowPastBackLimit() && elbowSpeed < 0) && !(elbowPastFrontLimit() && elbowSpeed > 0);
     }
 
@@ -184,6 +184,10 @@ public class Arms extends SubsystemBase {
     // Check if the forearm has rotated too far forward and could hit the bottom of the bicep
     public boolean elbowPastFrontLimit() {
         return ArmConstants.kElbowFrontLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontMechanicalStop;
+    }
+
+    public boolean elbowPresetMoveable(double shoulderSpeed) {
+        return shoulderAngle() > 0 && shoulderSpeed >= 0;
     }
 
     public double[] getPreset() {

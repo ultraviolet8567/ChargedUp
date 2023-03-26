@@ -38,7 +38,7 @@ public class ArmManual extends CommandBase {
         double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeed.get();
         double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeed.get();
 
-        if (arms.shoulderMovable(shoulderSpeed)) {
+        if (arms.shoulderMoveable(shoulderSpeed)) {
             arms.runShoulder(shoulderSpeed);
 
             // Turn the speed a bit more to account for the shoulder rotation
@@ -48,7 +48,7 @@ public class ArmManual extends CommandBase {
             arms.stopShoulder();
         }
         
-        if (arms.elbowMovable(elbowSpeed)) {
+        if (arms.elbowMoveable(elbowSpeed)) {
             arms.runElbow(elbowSpeed);
         }
         else {

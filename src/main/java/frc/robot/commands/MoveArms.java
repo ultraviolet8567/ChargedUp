@@ -38,7 +38,7 @@ public class MoveArms extends CommandBase {
             arms.stop();
         }
         else {
-            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || leftJoystickSupplier.get() > 0.2 || rightJoystickSupplier.get() > 0.2) {
+            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || Math.abs(leftJoystickSupplier.get()) > 0.2 || Math.abs(rightJoystickSupplier.get()) > 0.2) {
                 // Manual arm movement
                 manual.execute();
                 arms.setPresetValue(Preset.MANUAL_OVERRIDE);
