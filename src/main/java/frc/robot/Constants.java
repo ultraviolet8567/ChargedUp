@@ -74,7 +74,7 @@ public final class Constants {
         public static final double[] kHybridNodeConeSetpoints = new double[] { 2.796, -1.183 };
         public static final double[] kHybridNodeCubeSetpoints = new double[] { 2.796, -1.183 };
         public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.423, -0.821 };
-        public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.736, -0.97 };
+        public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.263, -0.443 };
         public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.642, 2.012 };
         public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
