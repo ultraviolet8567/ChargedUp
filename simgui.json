@@ -3,14 +3,8 @@
     "types": {
       "/AdvantageKit/RealOutputs/Mechanisms": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Simulator/Mechanisms": "Mechanism2d",
-      "/FMSInfo": "FMSInfo"
-    },
-    "windows": {
-      "/AdvantageKit/RealOutputs/Mechanisms": {
-        "window": {
-          "visible": true
-        }
-      }
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Main/Auto mode": "String Chooser"
     }
   },
   "NetworkTables": {
