@@ -28,7 +28,7 @@ public class MoveToPreset extends CommandBase {
 
         if (arms.shoulderMoveable(shoulderSpeed))
             arms.runShoulder(shoulderSpeed);
-        if (arms.elbowMoveable(elbowSpeed))
+        if (arms.elbowMoveable(elbowSpeed) && arms.elbowPresetMovable(shoulderSpeed))
             arms.runElbow(elbowSpeed);    
     }
 

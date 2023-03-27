@@ -156,6 +156,11 @@ public class Arms extends SubsystemBase {
         return !(elbowPastBackLimit() && elbowSpeed < 0) && !(elbowPastFrontLimit() && elbowSpeed > 0);
     }
 
+    // Check if the elbow can be moved in preset mode, aka shoulder is past 0 (positively)
+    public boolean elbowPresetMovable(double shoulderSpeed) {
+        return shoulderAngle() > -Math.PI / 6 && shoulderSpeed >= 0;
+    }
+
     // Check if the bicep is within the operable range
     public boolean shoulderWithinRange() {
         return ArmConstants.kShoulderBackLimit < shoulderAngle() && shoulderAngle() < ArmConstants.kShoulderFrontLimit;
