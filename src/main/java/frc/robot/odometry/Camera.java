@@ -8,59 +8,39 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Pose3d;
 import frc.robot.Constants;
 
 public class Camera {
+    public static PhotonPoseEstimator estimator;
+    private PhotonCamera camera;
+    private int ID;
 
-  public static PhotonPoseEstimator estimator;
-
-  private PhotonCamera camera;
-
-  private int ID;
-
-  public Camera(int cameraID) {
-    ID = cameraID;
-
-    camera = new PhotonCamera("camera" + cameraID);
-
-    estimator = new PhotonPoseEstimator(Constants.FieldConstants.aprilTags, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.Camera.cameraDistances[ID]);
-  }
-
-  // updates pose estimator, used for odometry updates
-  public Optional<EstimatedRobotPose> getEstimate() {
-    return estimator.update(); // creates estimated robot poses
-  }
-
-  public double getX() {
-    return getEstimate().get().estimatedPose.getX();
-  }
-
-  public double getY() {
-    return getEstimate().get().estimatedPose.getY();
-  }
-
-  public double getZ() {
-    return getEstimate().get().estimatedPose.getZ();
-  }
-
-  public Rotation3d getHeading() {
-    return getEstimate().get().estimatedPose.getRotation();
-  }
-
-  public boolean checkDetections() {
-    PhotonPipelineResult result = camera.getLatestResult();
-    
-    if (!result.hasTargets())
-      return false;
-    else {
-      if (result.getBestTarget().getPoseAmbiguity() >= 0.0 && result.getBestTarget().getPoseAmbiguity() < 0.15)
-        return true;
-      else return false;
+    public Camera(int cameraID) {
+        ID = cameraID;
+        camera = new PhotonCamera("camera" + cameraID);
+        estimator = new PhotonPoseEstimator(Constants.FieldConstants.aprilTags, PoseStrategy.LOWEST_AMBIGUITY, camera, Constants.Camera.cameraDistances[ID]);
     }
-  }
 
-  public int getTag() {
-    return camera.getLatestResult().getBestTarget().getFiducialId();
-  }
+    // updates pose estimator, used for odometry updates
+    public Optional<EstimatedRobotPose> getEstimate() {
+        return estimator.update(); // creates estimated robot poses
+    }
+
+    public Pose3d getEstimatedPose() {
+        return getEstimate().get().estimatedPose;
+    }
+
+    public boolean checkDetections() {
+        PhotonPipelineResult result = camera.getLatestResult();
+
+        if (!result.hasTargets())
+            return false;
+        else
+            return (result.getBestTarget().getPoseAmbiguity() >= 0.0 && result.getBestTarget().getPoseAmbiguity() < 0.15);
+    }
+
+    public int getTag() {
+        return camera.getLatestResult().getBestTarget().getFiducialId();
+    }
 }

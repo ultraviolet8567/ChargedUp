@@ -19,8 +19,9 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Logger.getInstance().recordOutput("Measured/Intake", intake.getEncoder().getVelocity());
         Logger.getInstance().recordOutput("Setpoints/Intake", intake.get());
+        
+        Logger.getInstance().recordOutput("Measured/Intake", intake.getEncoder().getVelocity());
     }
 
     public void pickup(GamePiece gamePiece) {

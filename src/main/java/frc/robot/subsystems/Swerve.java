@@ -2,89 +2,65 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.DriveConstants;
 
 public class Swerve extends SubsystemBase {
-    private final SwerveModule frontLeft = new SwerveModule(
-        CAN.kFrontLeftDriveMotorPort,
-        CAN.kFrontLeftTurningMotorPort,
-        DriveConstants.kFrontLeftDriveEncoderReversed,
-        DriveConstants.kFrontLeftTurningEncoderReversed,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
-
-    private final SwerveModule frontRight = new SwerveModule(
-        CAN.kFrontRightDriveMotorPort,
-        CAN.kFrontRightTurningMotorPort,
-        DriveConstants.kFrontRightDriveEncoderReversed,
-        DriveConstants.kFrontRightTurningEncoderReversed,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
-    
-    private final SwerveModule backLeft = new SwerveModule(
-        CAN.kBackLeftDriveMotorPort,
-        CAN.kBackLeftTurningMotorPort,
-        DriveConstants.kBackLeftDriveEncoderReversed,
-        DriveConstants.kBackLeftTurningEncoderReversed,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
-    
-    private final SwerveModule backRight = new SwerveModule(
-        CAN.kBackRightDriveMotorPort,
-        CAN.kBackRightTurningMotorPort,
-        DriveConstants.kBackRightDriveEncoderReversed,
-        DriveConstants.kBackRightTurningEncoderReversed,
-        DriveConstants.kBackRightDriveAbsoluteEncoderPort,
-        DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
-
-    private AHRS gyro = new AHRS(SPI.Port.kMXP);
-
+    private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
     public Swerve() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                gyro.calibrate();
-            } catch (Exception e) {
-            }
-        });
+        frontLeft = new SwerveModule(
+            CAN.kFrontLeftDriveMotorPort,
+            CAN.kFrontLeftTurningMotorPort,
+            DriveConstants.kFrontLeftDriveEncoderReversed,
+            DriveConstants.kFrontLeftTurningEncoderReversed,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
+
+        frontRight = new SwerveModule(
+            CAN.kFrontRightDriveMotorPort,
+            CAN.kFrontRightTurningMotorPort,
+            DriveConstants.kFrontRightDriveEncoderReversed,
+            DriveConstants.kFrontRightTurningEncoderReversed,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
+        
+        backLeft = new SwerveModule(
+            CAN.kBackLeftDriveMotorPort,
+            CAN.kBackLeftTurningMotorPort,
+            DriveConstants.kBackLeftDriveEncoderReversed,
+            DriveConstants.kBackLeftTurningEncoderReversed,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
+        
+        backRight = new SwerveModule(
+            CAN.kBackRightDriveMotorPort,
+            CAN.kBackRightTurningMotorPort,
+            DriveConstants.kBackRightDriveEncoderReversed,
+            DriveConstants.kBackRightTurningEncoderReversed,
+            DriveConstants.kBackRightDriveAbsoluteEncoderPort,
+            DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
     }
 
-    public double getHeading() {
-        // Negate the reading because the navX has CCW- and we need CCW+
-        return Math.IEEEremainder(-gyro.getAngle(), 360);
-    }
+    public void periodic() {
+        // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
+        Logger.getInstance().recordOutput("Measured/SwerveModuleStates", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
 
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        // FL absolute encoder angle, FR absolute encoder angle, BL absolute encoder angle, BR absolute encoder angle
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
     }
 
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] output = {frontLeft.getModulePosition(), frontRight.getModulePosition(), backLeft.getModulePosition(), backRight.getModulePosition()};
         return output;
-    }
-
-    public void periodic() {
-        // CCW+
-        Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
-
-        // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
-        Logger.getInstance().recordOutput("Measured/SwerveModuleStates", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
-
-        Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
     }
     
     public void setModuleStates(SwerveModuleState[] desiredStates) {

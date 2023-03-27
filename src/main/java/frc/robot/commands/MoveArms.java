@@ -10,14 +10,12 @@ public class MoveArms extends CommandBase {
     private Arms arms;
     private ArmManual manual;
     private MoveToPreset preset;
-    private Supplier<Double> leftJoystickSupplier, rightJoystickSupplier, leftTriggerSupplier, rightTriggerSupplier;
+    private Supplier<Double> leftJoystickSupplier, rightJoystickSupplier;
 
-    public MoveArms(Arms arms, Supplier<Double> leftJoystickSupplier, Supplier<Double> rightJoystickSupplier, Supplier<Double> leftTriggerSupplier, Supplier<Double> rightTriggerSupplier) {
+    public MoveArms(Arms arms, Supplier<Double> leftJoystickSupplier, Supplier<Double> rightJoystickSupplier) {
         this.arms = arms;
         this.leftJoystickSupplier = leftJoystickSupplier;
         this.rightJoystickSupplier = rightJoystickSupplier;
-        this.leftTriggerSupplier = leftTriggerSupplier;
-        this.rightTriggerSupplier = rightTriggerSupplier;
 
         manual = new ArmManual(arms, leftJoystickSupplier, rightJoystickSupplier);
         preset = new MoveToPreset(arms);

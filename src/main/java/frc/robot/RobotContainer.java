@@ -46,9 +46,7 @@ public class RobotContainer {
         arms.setDefaultCommand(new MoveArms(
             arms,
             () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
-            () -> armJoystick.getRawAxis(ControllerIO.getRightY()),
-            () -> armJoystick.getRawAxis(ControllerIO.getLeftTrigger()),
-            () -> armJoystick.getRawAxis(ControllerIO.getRightTrigger())));
+            () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
         
         // Configure autonomous sendable chooser and send to Shuffleboard
         autoChooser.setDefaultOption("Drive out auto", new AutoDriveOut(swerve, gyro));

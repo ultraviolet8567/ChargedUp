@@ -80,12 +80,12 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState state) {
         if (Math.abs(state.speedMetersPerSecond) < 0.001) {
             stop();
-            return;
         }
-        
-        state = SwerveModuleState.optimize(state, getState().angle);
-        driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+        else {
+            state = SwerveModuleState.optimize(state, getState().angle);
+            driveMotor.set(state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
+            turningMotor.set(turningPidController.calculate(getTurningPosition(), state.angle.getRadians()));
+        }
     }
 
     public SwerveModulePosition getModulePosition() {
@@ -93,7 +93,7 @@ public class SwerveModule {
     }
 
     public void stop() {
-        driveMotor.set(0);
-        turningMotor.set(0);
+        driveMotor.stopMotor();
+        turningMotor.stopMotor();
     }
 }

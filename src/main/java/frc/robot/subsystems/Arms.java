@@ -15,33 +15,26 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.Preset;
+import frc.robot.Robot;
 
 public class Arms extends SubsystemBase {
+    public final CANSparkMax shoulder, elbow;
     
-    public final CANSparkMax shoulder;
-    public final CANSparkMax elbow;
-    
-    private final DutyCycleEncoder shoulderEncoder;
-    private final DutyCycleEncoder elbowEncoder;
-    private final PIDController shoulderPidController;
-    private final PIDController elbowPidController;
+    private final DutyCycleEncoder shoulderEncoder, elbowEncoder;
+    private final PIDController shoulderPidController, elbowPidController;
 
     private Preset presetValue;
 
     // Simulator stuff
-    private double shoulderSimEncoder;
-    private double elbowSimEncoder;
+    private double shoulderSimEncoder, elbowSimEncoder;
 
     Mechanism2d armsMech;
     MechanismRoot2d armsRoot;
-    MechanismLigament2d superstructureMech;
-    MechanismLigament2d shoulderMech;
-    MechanismLigament2d elbowMech;
+    MechanismLigament2d superstructureMech, shoulderMech, elbowMech;
 
     public Arms() {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
@@ -59,14 +52,14 @@ public class Arms extends SubsystemBase {
         elbowPidController = new PIDController(ArmConstants.kPElbow.get(), 0, 0);
         elbowPidController.setTolerance(ArmConstants.kElbowPidTolerance);
         
-        presetValue = Preset.IDLE;
+        presetValue = Preset.TAXI;
 
         // Simulator stuff
         shoulderSimEncoder = 0;
         elbowSimEncoder = 0;
 
         armsMech = new Mechanism2d(2, 2);   
-        armsRoot = armsMech.getRoot("arms", 1, 0);
+        armsRoot = armsMech.getRoot("Arms", 1, 0);
         superstructureMech = armsRoot.append(new MechanismLigament2d("Superstructure", Units.inchesToMeters(25), 90));
         shoulderMech = superstructureMech.append(new MechanismLigament2d("Bicep", Units.inchesToMeters(20), shoulderAngle(), 5, new Color8Bit(0, 0, 255)));
         elbowMech = shoulderMech.append(new MechanismLigament2d("Forearm", Units.inchesToMeters(16), elbowAngle(), 3, new Color8Bit(0, 255, 0)));    
@@ -74,19 +67,24 @@ public class Arms extends SubsystemBase {
 
     @Override
     public void periodic() {
+        Logger.getInstance().recordOutput("Preset/Shoulder", getPreset()[0]);
+        Logger.getInstance().recordOutput("Preset/Elbow", getPreset()[1]);
+
         Logger.getInstance().recordOutput("AbsoluteEncoders/Shoulder", shoulderAngle());
         Logger.getInstance().recordOutput("AbsoluteEncoders/Elbow", elbowAngle());
 
-        Logger.getInstance().recordOutput("Speeds/Shoulder", shoulder.getEncoder().getVelocity());
-        Logger.getInstance().recordOutput("Speeds/Elbow", elbow.getEncoder().getVelocity());
+        Logger.getInstance().recordOutput("Setpoints/Shoulder", shoulder.get());
+        Logger.getInstance().recordOutput("Setpoints/Elbow", elbow.get());
 
-        Logger.getInstance().recordOutput("Setpoints/Shoulder", getPreset()[0]);
-        Logger.getInstance().recordOutput("Setpoints/Elbow", getPreset()[1]);
+        Logger.getInstance().recordOutput("Measured/Shoulder", shoulder.getEncoder().getVelocity());
+        Logger.getInstance().recordOutput("Measured/Elbow", elbow.getEncoder().getVelocity());
+        
+        Logger.getInstance().recordOutput("PIDError/Shoulder", shoulderPidController.getPositionError());
+        Logger.getInstance().recordOutput("PIDError/Elbow", elbowPidController.getPositionError());
     }
         
     @Override
     public void simulationPeriodic() {
-        // Simulator stuff
         Logger.getInstance().recordOutput("Simulator/AbsoluteEncoders/SimShoulder", shoulderSimEncoder);
         Logger.getInstance().recordOutput("Simulator/AbsoluteEncoders/SimElbow", elbowSimEncoder);
         Logger.getInstance().recordOutput("Simulator/Mechanisms", armsMech);
@@ -139,20 +137,17 @@ public class Arms extends SubsystemBase {
         // Clamp the speeds between -100% and 100%
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -1, 1);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -1, 1);
-        
-        Logger.getInstance().recordOutput("PIDError/Shoulder", shoulderPidController.getPositionError());
-        Logger.getInstance().recordOutput("PIDError/Elbow", elbowPidController.getPositionError());
 
         return new double[] {shoulderSpeed, elbowSpeed};
     }
     
     // Check if the shoulder can be moved
-    public boolean shoulderMoveable(double shoulderSpeed) {
+    public boolean shoulderMovable(double shoulderSpeed) {
         return !(shoulderPastBackLimit() && shoulderSpeed < 0) && !(shoulderPastFrontLimit() && shoulderSpeed > 0);
     }
 
     // Check if the elbow can be moved
-    public boolean elbowMoveable(double elbowSpeed) {
+    public boolean elbowMovable(double elbowSpeed) {
         return !(elbowPastBackLimit() && elbowSpeed < 0) && !(elbowPastFrontLimit() && elbowSpeed > 0);
     }
 
@@ -191,10 +186,6 @@ public class Arms extends SubsystemBase {
         return ArmConstants.kElbowFrontLimit < elbowAngle() && elbowAngle() < ArmConstants.kElbowFrontMechanicalStop;
     }
 
-    public boolean elbowPresetMoveable(double shoulderSpeed) {
-        return shoulderAngle() > 0 && shoulderSpeed >= 0;
-    }
-
     public double[] getPreset() {
         switch (presetValue) {
             case HIGH_NODE:
@@ -210,7 +201,6 @@ public class Arms extends SubsystemBase {
             case START:
                 return ArmConstants.kStartSetpoints;
             case TAXI:
-                return ArmConstants.kTaxiSetpoints;
             case IDLE:
             default:
                 return ArmConstants.kTaxiSetpoints;
@@ -258,7 +248,7 @@ public class Arms extends SubsystemBase {
         elbowEncoder.reset();
     }
 
-
+    
     // public void runShoulderSim(double speed) {
     //     shoulderSimEncoder += speed * 5;
     // }
