@@ -134,7 +134,7 @@ public class Arms extends SubsystemBase {
         double elbowSpeed = elbowPidController.calculate(elbowAngle(), elbowSetpoint);
 
         // Make sure the elbow turns with the shoulder
-        elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
+        // elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
         
         // Clamp the speeds between -100% and 100%
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -1, 1);
