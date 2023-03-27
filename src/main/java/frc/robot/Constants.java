@@ -88,7 +88,7 @@ public final class Constants {
         public static final int kDriveControllerPort = 0;
         public static final int kArmControllerPort = 1;
 
-        public static final double kDeadband = 0.15;
+        public static final double kDeadband = 0.1;
     }
 
     public static final class CAN {

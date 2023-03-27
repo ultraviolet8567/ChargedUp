@@ -3,6 +3,7 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
 import frc.robot.subsystems.Arms;
 
@@ -36,7 +37,7 @@ public class MoveArms extends CommandBase {
             arms.stop();
         }
         else {
-            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || Math.abs(leftJoystickSupplier.get()) > 0.2 || Math.abs(rightJoystickSupplier.get()) > 0.2) {
+            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || Math.abs(leftJoystickSupplier.get()) > 1.5 * OIConstants.kDeadband || Math.abs(rightJoystickSupplier.get()) > 1.5 * OIConstants.kDeadband) {
                 // Manual arm movement
                 manual.execute();
                 arms.setPresetValue(Preset.MANUAL_OVERRIDE);
