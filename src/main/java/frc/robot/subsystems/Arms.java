@@ -7,7 +7,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -25,7 +26,7 @@ public class Arms extends SubsystemBase {
     public final CANSparkMax shoulder, elbow;
     
     private final DutyCycleEncoder shoulderEncoder, elbowEncoder;
-    private final PIDController shoulderPidController, elbowPidController;
+    private final ProfiledPIDController shoulderPidController, elbowPidController;
 
     private Preset presetValue;
 
@@ -46,13 +47,19 @@ public class Arms extends SubsystemBase {
         shoulderEncoder = new DutyCycleEncoder(ArmConstants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(ArmConstants.kElbowEncoderPort);
 
-        shoulderPidController = new PIDController(ArmConstants.kPShoulder.get(), 0, 0);
+        // Profiled PID controllers also limit the output to stay within the maximum speed and acceleration constraints
+        // This is referred to as Trapezoidal Motion Profiling (because if you graph the velocity or acceleration
+        // it creates a trapezoid as the PID controller goes steadily up to the maximum and stays there)
+        shoulderPidController = new ProfiledPIDController(ArmConstants.kPShoulder.get(), ArmConstants.kIShoulder.get(), ArmConstants.kDShoulder.get(),
+            new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get()));
         shoulderPidController.setTolerance(ArmConstants.kShoulderPidTolerance);
 
-        elbowPidController = new PIDController(ArmConstants.kPElbow.get(), 0, 0);
+        elbowPidController = new ProfiledPIDController(ArmConstants.kPElbow.get(), ArmConstants.kIElbow.get(), ArmConstants.kDElbow.get(),
+            new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get()));
         elbowPidController.setTolerance(ArmConstants.kElbowPidTolerance);
         
         presetValue = Preset.TAXI;
+        resetPIDControllers();
 
         // Simulator stuff
         shoulderSimEncoder = 0;
@@ -135,6 +142,7 @@ public class Arms extends SubsystemBase {
         // elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
         
         // Clamp the speeds between -100% and 100%
+        // Might not be necessary because of the ProfiledPID control (subject to testing)
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -1, 1);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -1, 1);
 
@@ -209,6 +217,10 @@ public class Arms extends SubsystemBase {
 
     public void setPresetValue(Preset preset) {
         presetValue = preset;
+
+        // The PID controllers need to be reset any time we switch back to PID from open loop control (manual)
+        if (preset == Preset.MANUAL_OVERRIDE)
+            resetPIDControllers();
     }
 
     public Preset getPresetValue() {
@@ -246,6 +258,11 @@ public class Arms extends SubsystemBase {
     public void resetAbsoluteEncoders() {
         shoulderEncoder.reset();
         elbowEncoder.reset();
+    }
+
+    public void resetPIDControllers() {
+        shoulderPidController.reset(shoulderAngle());
+        elbowPidController.reset(elbowAngle());
     }
 
     

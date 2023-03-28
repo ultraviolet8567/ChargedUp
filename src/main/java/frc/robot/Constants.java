@@ -34,17 +34,22 @@ public final class Constants {
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
-        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
-        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
-        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
 
-        // PID controllers
+        // PID control constants
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
         public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 1);
+        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kP", 0);
+        public static final LoggedTunableNumber kDShoulder = new LoggedTunableNumber("Shoulder kP", 0);
         public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
+        
+        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
         public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
+        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
+        public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
         public static final double kElbowPidTolerance = 5 * Math.PI / 600;
-    
+
         // Arm absolute encoders
         public static final int kShoulderEncoderPort = 0;
         public static final int kElbowEncoderPort = 1;
