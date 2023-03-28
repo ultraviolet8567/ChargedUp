@@ -53,15 +53,15 @@ public final class Constants {
         // PID control constants
         public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
         public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.25);
-        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kI", 0);
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.6);
+        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kI", 0.2);
         public static final LoggedTunableNumber kDShoulder = new LoggedTunableNumber("Shoulder kD", 0);
         public static final double kShoulderPidTolerance = (kShoulderFrontLimit - kShoulderBackLimit) / 100.0;
         
         public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
         public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
-        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.25);
-        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.6);
+        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0.2);
         public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
         public static final double kElbowPidTolerance = (kElbowFrontLimit - kElbowBackLimit) / 100.0;
 
