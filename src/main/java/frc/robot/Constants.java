@@ -30,30 +30,11 @@ public final class Constants {
     public static final Mode currentMode = Mode.TUNING;
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
-    public static final String logpath = "C:/Users/Wellesley FRC 8567/Desktop/Logs";
+    public static final String logpath = "C:\\Users\\Wellesley FRC 8567\\Desktop\\Logs";
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
 
-        // PID control constants
-        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 1);
-        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kP", 0);
-        public static final LoggedTunableNumber kDShoulder = new LoggedTunableNumber("Shoulder kP", 0);
-        public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
-        
-        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
-        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
-        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
-        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
-        public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
-        public static final double kElbowPidTolerance = 5 * Math.PI / 600;
-
-        // Arm absolute encoders
-        public static final int kShoulderEncoderPort = 0;
-        public static final int kElbowEncoderPort = 1;
-    
         // Rotation boundaries for arm joints point
         public static final double kShoulderFrontLimit = 2.693;
         public static final double kShoulderFrontMechanicalStop = 2.968;
@@ -64,6 +45,25 @@ public final class Constants {
         public static final double kElbowBackLimit = -2.581;
         public static final double kElbowBackMechanicalStop = -2.792;
         
+        // PID control constants
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.25);
+        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kI", 0);
+        public static final LoggedTunableNumber kDShoulder = new LoggedTunableNumber("Shoulder kD", 0);
+        public static final double kShoulderPidTolerance = (kShoulderFrontLimit - kShoulderBackLimit) / 100.0;
+        
+        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.25);
+        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
+        public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
+        public static final double kElbowPidTolerance = (kElbowFrontLimit - kElbowBackLimit) / 100.0;
+
+        // Arm absolute encoders
+        public static final int kShoulderEncoderPort = 0;
+        public static final int kElbowEncoderPort = 1;
+    
         // Encoder offsets
         public static final double kShoulderEncoderOffset = 0;
         public static final double kElbowEncoderOffset = -1.705;

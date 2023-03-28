@@ -19,19 +19,20 @@ import frc.robot.subsystems.*;
 import frc.robot.util.ControllerIO;
 
 public class RobotContainer {
-    private final Swerve swerve = new Swerve();
-    private final Intake intake = new Intake();
-    private final Arms arms = new Arms();
+    private static final Swerve swerve = new Swerve();
+    private static final Intake intake = new Intake();
+    private static final Arms arms = new Arms();
+    private static final GyroOdometry gyro = new GyroOdometry(swerve);
     // private final VisionOdometry vision = new VisionOdometry();
-    private final GyroOdometry gyro = new GyroOdometry(swerve);
     // private final Odometry odometry = new Odometry(gyro, vision);
-    private final Joystick driverJoystick = new Joystick(OIConstants.kDriveControllerPort);
+
+    private static final Joystick driverJoystick = new Joystick(OIConstants.kDriveControllerPort);
     private static final Joystick armJoystick = new Joystick(OIConstants.kArmControllerPort);
 
-    public final static ShuffleboardTab tabMain = Shuffleboard.getTab("Main");
+    private static final ShuffleboardTab tabMain = Shuffleboard.getTab("Main");
 
     // Autonomous chooser
-    SendableChooser<Command> autoChooser = new SendableChooser<>();
+    private static final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
@@ -51,9 +52,10 @@ public class RobotContainer {
         // Configure autonomous sendable chooser and send to Shuffleboard
         autoChooser.setDefaultOption("Drive out auto", new AutoDriveOut(swerve, gyro));
         autoChooser.addOption("Charging station engage auto", new AutoBalance(swerve, gyro));
+        autoChooser.addOption("No auto", null);
         tabMain.add("Auto mode", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser)
             .withSize(2, 1)
-            .withPosition(6, 0);
+            .withPosition(4, 2);
         
         configureButtonBindings();
     }
@@ -74,7 +76,6 @@ public class RobotContainer {
         // new JoystickButton(armJoystick , XboxController.Button.kStart.value).onTrue(new ToggleArmIdleMode(arms));
                 
         // Change preset target
-        // TODO: Controller mapping for these presets
         new JoystickButton(armJoystick, XboxController.Button.kY.value).onTrue(new SetPresetValue(arms, Preset.HIGH_NODE));
         new JoystickButton(armJoystick, XboxController.Button.kX.value).onTrue(new SetPresetValue(arms, Preset.MID_NODE));
         new JoystickButton(armJoystick, XboxController.Button.kA.value).onTrue(new SetPresetValue(arms, Preset.HYBRID_NODE));

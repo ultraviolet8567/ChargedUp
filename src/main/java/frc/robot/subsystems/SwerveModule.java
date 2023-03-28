@@ -89,7 +89,7 @@ public class SwerveModule {
     }
 
     public SwerveModulePosition getModulePosition() {
-        return new SwerveModulePosition(driveEncoder.getPosition(), getState().angle);
+        return new SwerveModulePosition(getDrivePosition(), getState().angle);
     }
 
     public void stop() {

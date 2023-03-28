@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.GamePiece;
@@ -21,8 +22,9 @@ public class Robot extends LoggedRobot {
     private RobotContainer m_robotContainer;
 
     private static GamePiece gamePiece;
-    private static GenericEntry gamePieceBox;
-    private static GenericEntry postTime;
+    private static GenericEntry gamePieceBox, postTime;
+    private static SendableChooser<GamePiece> initialGamePiece;
+    private static SendableChooser<Boolean> toggleOn;
 
     @Override
     public void robotInit() {
@@ -68,13 +70,19 @@ public class Robot extends LoggedRobot {
         // Instantiate our RobotContainer
         m_robotContainer = new RobotContainer();
 
-        gamePiece = GamePiece.CONE;
-        Logger.getInstance().recordOutput("GamePiece", "Cone");
+        initialGamePiece = new SendableChooser<>();
+        initialGamePiece.setDefaultOption("Cone", GamePiece.CONE);
+        initialGamePiece.addOption("Cube", GamePiece.CUBE);
+        gamePiece = initialGamePiece.getSelected();
 
-        gamePieceBox = Shuffleboard.getTab("Main").add("Game Piece", true).withWidget(BuiltInWidgets.kBooleanBox)
+        Shuffleboard.getTab("Main").add("Initial game piece", initialGamePiece).withWidget(BuiltInWidgets.kComboBoxChooser)
+            .withSize(2, 1)
+            .withPosition(4, 1);
+
+        gamePieceBox = Shuffleboard.getTab("Main").add("Game piece", true).withWidget(BuiltInWidgets.kBooleanBox)
             .withProperties(Map.of("color when true", "Yellow", "color when false", "Purple"))
-            .withSize(1, 1)
-            .withPosition(3, 0)
+            .withSize(3, 3)
+            .withPosition(7, 0)
             .getEntry();
 
         postTime = Shuffleboard.getTab("Main").add("Time left", 0).withWidget(BuiltInWidgets.kNumberBar)
@@ -82,6 +90,15 @@ public class Robot extends LoggedRobot {
             .withPosition(4, 0)
             .withSize(2, 1)
             .getEntry();
+
+        toggleOn = new SendableChooser<>();
+        toggleOn.setDefaultOption("Left trigger cube right cone", false);
+        toggleOn.addOption("Toggle on left trigger", true);
+        Shuffleboard.getTab("Main").add("Toggle game piece switch", toggleOn).withWidget(BuiltInWidgets.kComboBoxChooser)
+            .withSize(2, 1)
+            .withPosition(4, 3);
+
+        Logger.getInstance().recordOutput("GamePiece", toString(gamePiece));
     }
 
     @Override
@@ -100,7 +117,9 @@ public class Robot extends LoggedRobot {
     public void disabledInit() {}
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        gamePiece = initialGamePiece.getSelected();
+    }
 
     @Override
     public void autonomousInit() {
@@ -109,6 +128,8 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
         }
+
+        gamePiece = initialGamePiece.getSelected();
     }
 
     @Override
@@ -145,5 +166,13 @@ public class Robot extends LoggedRobot {
 
     public static void setGamePiece(GamePiece gp) {
         gamePiece = gp;
+    }
+
+    public static String toString(GamePiece gp) {
+        return gp == GamePiece.CONE ? "Cone" : "Cube";
+    }
+
+    public static boolean getToggleOn() {
+        return toggleOn.getSelected();
     }
 }

@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
@@ -18,12 +17,11 @@ import frc.robot.subsystems.Swerve;
 public class GyroOdometry extends SubsystemBase {
     private Swerve swerve;
     private AHRS gyro;
-    private SwerveModulePosition[] modulePositions;
     private SwerveDrivePoseEstimator estimator;
     private double latestXPose;
     
     // Minimum angle for slope in radians
-    private static final double minimumAngle = 0.03; 
+    private static final double minimumAngle = Math.PI / 6; 
 
     // TODO: The initial position estimate of the robot; may vary match to match
     private static final Pose2d initialPose = new Pose2d();
@@ -32,8 +30,7 @@ public class GyroOdometry extends SubsystemBase {
         this.swerve = swerve;
         gyro = new AHRS(SPI.Port.kMXP);
 
-        modulePositions = swerve.getModulePositions();
-        estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, initialPose);
+        estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), swerve.getModulePositions(), initialPose);
         
         new Thread(() -> {
             try {
@@ -49,32 +46,32 @@ public class GyroOdometry extends SubsystemBase {
         Logger.getInstance().recordOutput("Odometry/Roll", getRotation3d().getX());
         Logger.getInstance().recordOutput("Odometry/Pitch", getRotation3d().getY());
         Logger.getInstance().recordOutput("Odometry/Yaw", getRotation3d().getZ());
-    }
 
-
-    // Updates the pose estimator, runs in periodic
-    public void updateGyroOdometry() {
-        // Check if on a slope
-        if (Math.abs(getHeading()) > minimumAngle) {
-            slopeCalc();
-        }
-        else {
-            estimator.update(getRotation2d(), swerve.getModulePositions());
-        }
-
-        latestXPose = getPose2d().getX();
-    }
-
-    public void slopeCalc() {
         estimator.update(getRotation2d(), swerve.getModulePositions());
-        double pdX = getPose2d().getX() - latestXPose;
-        double adX = pdX * Math.cos(getHeading());
-        double aCurrentX = latestXPose + adX;
-        Pose2d updatedPose = new Pose2d(new Translation2d(aCurrentX, getHeading()), getRotation2d());
-
-        // Hope and pray that this sets the current position to the updatedPose and doesn't just break things
-        estimator.resetPosition(gyro.getRotation2d(), modulePositions, updatedPose);
     }
+
+    // public void updateGyroOdometry() {
+    //     // Check if on a slope
+    //     if (Math.abs(getRotation3d().getX()) > minimumAngle || Math.abs(getRotation3d().getY()) > minimumAngle) {
+    //         slopeCalc();
+    //     }
+    //     else {
+    //         estimator.update(getRotation2d(), swerve.getModulePositions());
+    //     }
+
+    //     latestXPose = getPose2d().getX();
+    // }
+
+    // public void slopeCalc() {
+    //     estimator.update(getRotation2d(), swerve.getModulePositions());
+    //     double pdX = getPose2d().getX() - latestXPose;
+    //     double adX = pdX * Math.cos(getHeading());
+    //     double aCurrentX = latestXPose + adX;
+    //     Pose2d updatedPose = new Pose2d(new Translation2d(aCurrentX, getHeading()), getRotation2d());
+
+    //     // Hope and pray that this sets the current position to the updatedPose and doesn't just break things
+    //     estimator.resetPosition(gyro.getRotation2d(), swerve.getModulePositions(), updatedPose);
+    // }
 
     public Rotation3d getRotation3d() {
         return new Rotation3d(

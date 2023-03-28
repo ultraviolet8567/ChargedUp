@@ -59,8 +59,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public SwerveModulePosition[] getModulePositions() {
-        SwerveModulePosition[] output = {frontLeft.getModulePosition(), frontRight.getModulePosition(), backLeft.getModulePosition(), backRight.getModulePosition()};
-        return output;
+        return new SwerveModulePosition[] { frontLeft.getModulePosition(), frontRight.getModulePosition(), backLeft.getModulePosition(), backRight.getModulePosition() };
     }
     
     public void setModuleStates(SwerveModuleState[] desiredStates) {

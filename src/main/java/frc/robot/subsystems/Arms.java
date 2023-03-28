@@ -58,7 +58,7 @@ public class Arms extends SubsystemBase {
             new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get()));
         elbowPidController.setTolerance(ArmConstants.kElbowPidTolerance);
         
-        presetValue = Preset.TAXI;
+        presetValue = Preset.IDLE;
         resetPIDControllers();
 
         // Simulator stuff
