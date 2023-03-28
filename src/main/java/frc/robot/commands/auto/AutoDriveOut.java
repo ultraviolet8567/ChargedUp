@@ -2,12 +2,12 @@ package frc.robot.commands.auto;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.commands.SwerveTeleOp;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Swerve;
 
@@ -32,12 +32,15 @@ public class AutoDriveOut extends CommandBase {
     @Override
     public void execute() {
         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(-0.3, 0, 0);
-        SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveModuleState[] moduleStatesB = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        SwerveModuleState[] moduleStates = { new SwerveModuleState(0.5, new Rotation2d(0.0)), new SwerveModuleState(0.5, new Rotation2d(0.0)),
+                                             new SwerveModuleState(0.5, new Rotation2d(0.0)), new SwerveModuleState(0.5, new Rotation2d(0.0)) };
         // swerve.setModuleStates(moduleStates);
 
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
         Logger.getInstance().recordOutput("AutoStatus", "Executing");
         Logger.getInstance().recordOutput("Auto/SwerveModuleStates", moduleStates);
+        Logger.getInstance().recordOutput("Auto/SwerveModuleStatesB", moduleStatesB);
 
         // if (timer.get() < 5) {
         //     ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(0.25, 0, 0, odometry.getRotation2d());

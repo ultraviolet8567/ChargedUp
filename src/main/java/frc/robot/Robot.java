@@ -24,7 +24,6 @@ public class Robot extends LoggedRobot {
     private static GamePiece gamePiece;
     private static GenericEntry gamePieceBox, postTime;
     private static SendableChooser<GamePiece> initialGamePiece;
-    private static SendableChooser<Boolean> toggleOn;
 
     @Override
     public void robotInit() {
@@ -90,13 +89,6 @@ public class Robot extends LoggedRobot {
             .withPosition(4, 0)
             .withSize(2, 1)
             .getEntry();
-
-        toggleOn = new SendableChooser<>();
-        toggleOn.setDefaultOption("Left trigger cube right cone", false);
-        toggleOn.addOption("Toggle on left trigger", true);
-        Shuffleboard.getTab("Main").add("Toggle game piece switch", toggleOn).withWidget(BuiltInWidgets.kComboBoxChooser)
-            .withSize(2, 1)
-            .withPosition(4, 3);
 
         Logger.getInstance().recordOutput("GamePiece", toString(gamePiece));
     }
@@ -170,9 +162,5 @@ public class Robot extends LoggedRobot {
 
     public static String toString(GamePiece gp) {
         return gp == GamePiece.CONE ? "Cone" : "Cube";
-    }
-
-    public static boolean getToggleOn() {
-        return toggleOn.getSelected();
     }
 }

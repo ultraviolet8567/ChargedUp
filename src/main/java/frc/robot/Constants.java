@@ -23,8 +23,13 @@ public final class Constants {
      * 
      * Gyro:
      *  - Forward = y+
-     *  - Right = x+
+     *  - Left = x-
      *  - Counterclockwise = z-
+     * 
+     * Odometry
+     *  - Forward = x+
+     *  - Left = y+
+     *  - Counterclockwise = z+ 
      */
 
     public static final Mode currentMode = Mode.TUNING;
@@ -164,8 +169,9 @@ public final class Constants {
         public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.3385;
         public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 7.2968;
         public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.031;
+
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5;
-        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
+        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
         public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
         public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond * 0.5;
