@@ -36,7 +36,7 @@ public class LoggedTunableNumber {
     */
     public LoggedTunableNumber(String dashboardKey, double defaultValue) {
         key = dashboardKey;
-        entry = table.add(key, 0).withWidget(BuiltInWidgets.kTextView)
+        entry = table.add(key, defaultValue).withWidget(BuiltInWidgets.kTextView)
             .withSize(2, 1)
             .getEntry();
         
