@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Arms;
 
@@ -23,8 +21,13 @@ public class MoveToPreset extends CommandBase {
 
         if (arms.shoulderMovable(shoulderSpeed))
             arms.runShoulder(shoulderSpeed);
-        // if (arms.elbowMovable(elbowSpeed) && arms.elbowPresetMovable(shoulderSpeed))
-        //     arms.runElbow(elbowSpeed);    
+        else
+            arms.stopShoulder();
+
+        if (arms.elbowMovable(elbowSpeed) && arms.elbowPresetMovable(shoulderSpeed))
+            arms.runElbow(elbowSpeed);
+        else
+            arms.stopElbow(); 
     }
 
     @Override

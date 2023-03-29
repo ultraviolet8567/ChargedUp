@@ -50,18 +50,21 @@ public final class Constants {
         public static final double kElbowBackLimit = -2.581;
         public static final double kElbowBackMechanicalStop = -2.792;
         
+        public static final double kMaxShoulderSpeedPercentage = 0.8;
+        public static final double kMaxElbowSpeedPercentage = 0.8;
+
         // PID control constants
-        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.8);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 3.0);
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 2.5);
-        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kI", 0.5);
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 3.5);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1);
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 1);
+        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kI", 0);
         public static final LoggedTunableNumber kDShoulder = new LoggedTunableNumber("Shoulder kD", 0);
-        public static final double kShoulderPidTolerance = (kShoulderFrontLimit - kShoulderBackLimit) / 100.0;
+        public static final double kShoulderPidTolerance = (kShoulderFrontLimit - kShoulderBackLimit) / 50.0;
         
         public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
-        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
-        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.7);
-        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0.6);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1);
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
+        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
         public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
         public static final double kElbowPidTolerance = (kElbowFrontLimit - kElbowBackLimit) / 100.0;
 
@@ -76,7 +79,7 @@ public final class Constants {
         // Arm to elbow gear ratio coefficient
         public static final double kArmsToElbow = -152.0 / 322.0;
 
-        //arm preset points TODO: find these points
+        // TODO: find these points (Jackson and Aadi)
         public static final double[] kHighNodeConeSetpoints = new double[] { 0.735, 0.417 };
         public static final double[] kHighNodeCubeSetpoints = new double[] { 0.715, 0.608 };
         public static final double[] kMidNodeConeSetpoints = new double[] { -0.405, 1.967 };
@@ -165,10 +168,10 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 16.880;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.3385;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 7.2968;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.031;
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 16.880 + 0.097;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.3385 - 0.214;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 7.2968 - 0.151;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.031 - 0.012;
 
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
@@ -182,10 +185,10 @@ public final class Constants {
     public static final class AutoConstants {
         public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
         public static final double kMaxAngularSpeedRadiansPerSecond = DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond / 10;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 1.5;
         public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 4;
-        public static final double kPXController = 1.5;
-        public static final double kPYController = 1.5;
+        public static final double kPXController = 0.5;
+        public static final double kPYController = 0.5;
         public static final double kPThetaController = 3;
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = //

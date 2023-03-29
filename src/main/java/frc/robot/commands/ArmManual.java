@@ -35,8 +35,8 @@ public class ArmManual extends CommandBase {
 
         // Make the driving smoother by using a slew rate limiter to minimize acceleration
         // And scale joystick input to m/s
-        double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeed.get();
-        double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeed.get();
+        double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeedPercentage;
+        double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeedPercentage;
 
         if (arms.shoulderMovable(shoulderSpeed)) {
             arms.runShoulder(shoulderSpeed);

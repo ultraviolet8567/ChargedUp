@@ -58,7 +58,7 @@ public class Arms extends SubsystemBase {
             new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get()));
         elbowPidController.setTolerance(ArmConstants.kElbowPidTolerance);
         
-        presetValue = Preset.IDLE;
+        presetValue = Preset.TAXI;
         resetPIDControllers();
 
         // Simulator stuff
@@ -141,10 +141,14 @@ public class Arms extends SubsystemBase {
         // Make sure the elbow turns with the shoulder
         // elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
         
-        // Clamp the speeds between -100% and 100%
-        // Might not be necessary because of the ProfiledPID control (subject to testing)
-        shoulderSpeed = MathUtil.clamp(shoulderSpeed, -1, 1);
-        elbowSpeed = MathUtil.clamp(elbowSpeed, -1, 1);
+        // Clamp the speeds between -80% and 80%
+        shoulderSpeed = MathUtil.clamp(shoulderSpeed, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
+        elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
+
+        if (shoulderPidController.atSetpoint())
+            shoulderSpeed = 0;
+        if (elbowPidController.atSetpoint())
+            elbowSpeed = 0;
 
         return new double[] {shoulderSpeed, elbowSpeed};
     }
