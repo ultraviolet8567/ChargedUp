@@ -39,6 +39,7 @@ import frc.robot.commands.SwerveTeleOp;
 import frc.robot.commands.auto.AutoBalance;
 import frc.robot.commands.auto.AutoDriveOut;
 import frc.robot.commands.ToggleArmIdleMode;
+import frc.robot.commands.ToggleSwerveSpeed;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.Intake;
@@ -90,7 +91,10 @@ public class RobotContainer {
     public void configureButtonBindings() {
         new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
-        
+
+        // Commands to change the max speed to a slower speed for small adjustments
+        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new ToggleSwerveSpeed());
+
         // Commands to pickup and drop game pieces
         new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));
         new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake));
@@ -134,11 +138,11 @@ public class RobotContainer {
         ProfiledPIDController thetaController = new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-        SwerveControllerCommand driveOutCommand = new SwerveControllerCommand(trajectory, gyro::getPose, DriveConstants.kDriveKinematics, xController, yController, thetaController, swerve::setModuleStates, swerve);
+        // SwerveControllerCommand driveOutCommand = new SwerveControllerCommand(trajectory, gyro::getPose, DriveConstants.kDriveKinematics, xController, yController, thetaController, swerve::setModuleStates, swerve);
         
         return new SequentialCommandGroup(
             new InstantCommand(() -> gyro.resetOdometry(trajectory.getInitialPose())),
-            driveOutCommand,
+            // driveOutCommand,
             new InstantCommand(() -> swerve.stopModules()));
     }
 }

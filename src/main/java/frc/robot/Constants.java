@@ -82,12 +82,12 @@ public final class Constants {
         // TODO: find these points (Jackson and Aadi)
         public static final double[] kHighNodeConeSetpoints = new double[] { 0.735, 0.417 };
         public static final double[] kHighNodeCubeSetpoints = new double[] { 0.715, 0.608 };
-        public static final double[] kMidNodeConeSetpoints = new double[] { -0.405, 1.967 };
+        public static final double[] kMidNodeConeSetpoints = new double[] { -0.185, 1.857 };
         public static final double[] kMidNodeCubeSetpoints = new double[] { -0.380, 1.949 };
         public static final double[] kHybridNodeConeSetpoints = new double[] { 2.796, -1.183 };
         public static final double[] kHybridNodeCubeSetpoints = new double[] { 2.796, -1.183 };
-        public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.423, -0.821 };
-        public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.263, -0.443 };
+        public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.704, -0.915 };
+        public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.975, -1.032 };
         public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.642, 2.012 };
         public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
@@ -176,8 +176,10 @@ public final class Constants {
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond * 0.5;
+        public static double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
+        public static final double kTeleDriveSlowSpeedPercentMetersPerSecond = 0.25;
+        public static final double kTeleDriveMaxSpeedPercentMetersPerSecond = 0.75;
+        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond * 0.4;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }
