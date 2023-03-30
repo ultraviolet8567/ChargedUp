@@ -61,39 +61,39 @@ public final class ControllerIO {
     public static int inversionY() {
         switch (controllerDrive) {
             case XBOX:
-                return 1;
-            case LOGITECH:
-                return 1;
-            case JOYSTICK:
                 return -1;
-            default:
+            case LOGITECH:
+                return -1;
+            case JOYSTICK:
                 return 1;
+            default:
+                return -1;
         }
     }
 
     public static int inversionX() {
         switch (controllerDrive) {
             case XBOX:
-                return 1;
-            case LOGITECH:
-                return 1;
-            case JOYSTICK:
                 return -1;
-            default:
+            case LOGITECH:
+                return -1;
+            case JOYSTICK:
                 return 1;
+            default:
+                return -1;
         }
     }
 
     public static int inversionRot() {
         switch (controllerDrive) {
             case XBOX:
-                return 1;
+                return -1;
             case LOGITECH:
-                return 1;
+                return -1;
             case JOYSTICK:
-                return 1;
+                return -1;
             default:
-                return 1;
+                return -1;
         }
     }
 
