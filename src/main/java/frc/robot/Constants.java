@@ -1,16 +1,16 @@
 package frc.robot;
 
+import java.util.List;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-
-import java.util.List;
-
-import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
@@ -36,6 +36,10 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
     public static final String logpath = "C:\\Users\\Wellesley FRC 8567\\Desktop\\Logs";
+    
+    // Offset added to gyro reading so that 0 is forward when on the Red Alliance
+    public static final double kGyroOffset = -2.229;
+    public static final boolean kDirectionSwitch = false;
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
@@ -137,9 +141,9 @@ public final class Constants {
     public static final class DriveConstants {
         // Have to change depending on our robot design
         // Distance between right and left wheels:
-        public static final double kTrackWidth = Units.inchesToMeters(26);
+        public static final double kTrackWidth = Units.inchesToMeters(34); // 0.8636 m
         // Distance between front and back wheels:
-        public static final double kWheelBase = Units.inchesToMeters(26);
+        public static final double kWheelBase = Units.inchesToMeters(32); // 0.8128 m
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
                 new Translation2d(kWheelBase / 2, kTrackWidth / 2), // Front left (+/+)
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
@@ -152,6 +156,7 @@ public final class Constants {
         public static final boolean kBackLeftTurningEncoderReversed = true;
         public static final boolean kBackRightTurningEncoderReversed = true;
 
+        // Temporarily negate to make the video work (hot fix, don't forget to reverse)
         public static final boolean kFrontLeftDriveEncoderReversed = true;
         public static final boolean kFrontRightDriveEncoderReversed = false;
         public static final boolean kBackLeftDriveEncoderReversed = true;
@@ -185,18 +190,11 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
-        public static final double kMaxAngularSpeedRadiansPerSecond = DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond / 10;
+        public static final double kMaxSpeedMetersPerSecond = 1;
         public static final double kMaxAccelerationMetersPerSecondSquared = 1.5;
-        public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 4;
-        public static final double kPXController = 0.5;
-        public static final double kPYController = 0.5;
-        public static final double kPThetaController = 3;
-
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = //
-                new TrapezoidProfile.Constraints(
-                        kMaxAngularSpeedRadiansPerSecond,
-                        kMaxAngularAccelerationRadiansPerSecondSquared);
+        public static final double kPXController = 0.25;
+        public static final double kPYController = 0.25;
+        public static final double kPThetaController = 0.25;
     }
 
     public static final class Camera {

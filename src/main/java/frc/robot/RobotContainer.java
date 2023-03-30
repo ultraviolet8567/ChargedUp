@@ -1,15 +1,11 @@
 package frc.robot;
 
-import java.util.List;
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -19,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.AutoConstants;
@@ -36,10 +31,10 @@ import frc.robot.commands.ResetEncoders;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.SetPresetValue;
 import frc.robot.commands.SwerveTeleOp;
+import frc.robot.commands.ToggleSwerveSpeed;
 import frc.robot.commands.auto.AutoBalance;
 import frc.robot.commands.auto.AutoDriveOut;
-import frc.robot.commands.ToggleArmIdleMode;
-import frc.robot.commands.ToggleSwerveSpeed;
+import frc.robot.commands.auto.AutoPlace;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.Intake;
@@ -121,28 +116,29 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // return null;
-        TrajectoryConfig trajectoryConfig = new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared).setKinematics(DriveConstants.kDriveKinematics);
-        
-        Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
-            new Pose2d(1, 0, new Rotation2d(0)),
-            List.of(
-                new Translation2d(0.5, 0),
-                new Translation2d(0, 0.5)
-            ),
-            new Pose2d(1.5, 0.5, new Rotation2d(0)),
-            trajectoryConfig);
+        String pathName = "Auto Balance";
 
-        PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
-        PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
-        ProfiledPIDController thetaController = new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName, new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
+        return followTrajectoryCommand(trajectory, false);
+    }
 
-        // SwerveControllerCommand driveOutCommand = new SwerveControllerCommand(trajectory, gyro::getPose, DriveConstants.kDriveKinematics, xController, yController, thetaController, swerve::setModuleStates, swerve);
-        
+    // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
+    public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
         return new SequentialCommandGroup(
-            new InstantCommand(() -> gyro.resetOdometry(trajectory.getInitialPose())),
-            // driveOutCommand,
-            new InstantCommand(() -> swerve.stopModules()));
+            new InstantCommand(() -> gyro.resetOdometry(traj.getInitialHolonomicPose())),
+            new AutoPlace(arms, intake),
+            new PPSwerveControllerCommand(
+                traj, 
+                gyro::getPose, // Pose supplier
+                DriveConstants.kDriveKinematics, // SwerveDriveKinematics
+                new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
+                new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+                swerve::setModuleStates, // Module states consumer
+                true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+                swerve // Requires this drive subsystem
+            ),
+            new InstantCommand(() -> swerve.stopModules())
+        );
     }
 }

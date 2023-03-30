@@ -8,8 +8,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
@@ -28,30 +31,33 @@ public class GyroOdometry extends SubsystemBase {
     public GyroOdometry(Swerve swerve) {
         this.swerve = swerve;
         gyro = new AHRS(SPI.Port.kMXP);
-
         odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(), swerve.getModulePositions(), initialPose);
         
-        new Thread(() -> {
-            try {
-                Thread.sleep(100);
-                gyro.calibrate();
-            } catch (Exception e) { }
-        });
+        // new Thread(() -> {
+        //     try {
+        //         Thread.sleep(100);
+        //         gyro.calibrate();
+        //     } catch (Exception e) { }
+        // });
     }
 
     public void periodic() {
-        Logger.getInstance().recordOutput("Odometry/Pose2d", getPose2d());
+        Logger.getInstance().recordOutput("Odometry/Pose", getPose());
+        Logger.getInstance().recordOutput("Odometry/PoseInverted", invertPose(getPose()));
         Logger.getInstance().recordOutput("Odometry/Heading", Math.IEEEremainder(getRotation2d().getRadians(), 2 * Math.PI));
-        Logger.getInstance().recordOutput("Odometry/Roll", getRotation3d().getX());
-        Logger.getInstance().recordOutput("Odometry/Pitch", getRotation3d().getY());
-        Logger.getInstance().recordOutput("Odometry/Yaw", getRotation3d().getZ());
+        Logger.getInstance().recordOutput("Odometry/Rotation3d/Roll", getRotation3d().getX());
+        Logger.getInstance().recordOutput("Odometry/Rotation3d/Pitch", getRotation3d().getY());
+        Logger.getInstance().recordOutput("Odometry/Rotation3d/Yaw", getRotation3d().getZ());
         
         odometer.update(getRotation2d(), swerve.getModulePositions());
     }
 
-    public Pose2d getPose2d() {
-        Pose2d outputPose = odometer.getPoseMeters();
-        return new Pose2d(outputPose.getX(), outputPose.getY(), outputPose.getRotation());
+    public Pose2d getPose() {
+        return odometer.getPoseMeters();
+    }
+
+    public Pose2d invertPose(Pose2d original) {
+        return new Pose2d(-original.getX(), -original.getY(), original.getRotation());
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -73,12 +79,23 @@ public class GyroOdometry extends SubsystemBase {
 
     public double getHeading() {
         // Negate the reading because the navX has CCW- and we need CCW+
-        return -gyro.getAngle();
+        double reading = -gyro.getAngle();
+        // Calculate this offset for the field when at pit setup
+        reading += Constants.kGyroOffset;
+
+        // Add π radians since 0 is the opposite for blue
+        if (DriverStation.getAlliance() == Alliance.Blue)
+            reading += Math.PI;
+
+        if (Constants.kDirectionSwitch)
+            reading += Math.PI;
+            
+        return reading;
     }
 
     // On pit setup day, take robot to corner of field and reset (set 0, 0)
     public void resetGyro() {
-        gyro.reset();
+        gyro.zeroYaw();
         resetOdometry(initialPose);
     }
 
