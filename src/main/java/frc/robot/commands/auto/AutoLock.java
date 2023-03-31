@@ -29,10 +29,6 @@ public class AutoLock extends CommandBase {
     }
 
     public boolean isFinished() {
-        return timeEquals(0.5);
-    }
-
-    public boolean timeEquals(double target) {
-        return Math.abs(timer.get() - target) < 0.1;
+        return Math.abs(timer.get() - 0.5) < 0.1;
     }
 }

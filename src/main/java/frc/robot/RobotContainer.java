@@ -1,10 +1,9 @@
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ControllerType;
@@ -15,11 +14,8 @@ import frc.robot.commands.ChangeGamePiece;
 import frc.robot.commands.Drop;
 import frc.robot.commands.MoveArms;
 import frc.robot.commands.Pickup;
-import frc.robot.commands.ResetEncoders;
-import frc.robot.commands.ResetGyro;
 import frc.robot.commands.SetPresetValue;
 import frc.robot.commands.SwerveTeleOp;
-import frc.robot.commands.ToggleSwerveSpeed;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.AutoChooser;
@@ -58,11 +54,8 @@ public class RobotContainer {
     }
 
     public void configureButtonBindings() {
-        new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new ResetEncoders(swerve));
-        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new ResetGyro(gyro));
-
-        // Commands to change the max speed to a slower speed for small adjustments
-        new JoystickButton(driverJoystick, XboxController.Button.kRightBumper.value).whileTrue(new ToggleSwerveSpeed());
+        // new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new InstantCommand(() -> swerve.resetEncoders()));
+        new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new InstantCommand(() -> gyro.resetGyro()));
 
         // Commands to pickup and drop game pieces
         new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));
@@ -90,8 +83,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        Logger.getInstance().recordOutput("Auto/Path", autoChooser.getPathName());
         return autoChooser.getAutoCommand();
-        // return null;
     }
 }
