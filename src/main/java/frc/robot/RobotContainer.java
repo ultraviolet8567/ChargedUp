@@ -1,11 +1,16 @@
 package frc.robot;
 
+import java.util.Map;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ControllerType;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OIConstants;
@@ -24,6 +29,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.ControllerIO;
 
 public class RobotContainer {
+    // Subsystems
     private static final Swerve swerve = new Swerve();
     private static final Intake intake = new Intake();
     private static final Arms arms = new Arms();
@@ -32,10 +38,15 @@ public class RobotContainer {
     // private final VisionOdometry vision = new VisionOdometry();
     // private final Odometry odometry = new Odometry(gyro, vision);
 
+    // Joysticks
     private static final Joystick driverJoystick = new Joystick(OIConstants.kDriveControllerPort);
     private static final Joystick armJoystick = new Joystick(OIConstants.kArmControllerPort);
 
+    // Cameras
+    public final UsbCamera frontCamera = CameraServer.startAutomaticCapture(0);
+
     public RobotContainer() {
+        // Configure default commands for driving and arm movement
         swerve.setDefaultCommand(new SwerveTeleOp(
             swerve,
             gyro,
@@ -49,6 +60,11 @@ public class RobotContainer {
             arms,
             () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
             () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
+
+        // Send camera to Shuffleboard
+        Shuffleboard.getTab("Main").add("Front camera", frontCamera).withWidget(BuiltInWidgets.kCameraStream)
+            .withSize(4, 4)
+            .withProperties(Map.of("rotation", "HALF"));
         
         configureButtonBindings();
     }
@@ -76,10 +92,10 @@ public class RobotContainer {
         new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
         new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
 
-        new POVButton(armJoystick, 0).onTrue(new ChangeGamePiece(true));
-        new POVButton(armJoystick, 90).onTrue(new ChangeGamePiece(true));
-        new POVButton(armJoystick, 180).onTrue(new ChangeGamePiece(true));
-        new POVButton(armJoystick, 270).onTrue(new ChangeGamePiece(true));
+        // new POVButton(armJoystick, 0).onTrue(new ChangeGamePiece(true));
+        // new POVButton(armJoystick, 90).onTrue(new ChangeGamePiece(true));
+        // new POVButton(armJoystick, 180).onTrue(new ChangeGamePiece(true));
+        // new POVButton(armJoystick, 270).onTrue(new ChangeGamePiece(true));
     }
 
     public Command getAutonomousCommand() {

@@ -31,6 +31,7 @@ public class SwerveTeleOp extends CommandBase {
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
+
         addRequirements(swerve);
     }
 
@@ -77,10 +78,5 @@ public class SwerveTeleOp extends CommandBase {
     @Override
     public void end(boolean interuppted) {
         swerve.stopModules();
-    }
-
-    @Override
-    public boolean isFinished() {
-        return false;
     }
 }

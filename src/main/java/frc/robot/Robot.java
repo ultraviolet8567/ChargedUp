@@ -80,8 +80,8 @@ public class Robot extends LoggedRobot {
 
         gamePieceBox = Shuffleboard.getTab("Main").add("Game piece", true).withWidget(BuiltInWidgets.kBooleanBox)
             .withProperties(Map.of("color when true", "Yellow", "color when false", "Purple"))
-            .withSize(3, 3)
-            .withPosition(7, 0)
+            .withSize(4, 4)
+            .withPosition(6, 0)
             .getEntry();
 
         postTime = Shuffleboard.getTab("Main").add("Time left", 0).withWidget(BuiltInWidgets.kNumberBar)
