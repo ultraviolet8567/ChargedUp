@@ -87,13 +87,13 @@ public final class ControllerIO {
     public static int inversionRot() {
         switch (controllerDrive) {
             case XBOX:
-                return -1;
+                return 1;
             case LOGITECH:
-                return -1;
+                return 1;
             case JOYSTICK:
-                return -1;
+                return 1;
             default:
-                return -1;
+                return 1;
         }
     }
 
@@ -133,6 +133,15 @@ public final class ControllerIO {
                 return 2;
             default:
                 return 2;
+        }
+    }
+
+    public static int getRightBumper() {
+        switch (controllerDrive) {
+            case XBOX:
+                return XboxController.Button.kRightBumper.value;
+            default:
+                return XboxController.Button.kRightBumper.value;
         }
     }
 }

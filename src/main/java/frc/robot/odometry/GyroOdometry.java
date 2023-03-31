@@ -9,10 +9,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
@@ -22,7 +21,7 @@ public class GyroOdometry extends SubsystemBase {
     private SwerveDriveOdometry odometer;
 
     // TODO: The initial position estimate of the robot; may vary match to match
-    private static final Pose2d initialPose = new Pose2d(1, 0, new Rotation2d(0));
+    private static final Pose2d initialPose = new Pose2d(1.86, 0, new Rotation2d(0));
     
     // private double latestXPose;
     // Minimum angle for slope in radians
@@ -81,14 +80,14 @@ public class GyroOdometry extends SubsystemBase {
         // Negate the reading because the navX has CCW- and we need CCW+
         double reading = -gyro.getAngle();
         // Calculate this offset for the field when at pit setup
-        reading += Constants.kGyroOffset;
+        // reading += Constants.kGyroOffset;
 
         // Add π radians since 0 is the opposite for blue
-        if (DriverStation.getAlliance() == Alliance.Blue)
-            reading += Math.PI;
+        // if (DriverStation.getAlliance() == Alliance.Blue)
+        //     reading += Math.PI;
 
-        if (Constants.kDirectionSwitch)
-            reading += Math.PI;
+        // if (Constants.kDirectionSwitch)
+        //     reading += Math.PI;
             
         return reading;
     }

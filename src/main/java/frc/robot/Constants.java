@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
@@ -70,7 +69,7 @@ public final class Constants {
         public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
         public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
         public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
-        public static final double kElbowPidTolerance = (kElbowFrontLimit - kElbowBackLimit) / 100.0;
+        public static final double kElbowPidTolerance = (kElbowFrontLimit - kElbowBackLimit) / 150.0;
 
         // Arm absolute encoders
         public static final int kShoulderEncoderPort = 0;
@@ -84,15 +83,15 @@ public final class Constants {
         public static final double kArmsToElbow = -152.0 / 322.0;
 
         // TODO: find these points (Jackson and Aadi)
-        public static final double[] kHighNodeConeSetpoints = new double[] { 0.735, 0.417 };
+        public static final double[] kHighNodeConeSetpoints = new double[] { 0.850, 0.454 };
         public static final double[] kHighNodeCubeSetpoints = new double[] { 0.715, 0.608 };
-        public static final double[] kMidNodeConeSetpoints = new double[] { -0.185, 1.857 };
+        public static final double[] kMidNodeConeSetpoints = new double[] { -0.233, 2.024 };
         public static final double[] kMidNodeCubeSetpoints = new double[] { -0.380, 1.949 };
         public static final double[] kHybridNodeConeSetpoints = new double[] { 2.796, -1.183 };
         public static final double[] kHybridNodeCubeSetpoints = new double[] { 2.796, -1.183 };
-        public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.704, -0.915 };
+        public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.773, -1.114 };
         public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.975, -1.032 };
-        public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.642, 2.012 };
+        public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.601, 2.041 };
         public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
         public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
@@ -175,11 +174,11 @@ public final class Constants {
 
         public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 16.880 + 0.097;
         public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.3385 - 0.214;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 7.2968 - 0.151;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 7.2968 - 0.151 + 0.096;
         public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.031 - 0.012;
 
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5;
-        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
+        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 3 * Math.PI;
 
         public static double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
         public static final double kTeleDriveSlowSpeedPercentMetersPerSecond = 0.25;

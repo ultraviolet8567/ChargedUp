@@ -4,7 +4,8 @@
       "/AdvantageKit/RealOutputs/Mechanisms": "Mechanism2d",
       "/AdvantageKit/RealOutputs/Simulator/Mechanisms": "Mechanism2d",
       "/FMSInfo": "FMSInfo",
-      "/Shuffleboard/Main/Auto mode": "String Chooser"
+      "/Shuffleboard/Main/Auto mode": "String Chooser",
+      "/Shuffleboard/Main/Initial game piece": "String Chooser"
     }
   },
   "NetworkTables": {

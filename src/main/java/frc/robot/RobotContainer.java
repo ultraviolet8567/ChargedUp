@@ -1,25 +1,13 @@
 package frc.robot;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ControllerType;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
@@ -32,11 +20,9 @@ import frc.robot.commands.ResetGyro;
 import frc.robot.commands.SetPresetValue;
 import frc.robot.commands.SwerveTeleOp;
 import frc.robot.commands.ToggleSwerveSpeed;
-import frc.robot.commands.auto.AutoBalance;
-import frc.robot.commands.auto.AutoDriveOut;
-import frc.robot.commands.auto.AutoPlace;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Arms;
+import frc.robot.subsystems.AutoChooser;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.ControllerIO;
@@ -46,16 +32,12 @@ public class RobotContainer {
     private static final Intake intake = new Intake();
     private static final Arms arms = new Arms();
     private static final GyroOdometry gyro = new GyroOdometry(swerve);
+    private static final AutoChooser autoChooser = new AutoChooser(swerve, arms, intake, gyro);
     // private final VisionOdometry vision = new VisionOdometry();
     // private final Odometry odometry = new Odometry(gyro, vision);
 
     private static final Joystick driverJoystick = new Joystick(OIConstants.kDriveControllerPort);
     private static final Joystick armJoystick = new Joystick(OIConstants.kArmControllerPort);
-
-    private static final ShuffleboardTab tabMain = Shuffleboard.getTab("Main");
-
-    // Autonomous chooser
-    private static final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
     public RobotContainer() {
         swerve.setDefaultCommand(new SwerveTeleOp(
@@ -65,20 +47,12 @@ public class RobotContainer {
             () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getLeftX()),
             () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
             () -> OIConstants.controllerTypeDrive == ControllerType.JOYSTICK ? driverJoystick.getRawButton(ControllerIO.getTrigger()) : true,
-            () -> Constants.fieldOriented));
+            () -> driverJoystick.getRawButton(ControllerIO.getRightBumper())));
 
         arms.setDefaultCommand(new MoveArms(
             arms,
             () -> armJoystick.getRawAxis(ControllerIO.getLeftY()),
             () -> armJoystick.getRawAxis(ControllerIO.getRightY())));
-        
-        // Configure autonomous sendable chooser and send to Shuffleboard
-        autoChooser.setDefaultOption("Drive out auto", new AutoDriveOut(swerve, gyro));
-        autoChooser.addOption("Charging station engage auto", new AutoBalance(swerve, gyro));
-        autoChooser.addOption("No auto", null);
-        tabMain.add("Auto mode", autoChooser).withWidget(BuiltInWidgets.kComboBoxChooser)
-            .withSize(2, 1)
-            .withPosition(4, 2);
         
         configureButtonBindings();
     }
@@ -116,29 +90,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        String pathName = "Auto Balance";
-
-        PathPlannerTrajectory trajectory = PathPlanner.loadPath(pathName, new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
-        return followTrajectoryCommand(trajectory, false);
-    }
-
-    // Assuming this method is part of a drivetrain subsystem that provides the necessary methods
-    public Command followTrajectoryCommand(PathPlannerTrajectory traj, boolean isFirstPath) {
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> gyro.resetOdometry(traj.getInitialHolonomicPose())),
-            new AutoPlace(arms, intake),
-            new PPSwerveControllerCommand(
-                traj, 
-                gyro::getPose, // Pose supplier
-                DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-                new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-                new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
-                new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
-                swerve::setModuleStates, // Module states consumer
-                true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-                swerve // Requires this drive subsystem
-            ),
-            new InstantCommand(() -> swerve.stopModules())
-        );
+        Logger.getInstance().recordOutput("Auto/Path", autoChooser.getPathName());
+        return autoChooser.getAutoCommand();
+        // return null;
     }
 }

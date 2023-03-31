@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -70,6 +71,17 @@ public class Swerve extends SubsystemBase {
         backRight.setDesiredState(desiredStates[3]);
 
         Logger.getInstance().recordOutput("Setpoints/SwerveModuleStates", desiredStates);
+    }
+
+    public void lockWheels() {
+        SwerveModuleState[] locked = new SwerveModuleState[] {
+            new SwerveModuleState(0, new Rotation2d(Math.PI - 0.81)),
+            new SwerveModuleState(0, new Rotation2d(0.81)), 
+            new SwerveModuleState(0, new Rotation2d(0.81)), 
+            new SwerveModuleState(0, new Rotation2d(Math.PI - 0.81))
+        };
+
+        setModuleStates(locked);
     }
 
     public void resetEncoders() {
