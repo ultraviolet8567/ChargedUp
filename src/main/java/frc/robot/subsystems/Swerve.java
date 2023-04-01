@@ -73,12 +73,13 @@ public class Swerve extends SubsystemBase {
         Logger.getInstance().recordOutput("Setpoints/SwerveModuleStates", desiredStates);
     }
 
+    // Sets the wheels to 45 degree angles so it doesn't move
     public void lockWheels() {
         SwerveModuleState[] locked = new SwerveModuleState[] {
-            new SwerveModuleState(0, new Rotation2d(Math.PI - 0.81)),
-            new SwerveModuleState(0, new Rotation2d(0.81)), 
-            new SwerveModuleState(0, new Rotation2d(0.81)), 
-            new SwerveModuleState(0, new Rotation2d(Math.PI - 0.81))
+            new SwerveModuleState(0, new Rotation2d(2.386)),
+            new SwerveModuleState(0, new Rotation2d(0.755)), 
+            new SwerveModuleState(0, new Rotation2d(-2.386)), 
+            new SwerveModuleState(0, new Rotation2d(-0.755))
         };
 
         setModuleStates(locked);

@@ -3,13 +3,12 @@ package frc.robot.commands.auto;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.Preset;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.odometry.GyroOdometry;
-import frc.robot.Robot;
-import frc.robot.subsystems.Arms;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
 
 public class AutoBalance extends CommandBase {
@@ -33,26 +32,26 @@ public class AutoBalance extends CommandBase {
 
     @Override
     public void execute() {
+        double speed = pid.calculate(gyro.getRotation3d().getY(), 0);
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speed, 0, 0, gyro.getRotation2d());
+        SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        
+        swerve.setModuleStates(moduleStates);
+        
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
-
-        double value = pid.calculate(gyro.getRotation3d().getY(), 0);
-        Logger.getInstance().recordOutput("Auto/Value", value);
-
-        // if (timeEquals(5)) {
-        //     intake.drop(Robot.getGamePiece());
-        // }
+        Logger.getInstance().recordOutput("Auto/Speed", speed);
+        Logger.getInstance().recordOutput("Auto/PIDError", pid.getPositionError());
     }
 
     @Override
     public void end(boolean interrupted) {
         timer.stop();
-
-        // arms.setPresetValue(Preset.TAXI);
-        // intake.stop();
+        swerve.lockWheels();
     }
 
     public boolean isFinished() {
-        return timeEquals(7);
+        return false;
+        // return timeEquals(7);
     }
 
     public boolean timeEquals(double target) {

@@ -8,10 +8,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
@@ -19,6 +18,8 @@ public class GyroOdometry extends SubsystemBase {
     private Swerve swerve;
     private AHRS gyro;
     private SwerveDriveOdometry odometer;
+
+    private double gyroOffset;
 
     // TODO: The initial position estimate of the robot; may vary match to match
     private static final Pose2d initialPose = new Pose2d(1.86, 0, new Rotation2d(0));
@@ -30,14 +31,8 @@ public class GyroOdometry extends SubsystemBase {
     public GyroOdometry(Swerve swerve) {
         this.swerve = swerve;
         gyro = new AHRS(SPI.Port.kMXP);
-        odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, new Rotation2d(), swerve.getModulePositions(), initialPose);
-        
-        // new Thread(() -> {
-        //     try {
-        //         Thread.sleep(100);
-        //         gyro.calibrate();
-        //     } catch (Exception e) { }
-        // });
+        odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getRotation2d(), swerve.getModulePositions(), initialPose);
+        gyroOffset = Constants.kGyroOffset;
     }
 
     public void periodic() {
@@ -67,9 +62,9 @@ public class GyroOdometry extends SubsystemBase {
     public Rotation3d getRotation3d() {
         return new Rotation3d(
             // Negate the reading because the navX has CCW- and we need CCW+
-            Rotation2d.fromDegrees(-gyro.getRoll()).getRadians(),
-            Rotation2d.fromDegrees(-gyro.getPitch()).getRadians(),
-            Rotation2d.fromDegrees(-gyro.getYaw()).getRadians());
+            Rotation2d.fromDegrees(-gyro.getRoll()).getRadians(), // X-axis
+            Rotation2d.fromDegrees(-gyro.getPitch()).getRadians(), // Y-axis
+            Rotation2d.fromDegrees(-gyro.getYaw()).getRadians()); // Z-axis
     } 
 
     public Rotation2d getRotation2d() {
@@ -79,22 +74,16 @@ public class GyroOdometry extends SubsystemBase {
     public double getHeading() {
         // Negate the reading because the navX has CCW- and we need CCW+
         double reading = -gyro.getAngle();
+
         // Calculate this offset for the field when at pit setup
-        // reading += Constants.kGyroOffset;
-
-        // Add π radians since 0 is the opposite for blue
-        // if (DriverStation.getAlliance() == Alliance.Blue)
-        //     reading += Math.PI;
-
-        // if (Constants.kDirectionSwitch)
-        //     reading += Math.PI;
+        reading -= gyroOffset;
             
         return reading;
     }
 
     // On pit setup day, take robot to corner of field and reset (set 0, 0)
     public void resetGyro() {
-        gyro.zeroYaw();
+        gyroOffset = -gyro.getAngle();
         resetOdometry(initialPose);
     }
 

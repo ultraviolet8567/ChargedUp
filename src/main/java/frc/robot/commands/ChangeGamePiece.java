@@ -30,4 +30,9 @@ public class ChangeGamePiece extends CommandBase {
         String gamePieceString = gamePiece == GamePiece.CONE ? "Cone" : "Cube";
         Logger.getInstance().recordOutput("GamePiece", gamePieceString);
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

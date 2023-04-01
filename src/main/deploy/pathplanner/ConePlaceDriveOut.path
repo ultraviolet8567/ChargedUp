@@ -28,7 +28,7 @@
         "y": 0.8107609377611926
       },
       "prevControl": {
-        "x": 6.431770470378549,
+        "x": 4.810248594856164,
         "y": 0.8107609377611926
       },
       "nextControl": null,
@@ -45,5 +45,8 @@
       }
     }
   ],
+  "maxVelocity": 1.0,
+  "maxAcceleration": 2.0,
+  "isReversed": null,
   "markers": []
 }

@@ -11,13 +11,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
 
 public final class Constants {
     /** General info
      * Controller axis range: -1 to 1
-     * Motor max: 5676 rot/min = 14.5 ft/s = 4.4196 m/s
+     * Motor max: 5676 rot/min = 14.5 ft/s = 4.5 m/s
      * Speed cap: 5000 rot/min
      * 
      * Gyro:
@@ -31,14 +33,15 @@ public final class Constants {
      *  - Counterclockwise = z+ 
      */
 
-    public static final Mode currentMode = Mode.TUNING;
+    public static final Mode currentMode = Mode.REAL;
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
     public static final String logpath = "C:\\Users\\Wellesley FRC 8567\\Desktop\\Logs";
     
-    // Offset added to gyro reading so that 0 is forward when on the Red Alliance
-    public static final double kGyroOffset = -2.229;
-    public static final boolean kDirectionSwitch = false;
+    // Offset subtracted from the gyro reading so that 0 is forward when on the Red Alliance
+    public static final double kGyroOffsetRed = 0;
+    // Make sure to take the opposite as 0 if on Blue Alliance
+    public static final double kGyroOffset = DriverStation.getAlliance() == Alliance.Red ? kGyroOffsetRed : kGyroOffsetRed + Math.PI;
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);

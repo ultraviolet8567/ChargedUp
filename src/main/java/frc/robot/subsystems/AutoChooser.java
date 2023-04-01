@@ -22,6 +22,7 @@ import frc.robot.commands.auto.AutoBalance;
 import frc.robot.commands.auto.AutoLock;
 import frc.robot.commands.auto.AutoPlace;
 import frc.robot.odometry.GyroOdometry;
+import frc.robot.Robot;
 
 public class AutoChooser extends SubsystemBase {
     private static final ShuffleboardTab main = Shuffleboard.getTab("Main");
@@ -31,8 +32,7 @@ public class AutoChooser extends SubsystemBase {
     private final Intake intake;
     private final GyroOdometry gyro;
 
-    private final SendableChooser<Boolean> chargeStation;
-    private final SendableChooser<String> placeGamePiece;
+    private final SendableChooser<Boolean> chargeStation, placeGamePiece;
 
     public AutoChooser(Swerve swerve, Arms arms, Intake intake, GyroOdometry gyro) {
         this.swerve = swerve;
@@ -48,26 +48,30 @@ public class AutoChooser extends SubsystemBase {
             .withPosition(4, 2);
 
         placeGamePiece = new SendableChooser<>();
-        placeGamePiece.setDefaultOption("None", "None");
-        placeGamePiece.addOption("Cone", "Cone");
-        placeGamePiece.addOption("Cube", "Cube");
+        placeGamePiece.setDefaultOption("No", false);
+        placeGamePiece.addOption("Yes", true);
         main.add("Place game piece", placeGamePiece).withWidget(BuiltInWidgets.kComboBoxChooser)
             .withSize(2, 1)
             .withPosition(4, 3);
     }
 
+    public void periodic() {
+        Logger.getInstance().recordOutput("Auto/Path", getPathName());
+    }
+
     public String getPathName() {
         String pathName = "";
         
-        switch (placeGamePiece.getSelected()) {
-            case "Cone":
-                pathName += "ConePlace";
-                break;
-            case "Cube":
-                pathName += "CubePlace";
-                break;
-            default:
-                break;
+        if (placeGamePiece.getSelected()) {
+            switch (Robot.getGamePiece()) {
+                case CONE:
+                    pathName += "ConePlace";
+                    break;
+                case CUBE:
+                default:
+                    pathName += "CubePlace";
+                    break;
+            }
         }
 
         if (chargeStation.getSelected()) {
@@ -81,7 +85,12 @@ public class AutoChooser extends SubsystemBase {
     }
 
     public PathPlannerTrajectory getTrajectory() {
-        return PathPlanner.loadPath(getPathName(), new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
+        if (getPathName().contains("Balance")) {
+            return PathPlanner.loadPath(getPathName(), new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
+        }
+        else {
+            return PathPlanner.loadPath(getPathName(), new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
+        }
     }
 
     public PPSwerveControllerCommand getControllerCommand() {
@@ -91,9 +100,9 @@ public class AutoChooser extends SubsystemBase {
             trajectory, 
             gyro::getPose, // Pose supplier
             DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+            new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Leaving it at 0 will only use feedforwards.
             new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
-            new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Tune these values for your robot. Leaving them 0 will only use feedforwards.
+            new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Leaving it at 0 will only use feedforwards.
             swerve::setModuleStates, // Module states consumer
             true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
             swerve // Requires this drive subsystem
@@ -102,17 +111,7 @@ public class AutoChooser extends SubsystemBase {
 
     public Command getAutoCommand() {
         if (chargeStation.getSelected()) {
-            if (placeGamePiece.getSelected().equals("None")) {
-                // Balance on charge station
-                Logger.getInstance().recordOutput("Auto/Routine", "Balance on charge station");
-                return new SequentialCommandGroup(
-                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
-                    getControllerCommand(),
-                    new AutoBalance(swerve, gyro),
-                    new AutoLock(swerve),
-                    new InstantCommand(() -> swerve.stopModules()));
-            }
-            else {
+            if (placeGamePiece.getSelected()) {
                 // Place on high node and balance
                 Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and balance");
                 return new SequentialCommandGroup(
@@ -120,31 +119,37 @@ public class AutoChooser extends SubsystemBase {
                     new AutoPlace(arms, intake),
                     getControllerCommand(),
                     new AutoBalance(swerve, gyro),
-                    new AutoLock(swerve),
-                    new InstantCommand(() -> swerve.stopModules()));
+                    new AutoLock(swerve));
             }
-        }
-        else {
-            if (placeGamePiece.getSelected().equals("None")) {
-                // Drive out
-                Logger.getInstance().recordOutput("Auto/Routine", "Drive out");
+            else {
+                // Balance on charge station
+                Logger.getInstance().recordOutput("Auto/Routine", "Balance on charge station");
                 return new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
                     getControllerCommand(),
-                    new AutoLock(swerve),
-                    new InstantCommand(() -> swerve.stopModules()));
+                    new AutoBalance(swerve, gyro),
+                    new AutoLock(swerve));
             }
-            else {
+        }
+        else {
+            if (placeGamePiece.getSelected()) {
                 // Place on high node and drive out
                 Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and drive out");
                 return new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
                     new AutoPlace(arms, intake),
                     getControllerCommand(),
-                    new AutoBalance(swerve, gyro),
-                    new AutoLock(swerve),
-                    new InstantCommand(() -> swerve.stopModules()));
+                    new AutoLock(swerve));
             }
+            else {
+                // Drive out
+                Logger.getInstance().recordOutput("Auto/Routine", "Drive out");
+                return new SequentialCommandGroup(
+                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
+                    getControllerCommand(),
+                    new AutoLock(swerve));
+            }
+            
         }
     }
 }
