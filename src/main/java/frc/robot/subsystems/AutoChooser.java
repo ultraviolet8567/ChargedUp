@@ -8,6 +8,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -80,7 +82,16 @@ public class AutoChooser extends SubsystemBase {
         else {
             pathName += "DriveOut";
         }
-        
+
+
+        if (pathName.equals(""))
+            pathName = "DriveOut";
+
+        if (DriverStation.getAlliance() == Alliance.Red)
+            pathName += "Red";
+        else
+            pathName += "Blue";
+
         return pathName;
     }
 
@@ -104,7 +115,7 @@ public class AutoChooser extends SubsystemBase {
             new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
             new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Leaving it at 0 will only use feedforwards.
             swerve::setModuleStates, // Module states consumer
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+            false, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
             swerve // Requires this drive subsystem
         );
     }
@@ -115,19 +126,19 @@ public class AutoChooser extends SubsystemBase {
                 // Place on high node and balance
                 Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and balance");
                 return new SequentialCommandGroup(
-                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
+                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialPose())),
                     new AutoPlace(arms, intake),
-                    getControllerCommand(),
-                    new AutoBalance(swerve, gyro),
+                    // getControllerCommand(),
+                    // new AutoBalance(swerve, gyro),
                     new AutoLock(swerve));
             }
             else {
                 // Balance on charge station
                 Logger.getInstance().recordOutput("Auto/Routine", "Balance on charge station");
                 return new SequentialCommandGroup(
-                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
-                    getControllerCommand(),
-                    new AutoBalance(swerve, gyro),
+                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialPose())),
+                    // getControllerCommand(),
+                    // new AutoBalance(swerve, gyro),
                     new AutoLock(swerve));
             }
         }
@@ -136,7 +147,7 @@ public class AutoChooser extends SubsystemBase {
                 // Place on high node and drive out
                 Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and drive out");
                 return new SequentialCommandGroup(
-                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
+                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialPose())),
                     new AutoPlace(arms, intake),
                     getControllerCommand(),
                     new AutoLock(swerve));
@@ -145,7 +156,7 @@ public class AutoChooser extends SubsystemBase {
                 // Drive out
                 Logger.getInstance().recordOutput("Auto/Routine", "Drive out");
                 return new SequentialCommandGroup(
-                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialHolonomicPose())),
+                    new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialPose())),
                     getControllerCommand(),
                     new AutoLock(swerve));
             }

@@ -31,8 +31,9 @@ public class GyroOdometry extends SubsystemBase {
     public GyroOdometry(Swerve swerve) {
         this.swerve = swerve;
         gyro = new AHRS(SPI.Port.kMXP);
+        gyro.reset();
         odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getRotation2d(), swerve.getModulePositions(), initialPose);
-        gyroOffset = Constants.kGyroOffset;
+        // gyroOffset = Constants.kGyroOffset;
     }
 
     public void periodic() {
@@ -75,15 +76,16 @@ public class GyroOdometry extends SubsystemBase {
         // Negate the reading because the navX has CCW- and we need CCW+
         double reading = -gyro.getAngle();
 
-        // Calculate this offset for the field when at pit setup
-        reading -= gyroOffset;
+        // Calculate this offset for the field when at pit setup DEPRECATED
+        // reading -= gyroOffset;
             
         return reading;
     }
 
     // On pit setup day, take robot to corner of field and reset (set 0, 0)
     public void resetGyro() {
-        gyroOffset = -gyro.getAngle();
+        gyro.reset();
+        // gyroOffset = -gyro.getAngle();
         resetOdometry(initialPose);
     }
 
