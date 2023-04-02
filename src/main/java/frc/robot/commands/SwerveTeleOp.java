@@ -16,11 +16,11 @@ public class SwerveTeleOp extends CommandBase {
     private final Swerve swerve;
     private final GyroOdometry gyro;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
-    private final Supplier<Boolean> rotationOnFunction, slowDownFunction;
+    private final Supplier<Boolean> rotationOnFunction, slowDownFunction, disableSideFunction;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
     // First supplier is the forward velocity, then its horizontal velocity, then rotational velocity
-    public SwerveTeleOp(Swerve swerve, GyroOdometry gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> slowDownFunction) {
+    public SwerveTeleOp(Swerve swerve, GyroOdometry gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> slowDownFunction, Supplier<Boolean> disableSideFunction) {
         this.swerve = swerve;
         this.gyro = gyro;
         this.xSpdFunction = xSpdFunction;
@@ -28,6 +28,7 @@ public class SwerveTeleOp extends CommandBase {
         this.turningSpdFunction = turningSpdFunction;
         this.rotationOnFunction = rotationOnFunction;
         this.slowDownFunction = slowDownFunction;
+        this.disableSideFunction = disableSideFunction;
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
@@ -54,6 +55,10 @@ public class SwerveTeleOp extends CommandBase {
             xSpeed /= 3;
             ySpeed /= 3;
             turningSpeed /= 3;
+        }
+
+        if (disableSideFunction.get()) {
+            ySpeed = 0;
         }
 
         // Make the driving smoother by using a slew rate limiter to minimize acceleration

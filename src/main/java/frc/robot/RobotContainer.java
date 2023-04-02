@@ -54,7 +54,8 @@ public class RobotContainer {
             () -> ControllerIO.inversionX() * driverJoystick.getRawAxis(ControllerIO.getLeftX()),
             () -> ControllerIO.inversionRot() * driverJoystick.getRawAxis(ControllerIO.getRot()),
             () -> OIConstants.controllerTypeDrive == ControllerType.JOYSTICK ? driverJoystick.getRawButton(ControllerIO.getTrigger()) : true,
-            () -> driverJoystick.getRawButton(ControllerIO.getRightBumper())));
+            () -> driverJoystick.getRawButton(ControllerIO.getRightBumper()),
+            () -> driverJoystick.getRawButton(XboxController.Button.kLeftBumper.value)));
 
         arms.setDefaultCommand(new MoveArms(
             arms,
