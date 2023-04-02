@@ -22,22 +22,37 @@ public class AutoBalance extends CommandBase {
         this.gyro = gyro;
         timer = new Timer();
 
-        pid = new PIDController(0.5, 0, 0);
+        pid = new PIDController(1, 0, 0);
     }
 
     @Override
     public void initialize() {
+        pid.setTolerance(0.05);
+
         timer.start();
     }
 
     @Override
     public void execute() {
-        double speed = pid.calculate(gyro.getRotation3d().getY(), 0);
+        double speed = 0;
+        // double speed = pid.calculate(gyro.getRotation3d().getX(), 0) * 10;
+        if (Math.abs(gyro.getRotation3d().getX()) < 0.05) {
+            speed = 0;
+        } else {
+            if (gyro.getRotation3d().getX() < 0) {
+                speed = -1;
+            }
+            else {
+                speed = 1;
+            } 
+        }
+
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speed, 0, 0, gyro.getRotation2d());
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
         
         swerve.setModuleStates(moduleStates);
         
+        Logger.getInstance().recordOutput("Auto/ModuleStates", moduleStates);
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
         Logger.getInstance().recordOutput("Auto/Speed", speed);
         Logger.getInstance().recordOutput("Auto/PIDError", pid.getPositionError());
