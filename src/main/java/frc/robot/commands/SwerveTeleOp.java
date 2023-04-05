@@ -16,19 +16,19 @@ public class SwerveTeleOp extends CommandBase {
     private final Swerve swerve;
     private final GyroOdometry gyro;
     private final Supplier<Double> xSpdFunction, ySpdFunction, turningSpdFunction;
-    private final Supplier<Boolean> rotationOnFunction, slowDownFunction, disableSideFunction;
+    private final Supplier<Boolean> rotationOnFunction, leftBumper, rightBumper;
     private final SlewRateLimiter xLimiter, yLimiter, turningLimiter;
 
     // First supplier is the forward velocity, then its horizontal velocity, then rotational velocity
-    public SwerveTeleOp(Swerve swerve, GyroOdometry gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> slowDownFunction, Supplier<Boolean> disableSideFunction) {
+    public SwerveTeleOp(Swerve swerve, GyroOdometry gyro, Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> turningSpdFunction, Supplier<Boolean> rotationOnFunction, Supplier<Boolean> leftBumper, Supplier<Boolean> rightBumper) {
         this.swerve = swerve;
         this.gyro = gyro;
         this.xSpdFunction = xSpdFunction;
         this.ySpdFunction = ySpdFunction;
         this.turningSpdFunction = turningSpdFunction;
         this.rotationOnFunction = rotationOnFunction;
-        this.slowDownFunction = slowDownFunction;
-        this.disableSideFunction = disableSideFunction;
+        this.leftBumper = leftBumper;
+        this.rightBumper = rightBumper;
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAccelerationUnitsPerSecond);
         this.turningLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAngularAccelerationUnitsPerSecond);
@@ -51,14 +51,15 @@ public class SwerveTeleOp extends CommandBase {
         ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0;
         turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0;
 
-        if (slowDownFunction.get()) {
-            xSpeed /= 3;
-            ySpeed /= 3;
-            turningSpeed /= 3;
+        if (leftBumper.get()) {
+            xSpeed *= 0.11;
+            ySpeed *= 0.11;
+            turningSpeed *= 0.11;
         }
-
-        if (disableSideFunction.get()) {
-            ySpeed = 0;
+        else if (rightBumper.get()) {
+            xSpeed *= 0.33;
+            ySpeed *= 0.33;
+            turningSpeed *= 0.33;
         }
 
         // Make the driving smoother by using a slew rate limiter to minimize acceleration
