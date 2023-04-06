@@ -54,18 +54,23 @@ public class SwerveTeleOp extends CommandBase {
         turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0;
 
         if (leftBumper.get()) {
-            RobotContainer.getDriverJoystick().setRumble(RumbleType.kLeftRumble, 0.25);
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kLeftRumble, 0.025);
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kRightRumble, 0);
 
             xSpeed *= 0.11;
             ySpeed *= 0.11;
             turningSpeed *= 0.11;
         }
         else if (rightBumper.get()) {
-            RobotContainer.getDriverJoystick().setRumble(RumbleType.kRightRumble, 0.25);
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kLeftRumble, 0);
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kRightRumble, 0.025);
 
             xSpeed *= 0.33;
             ySpeed *= 0.33;
             turningSpeed *= 0.33;
+        }
+        else {
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kBothRumble, 0);
         }
 
         // Make the driving smoother by using a slew rate limiter to minimize acceleration
