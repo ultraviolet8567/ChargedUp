@@ -102,4 +102,8 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getAutoCommand();
     }
+
+    public static Joystick getDriverJoystick() {
+        return driverJoystick;
+    }
 }

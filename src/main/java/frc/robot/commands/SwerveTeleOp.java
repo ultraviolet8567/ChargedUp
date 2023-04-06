@@ -5,8 +5,10 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.odometry.GyroOdometry;
@@ -52,11 +54,15 @@ public class SwerveTeleOp extends CommandBase {
         turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0;
 
         if (leftBumper.get()) {
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kLeftRumble, 0.25);
+
             xSpeed *= 0.11;
             ySpeed *= 0.11;
             turningSpeed *= 0.11;
         }
         else if (rightBumper.get()) {
+            RobotContainer.getDriverJoystick().setRumble(RumbleType.kRightRumble, 0.25);
+
             xSpeed *= 0.33;
             ySpeed *= 0.33;
             turningSpeed *= 0.33;
