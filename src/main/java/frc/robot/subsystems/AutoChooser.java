@@ -128,8 +128,8 @@ public class AutoChooser extends SubsystemBase {
                 return new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialPose())),
                     new AutoPlace(arms, intake),
-                    // getControllerCommand(),
-                    // new AutoBalance(swerve, gyro),
+                    getControllerCommand(),
+                    new AutoBalance(swerve, gyro),
                     new AutoLock(swerve));
             }
             else {
@@ -137,8 +137,8 @@ public class AutoChooser extends SubsystemBase {
                 Logger.getInstance().recordOutput("Auto/Routine", "Balance on charge station");
                 return new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(getTrajectory().getInitialPose())),
-                    // getControllerCommand(),
-                    // new AutoBalance(swerve, gyro),
+                    getControllerCommand(),
+                    new AutoBalance(swerve, gyro),
                     new AutoLock(swerve));
             }
         }

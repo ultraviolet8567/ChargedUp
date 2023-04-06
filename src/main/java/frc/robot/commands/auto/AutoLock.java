@@ -10,6 +10,8 @@ public class AutoLock extends CommandBase {
 
     public AutoLock(Swerve swerve) {
         this.swerve = swerve;
+        addRequirements(swerve);
+
         timer = new Timer();
     }
 

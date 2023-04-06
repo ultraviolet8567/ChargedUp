@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
@@ -18,8 +17,6 @@ public class GyroOdometry extends SubsystemBase {
     private Swerve swerve;
     private AHRS gyro;
     private SwerveDriveOdometry odometer;
-
-    private double gyroOffset;
 
     // TODO: The initial position estimate of the robot; may vary match to match
     private static final Pose2d initialPose = new Pose2d(1.86, 0, new Rotation2d(0));
@@ -33,7 +30,6 @@ public class GyroOdometry extends SubsystemBase {
         gyro = new AHRS(SPI.Port.kMXP);
         gyro.reset();
         odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getRotation2d(), swerve.getModulePositions(), initialPose);
-        // gyroOffset = Constants.kGyroOffset;
     }
 
     public void periodic() {
@@ -74,18 +70,12 @@ public class GyroOdometry extends SubsystemBase {
 
     public double getHeading() {
         // Negate the reading because the navX has CCW- and we need CCW+
-        double reading = -gyro.getAngle();
-
-        // Calculate this offset for the field when at pit setup DEPRECATED
-        // reading -= gyroOffset;
-            
-        return reading;
+        return -gyro.getAngle();
     }
 
     // On pit setup day, take robot to corner of field and reset (set 0, 0)
     public void resetGyro() {
         gyro.reset();
-        // gyroOffset = -gyro.getAngle();
         resetOdometry(initialPose);
     }
 

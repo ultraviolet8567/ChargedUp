@@ -12,47 +12,35 @@ import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Swerve;
 
 public class AutoBalance extends CommandBase {
-    private Swerve swerve;
-    private GyroOdometry gyro;
+    private final Swerve swerve;
+    private final GyroOdometry gyro;
     private Timer timer;
     private PIDController pid;
 
     public AutoBalance(Swerve swerve, GyroOdometry gyro) {
         this.swerve = swerve;
         this.gyro = gyro;
+        addRequirements(swerve);
+
         timer = new Timer();
 
-        pid = new PIDController(1, 0, 0);
+        pid = new PIDController(2, 0, 0);
+        pid.setTolerance(0.1);
     }
 
     @Override
     public void initialize() {
-        pid.setTolerance(0.05);
-
         timer.start();
     }
 
     @Override
     public void execute() {
-        double speed = 0;
-        // double speed = pid.calculate(gyro.getRotation3d().getX(), 0) * 10;
-        if (Math.abs(gyro.getRotation3d().getX()) < 0.05) {
-            speed = 0;
-        } else {
-            if (gyro.getRotation3d().getX() < 0) {
-                speed = -1;
-            }
-            else {
-                speed = 1;
-            } 
-        }
+        double speed = pid.calculate(gyro.getRotation3d().getX(), 0);
 
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speed, 0, 0, gyro.getRotation2d());
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
-        
         swerve.setModuleStates(moduleStates);
         
-        Logger.getInstance().recordOutput("Auto/ModuleStates", moduleStates);
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
         Logger.getInstance().recordOutput("Auto/Speed", speed);
         Logger.getInstance().recordOutput("Auto/PIDError", pid.getPositionError());
@@ -65,11 +53,6 @@ public class AutoBalance extends CommandBase {
     }
 
     public boolean isFinished() {
-        return false;
-        // return timeEquals(7);
-    }
-
-    public boolean timeEquals(double target) {
-        return Math.abs(timer.get() - target) < 0.1;
+        return pid.atSetpoint();
     }
 }
