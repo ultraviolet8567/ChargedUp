@@ -36,7 +36,7 @@ public final class Constants {
     public static final Mode currentMode = Mode.REAL;
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
-    public static final String logpath = "C:\\Users\\Wellesley FRC 8567\\Desktop\\Logs";
+    public static final String logpath = "/media/sda1/";
     
     // Offset subtracted from the gyro reading so that 0 is forward when on the Red Alliance
     public static final double kGyroOffsetRed = 0;
@@ -183,9 +183,7 @@ public final class Constants {
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 3 * Math.PI;
 
-        public static double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
-        public static final double kTeleDriveSlowSpeedPercentMetersPerSecond = 0.25;
-        public static final double kTeleDriveMaxSpeedPercentMetersPerSecond = 0.75;
+        public static double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.9;
         public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond * 0.4;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
