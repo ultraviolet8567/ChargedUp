@@ -5,7 +5,9 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.odometry.GyroOdometry;
@@ -24,7 +26,11 @@ public class AutoBalance extends CommandBase {
 
         timer = new Timer();
 
-        pid = new PIDController(2, 0, 0);
+        if (DriverStation.getAlliance() == Alliance.Red) {
+            pid = new PIDController(2.75, 0, 0);
+        } else {
+            pid = new PIDController(2.25, 0, 0);
+        }
         pid.setTolerance(0.1);
     }
 

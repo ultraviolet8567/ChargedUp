@@ -34,7 +34,8 @@ public class AutoChooser extends SubsystemBase {
     private final Intake intake;
     private final GyroOdometry gyro;
 
-    private final SendableChooser<Boolean> chargeStation, placeGamePiece;
+    private final SendableChooser<Boolean> placeGamePiece;
+    private final SendableChooser<String> chargeStation;
 
     public AutoChooser(Swerve swerve, Arms arms, Intake intake, GyroOdometry gyro) {
         this.swerve = swerve;
@@ -43,8 +44,9 @@ public class AutoChooser extends SubsystemBase {
         this.gyro = gyro;
 
         chargeStation = new SendableChooser<>();
-        chargeStation.setDefaultOption("No", false);
-        chargeStation.addOption("Yes", true);
+        chargeStation.setDefaultOption("Drive out", "Drive out");
+        chargeStation.addOption("Balance", "Balance");
+        chargeStation.addOption("Don't move", "Don't move");
         main.add("Balance on charge station", chargeStation).withWidget(BuiltInWidgets.kComboBoxChooser)
             .withSize(2, 1)
             .withPosition(4, 2);
@@ -76,13 +78,12 @@ public class AutoChooser extends SubsystemBase {
             }
         }
 
-        if (chargeStation.getSelected()) {
+        if (chargeStation.getSelected().equals("Balance")) {
             pathName += "Balance";
         }
-        else {
+        else if (chargeStation.getSelected().equals("Drive out")) {
             pathName += "DriveOut";
         }
-
 
         if (pathName.equals(""))
             pathName = "DriveOut";
@@ -121,7 +122,7 @@ public class AutoChooser extends SubsystemBase {
     }
 
     public Command getAutoCommand() {
-        if (chargeStation.getSelected()) {
+        if (chargeStation.getSelected().equals("Balance")) {
             if (placeGamePiece.getSelected()) {
                 // Place on high node and balance
                 Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and balance");
@@ -142,7 +143,7 @@ public class AutoChooser extends SubsystemBase {
                     new AutoLock(swerve));
             }
         }
-        else {
+        else if (chargeStation.getSelected().equals("DriveOut")) {
             if (placeGamePiece.getSelected()) {
                 // Place on high node and drive out
                 Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and drive out");
@@ -160,7 +161,20 @@ public class AutoChooser extends SubsystemBase {
                     getControllerCommand(),
                     new AutoLock(swerve));
             }
-            
+        }
+        else {
+            if (placeGamePiece.getSelected()) {
+                // Place on high node and do not move
+                Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and do nothing");
+                return new SequentialCommandGroup(
+                    new AutoPlace(arms, intake),
+                    new AutoLock(swerve));
+            }
+            else {
+                // Do nothing
+                Logger.getInstance().recordOutput("Auto/Routine", "Do nothing");
+                return null;
+            }
         }
     }
 }
