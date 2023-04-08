@@ -39,10 +39,15 @@ public class Arms extends SubsystemBase {
 
     public Arms() {
         shoulder = new CANSparkMax(CAN.kShoulderPort, MotorType.kBrushless);
-        elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
+        shoulder.enableVoltageCompensation(12.0);
+        shoulder.setSmartCurrentLimit(40);
+        shoulder.setIdleMode(IdleMode.kBrake);
 
-        // Invert the elbow speed because otherwise positive moves towards the battery
+        elbow = new CANSparkMax(CAN.kElbowPort, MotorType.kBrushless);
+        elbow.enableVoltageCompensation(12.0);
+        elbow.setSmartCurrentLimit(40);
         elbow.setInverted(true);
+        elbow.setIdleMode(IdleMode.kBrake);
 
         shoulderEncoder = new DutyCycleEncoder(ArmConstants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(ArmConstants.kElbowEncoderPort);

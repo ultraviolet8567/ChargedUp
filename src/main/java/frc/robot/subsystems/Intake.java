@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,12 +16,14 @@ public class Intake extends SubsystemBase {
 
     public Intake() {
         intake = new CANSparkMax(CAN.kIntakePort, MotorType.kBrushless);
+        intake.enableVoltageCompensation(12.0);
+        intake.setSmartCurrentLimit(40);
+        intake.setIdleMode(IdleMode.kBrake);
     }
 
     @Override
     public void periodic() {
         Logger.getInstance().recordOutput("Setpoints/Intake", intake.get());
-        
         Logger.getInstance().recordOutput("Measured/Intake", intake.getEncoder().getVelocity());
     }
 
