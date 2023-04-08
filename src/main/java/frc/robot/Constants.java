@@ -1,6 +1,13 @@
 package frc.robot;
 
+import static java.util.Map.entry;
+
 import java.util.List;
+import java.util.Map;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -11,8 +18,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
 
@@ -38,10 +43,20 @@ public final class Constants {
     public static final boolean fieldOriented = true;
     public static final String logpath = "/media/sda1/";
     
-    // Offset subtracted from the gyro reading so that 0 is forward when on the Red Alliance
-    public static final double kGyroOffsetRed = 0;
-    // Make sure to take the opposite as 0 if on Blue Alliance
-    public static final double kGyroOffset = DriverStation.getAlliance() == Alliance.Red ? kGyroOffsetRed : kGyroOffsetRed + Math.PI;
+    public static final Map<String, PathPlannerTrajectory> trajectories = Map.ofEntries(
+        entry("BalanceBlue", PathPlanner.loadPath("BalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("BalanceRed", PathPlanner.loadPath("BalanceRed", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceBalanceBlue", PathPlanner.loadPath("ConePlaceBalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceBalanceRed", PathPlanner.loadPath("ConePlaceBalanceRed", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceDriveOutBlue", PathPlanner.loadPath("ConePlaceDriveOutBlue", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceDriveOutRed",PathPlanner.loadPath("ConePlaceDriveOutRed", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceBalanceBlue", PathPlanner.loadPath("CubePlaceBalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceBalanceRed", PathPlanner.loadPath("CubePlaceBalanceRed", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceDriveOutBlue",PathPlanner.loadPath("CubePlaceDriveOutBlue", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceDriveOutRed",PathPlanner.loadPath("CubePlaceDriveOutRed", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("DriveOutBlue",PathPlanner.loadPath("DriveOutBlue", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("DriveOutRed", PathPlanner.loadPath("DriveOutRed", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared)))
+    );
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
