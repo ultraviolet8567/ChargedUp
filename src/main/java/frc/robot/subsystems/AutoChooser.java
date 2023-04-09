@@ -31,9 +31,6 @@ import frc.robot.odometry.GyroOdometry;
 public class AutoChooser extends SubsystemBase {
     private static final ShuffleboardTab main = Shuffleboard.getTab("Main");
 
-    private final Swerve swerve;
-    private final GyroOdometry gyro;
-
     private final AutoBalance autoBalance;
     private final AutoPlace autoPlace;
     private final AutoLock autoLock;
@@ -44,9 +41,6 @@ public class AutoChooser extends SubsystemBase {
     private final SendableChooser<String> chargeStation;
 
     public AutoChooser(Swerve swerve, Arms arms, Intake intake, GyroOdometry gyro) {
-        this.swerve = swerve;
-        this.gyro = gyro;
-
         autoBalance = new AutoBalance(swerve, gyro);
         autoPlace = new AutoPlace(arms, intake);
         autoLock = new AutoLock(swerve);
@@ -74,38 +68,98 @@ public class AutoChooser extends SubsystemBase {
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("ConePlaceBalance" + alliance).getInitialPose())),
                     autoPlace,
-                    getControllerCommand("ConePlaceBalance" + alliance),
+                    new PPSwerveControllerCommand(
+                        Constants.trajectories.get("ConePlaceBalance" + alliance), 
+                        gyro::getPose, // Pose supplier
+                        DriveConstants.kDriveKinematics, // SwerveDriveKinematics
+                        new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Leaving it at 0 will only use feedforwards.
+                        new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
+                        new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Leaving it at 0 will only use feedforwards.
+                        swerve::setModuleStates, // Module states consumer
+                        false, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+                        swerve // Requires this drive subsystem
+                    ),
                     autoBalance,
                     autoLock)),
             entry("Cube place on high node and balance",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("CubePlaceBalance" + alliance).getInitialPose())),
                     autoPlace,
-                    getControllerCommand("CubePlaceBalance" + alliance),
+                    new PPSwerveControllerCommand(
+                        Constants.trajectories.get("CubePlaceBalance" + alliance), 
+                        gyro::getPose,
+                        DriveConstants.kDriveKinematics,
+                        new PIDController(AutoConstants.kPXController, 0, 0),
+                        new PIDController(AutoConstants.kPYController, 0, 0),
+                        new PIDController(AutoConstants.kPThetaController, 0, 0),
+                        swerve::setModuleStates,
+                        false,
+                        swerve
+                    ),
                     autoBalance,
                     autoLock)),
             entry("Balance on charge station",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("Balance" + alliance).getInitialPose())),
-                    getControllerCommand("Balance" + alliance),
+                    new PPSwerveControllerCommand(
+                        Constants.trajectories.get("Balance" + alliance), 
+                        gyro::getPose,
+                        DriveConstants.kDriveKinematics,
+                        new PIDController(AutoConstants.kPXController, 0, 0),
+                        new PIDController(AutoConstants.kPYController, 0, 0),
+                        new PIDController(AutoConstants.kPThetaController, 0, 0),
+                        swerve::setModuleStates,
+                        false,
+                        swerve
+                    ),
                     autoBalance,
                     autoLock)),
             entry("Cone place on high node and drive out",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("ConePlaceDriveOut" + alliance).getInitialPose())),
                     autoPlace,
-                    getControllerCommand("ConePlaceDriveOut" + alliance),
+                    new PPSwerveControllerCommand(
+                        Constants.trajectories.get("ConePlaceDriveOut" + alliance), 
+                        gyro::getPose,
+                        DriveConstants.kDriveKinematics,
+                        new PIDController(AutoConstants.kPXController, 0, 0),
+                        new PIDController(AutoConstants.kPYController, 0, 0),
+                        new PIDController(AutoConstants.kPThetaController, 0, 0),
+                        swerve::setModuleStates,
+                        false,
+                        swerve
+                    ),
                     autoLock)),
             entry("Cube place on high node and drive out",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("CubePlaceDriveOut" + alliance).getInitialPose())),
                     autoPlace,
-                    getControllerCommand("CubePlaceDriveOut" + alliance),
+                    new PPSwerveControllerCommand(
+                        Constants.trajectories.get("CubePlaceDriveOut" + alliance), 
+                        gyro::getPose,
+                        DriveConstants.kDriveKinematics,
+                        new PIDController(AutoConstants.kPXController, 0, 0),
+                        new PIDController(AutoConstants.kPYController, 0, 0),
+                        new PIDController(AutoConstants.kPThetaController, 0, 0),
+                        swerve::setModuleStates,
+                        false,
+                        swerve
+                    ),
                     autoLock)),
             entry("Drive out",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("DriveOut" + alliance).getInitialPose())),
-                    getControllerCommand("DriveOut" + alliance),
+                    new PPSwerveControllerCommand(
+                        Constants.trajectories.get("DriveOut" + alliance), 
+                        gyro::getPose,
+                        DriveConstants.kDriveKinematics,
+                        new PIDController(AutoConstants.kPXController, 0, 0),
+                        new PIDController(AutoConstants.kPYController, 0, 0),
+                        new PIDController(AutoConstants.kPThetaController, 0, 0),
+                        swerve::setModuleStates,
+                        false,
+                        swerve
+                    ),
                     autoLock)),
             entry("Place on high node and do not move",
                 new SequentialCommandGroup(
@@ -115,55 +169,35 @@ public class AutoChooser extends SubsystemBase {
                 null));
     }
 
-    public PPSwerveControllerCommand getControllerCommand(String pathName) {
-        return new PPSwerveControllerCommand(
-            Constants.trajectories.get(pathName), 
-            gyro::getPose, // Pose supplier
-            DriveConstants.kDriveKinematics, // SwerveDriveKinematics
-            new PIDController(AutoConstants.kPXController, 0, 0), // X controller. Leaving it at 0 will only use feedforwards.
-            new PIDController(AutoConstants.kPYController, 0, 0), // Y controller (usually the same values as X controller)
-            new PIDController(AutoConstants.kPThetaController, 0, 0), // Rotation controller. Leaving it at 0 will only use feedforwards.
-            swerve::setModuleStates, // Module states consumer
-            false, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-            swerve // Requires this drive subsystem
-        );
-    }
-
     public Command getAutoCommand() {
         String gamePiece = Robot.toString(Robot.getGamePiece());
 
         if (chargeStation.getSelected().equals("Balance")) {
             if (placeGamePiece.getSelected()) {
-                // Place on high node and balance
                 Logger.getInstance().recordOutput("Auto/Routine", gamePiece + " place on high node and balance");
                 return routines.get(gamePiece + " place on high node and balance");
             }
             else {
-                // Balance on charge station
                 Logger.getInstance().recordOutput("Auto/Routine", "Balance on charge station");
                 return routines.get("Balance on charge station");
             }
         }
         else if (chargeStation.getSelected().equals("DriveOut")) {
             if (placeGamePiece.getSelected()) {
-                // Place on high node and drive out
                 Logger.getInstance().recordOutput("Auto/Routine", gamePiece + " place on high node and drive out");
                 return routines.get(gamePiece + " place on high node and drive out");
             }
             else {
-                // Drive out
                 Logger.getInstance().recordOutput("Auto/Routine", "Drive out");
                 return routines.get("Drive out");
             }
         }
         else {
             if (placeGamePiece.getSelected()) {
-                // Place on high node and do not move
                 Logger.getInstance().recordOutput("Auto/Routine", gamePiece + " place on high node and do nothing");
                 return routines.get(gamePiece + " place on high node and do not move");
             }
             else {
-                // Do nothing
                 Logger.getInstance().recordOutput("Auto/Routine", "Do nothing");
                 return routines.get("Do nothing");
             }
