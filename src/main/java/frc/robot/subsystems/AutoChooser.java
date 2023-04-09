@@ -31,20 +31,12 @@ import frc.robot.odometry.GyroOdometry;
 public class AutoChooser extends SubsystemBase {
     private static final ShuffleboardTab main = Shuffleboard.getTab("Main");
 
-    private final AutoBalance autoBalance;
-    private final AutoPlace autoPlace;
-    private final AutoLock autoLock;
-
     private final Map<String, Command> routines;
 
     private final SendableChooser<Boolean> placeGamePiece;
     private final SendableChooser<String> chargeStation;
 
     public AutoChooser(Swerve swerve, Arms arms, Intake intake, GyroOdometry gyro) {
-        autoBalance = new AutoBalance(swerve, gyro);
-        autoPlace = new AutoPlace(arms, intake);
-        autoLock = new AutoLock(swerve);
-
         // Post the selectors to the ShuffleBoard
         chargeStation = new SendableChooser<>();
         chargeStation.setDefaultOption("Drive out", "Drive out");
@@ -67,7 +59,7 @@ public class AutoChooser extends SubsystemBase {
             entry("Cone place on high node and balance",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("ConePlaceBalance" + alliance).getInitialPose())),
-                    autoPlace,
+                    new AutoPlace(arms, intake),
                     new PPSwerveControllerCommand(
                         Constants.trajectories.get("ConePlaceBalance" + alliance), 
                         gyro::getPose, // Pose supplier
@@ -79,12 +71,12 @@ public class AutoChooser extends SubsystemBase {
                         false, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
                         swerve // Requires this drive subsystem
                     ),
-                    autoBalance,
-                    autoLock)),
+                    new AutoBalance(swerve, gyro),
+                    new AutoLock(swerve))),
             entry("Cube place on high node and balance",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("CubePlaceBalance" + alliance).getInitialPose())),
-                    autoPlace,
+                    new AutoPlace(arms, intake),
                     new PPSwerveControllerCommand(
                         Constants.trajectories.get("CubePlaceBalance" + alliance), 
                         gyro::getPose,
@@ -96,8 +88,8 @@ public class AutoChooser extends SubsystemBase {
                         false,
                         swerve
                     ),
-                    autoBalance,
-                    autoLock)),
+                    new AutoBalance(swerve, gyro),
+                    new AutoLock(swerve))),
             entry("Balance on charge station",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("Balance" + alliance).getInitialPose())),
@@ -112,12 +104,12 @@ public class AutoChooser extends SubsystemBase {
                         false,
                         swerve
                     ),
-                    autoBalance,
-                    autoLock)),
+                    new AutoBalance(swerve, gyro),
+                    new AutoLock(swerve))),
             entry("Cone place on high node and drive out",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("ConePlaceDriveOut" + alliance).getInitialPose())),
-                    autoPlace,
+                    new AutoPlace(arms, intake),
                     new PPSwerveControllerCommand(
                         Constants.trajectories.get("ConePlaceDriveOut" + alliance), 
                         gyro::getPose,
@@ -129,11 +121,11 @@ public class AutoChooser extends SubsystemBase {
                         false,
                         swerve
                     ),
-                    autoLock)),
+                    new AutoLock(swerve))),
             entry("Cube place on high node and drive out",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("CubePlaceDriveOut" + alliance).getInitialPose())),
-                    autoPlace,
+                    new AutoPlace(arms, intake),
                     new PPSwerveControllerCommand(
                         Constants.trajectories.get("CubePlaceDriveOut" + alliance), 
                         gyro::getPose,
@@ -145,7 +137,7 @@ public class AutoChooser extends SubsystemBase {
                         false,
                         swerve
                     ),
-                    autoLock)),
+                    new AutoLock(swerve))),
             entry("Drive out",
                 new SequentialCommandGroup(
                     new InstantCommand(() -> gyro.resetOdometry(Constants.trajectories.get("DriveOut" + alliance).getInitialPose())),
@@ -160,13 +152,11 @@ public class AutoChooser extends SubsystemBase {
                         false,
                         swerve
                     ),
-                    autoLock)),
+                    new AutoLock(swerve))),
             entry("Place on high node and do not move",
                 new SequentialCommandGroup(
-                    autoPlace,
-                    autoLock)),
-            entry("Do nothing",
-                null));
+                    new AutoPlace(arms, intake),
+                    new AutoLock(swerve))));
     }
 
     public Command getAutoCommand() {
@@ -199,7 +189,7 @@ public class AutoChooser extends SubsystemBase {
             }
             else {
                 Logger.getInstance().recordOutput("Auto/Routine", "Do nothing");
-                return routines.get("Do nothing");
+                return null;
             }
         }
     }
