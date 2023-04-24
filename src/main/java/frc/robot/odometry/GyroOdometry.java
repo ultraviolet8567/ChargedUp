@@ -1,134 +1,109 @@
 package frc.robot.odometry;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.Swerve;
 
-public class GyroOdometry {
+public class GyroOdometry extends SubsystemBase {
+    private Swerve swerve;
+    private AHRS gyro;
+    private SwerveDriveOdometry odometer;
 
-    Swerve swerve;
-
-    private AHRS gyro = new AHRS(SPI.Port.kMXP);
-
-    SwerveModulePosition[] modulePositions;
-  
-    boolean onSlope;
-    private double lastX;
-    // private double slopeY;
+    // TODO: The initial position estimate of the robot; may vary match to match
+    private static final Pose2d initialPose = new Pose2d(1.86, 0, new Rotation2d(0));
     
-    private static double minimumAngle = 0.03; // minimum angle for slope in radians
-
-    // the pose2d is the starting pose estimate of the robot 
-    // TODO: (find initial position)
-    // the pose2d says 'constructs a pose at origin facing towards the positive x axis' --> x is forwards? 
-    public SwerveDrivePoseEstimator estimator;
+    // private double latestXPose;
+    // Minimum angle for slope in radians
+    // private static final double minimumAngle = Math.PI / 6; 
 
     public GyroOdometry(Swerve swerve) {
         this.swerve = swerve;
-        this.onSlope = false;
-
-        modulePositions = swerve.getModulePositions();
-        estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, getRotation2d(), modulePositions, new Pose2d());
-
-        new Thread(() -> {
-            try {
-                  Thread.sleep(100);
-                  gyro.calibrate();
-                  resetGyro();
-            } catch (Exception e) { }
-        });
-    }
-
-    // on pit setup day, take robot to corner of field and record as 0
-    public void resetGyro() {
+        gyro = new AHRS(SPI.Port.kMXP);
         gyro.reset();
+        odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getRotation2d(), swerve.getModulePositions(), initialPose);
     }
 
-    // updates the pose estimator, runs in periodic
-    public void updateGyroOdometry() {
-        if (!onSlope) { //if not on slope at start of tick
-            if (getHeading().getY() > -minimumAngle && getHeading().getY() < minimumAngle) { //check if on slope
-                startSlope(); //if on slope, switch into slope mode
-            } 
-            else { //if still not on slope
-                normalCalc(); //calculate position normally
-            }
-        } else { //if on slope at start of tick
-            if (getHeading().getY() < -minimumAngle || getHeading().getY() > minimumAngle) { //check if not on slope
-                endSlope(); //if not on slope, switch out of slope mode
-            }
-            else { //if still on slope
-                slopeCalc(); //calculate position based on slope
-            }
-        }
-
-        lastX = getX();
+    public void periodic() {
+        Logger.getInstance().recordOutput("Odometry/Pose", getPose());
+        Logger.getInstance().recordOutput("Odometry/PoseInverted", invertPose(getPose()));
+        Logger.getInstance().recordOutput("Odometry/Heading", Math.IEEEremainder(getRotation2d().getRadians(), 2 * Math.PI));
+        Logger.getInstance().recordOutput("Odometry/Rotation3d/Roll", getRotation3d().getX());
+        Logger.getInstance().recordOutput("Odometry/Rotation3d/Pitch", getRotation3d().getY());
+        Logger.getInstance().recordOutput("Odometry/Rotation3d/Yaw", getRotation3d().getZ());
+        
+        odometer.update(getRotation2d(), swerve.getModulePositions());
     }
 
-    public void normalCalc() {
-        estimator.update(getRotation2d(), swerve.getModulePositions()); // regular estimator updating strategy
+    public Pose2d getPose() {
+        return odometer.getPoseMeters();
     }
 
-    public void startSlope() {
-        onSlope = true;
-
-        slopeCalc();
+    public Pose2d invertPose(Pose2d original) {
+        return new Pose2d(-original.getX(), -original.getY(), original.getRotation());
     }
 
-    // ;󠀿
-    public void slopeCalc() {
-        estimator.update(getRotation2d(), swerve.getModulePositions());
-        double pΔX = getX() - lastX;
-        double aΔX = pΔX * Math.cos(getHeading().getY());
-        double aCurrentX = lastX + aΔX;
-        Pose2d updatedPose = new Pose2d(new Translation2d(aCurrentX, getY()), getRotation2d());
-        // hope and pray that this sets the current position to the updatedPose and doesn't just break things
-        estimator.resetPosition(gyro.getRotation2d(), modulePositions, updatedPose);
+    public void resetOdometry(Pose2d pose) {
+        odometer.resetPosition(getRotation2d(), swerve.getModulePositions(), pose);
     }
-
-    public void endSlope() {
-        onSlope = false;
-
-        normalCalc();
-    }
-
-    // returns angular(?) values in rotation3d format
-    public Rotation3d getHeading() {
+    
+    // Returns angular values in Rrotation3d format
+    public Rotation3d getRotation3d() {
         return new Rotation3d(
-            toRadians(gyro.getRoll()), 
-            toRadians(gyro.getPitch()), 
-            toRadians(gyro.getYaw()));
+            // Negate the reading because the navX has CCW- and we need CCW+
+            Rotation2d.fromDegrees(-gyro.getRoll()).getRadians(), // X-axis
+            Rotation2d.fromDegrees(-gyro.getPitch()).getRadians(), // Y-axis
+            Rotation2d.fromDegrees(-gyro.getYaw()).getRadians()); // Z-axis
     } 
 
     public Rotation2d getRotation2d() {
+        return Rotation2d.fromDegrees(getHeading());
+    }
+
+    public double getHeading() {
         // Negate the reading because the navX has CCW- and we need CCW+
-        return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
+        return -gyro.getAngle();
     }
 
-    // gets X-translational value
-    public double getX() {
-        return estimator.getEstimatedPosition().getX();
-    }
-
-    // gets Y-translational value
-    public double getY() {
-        return estimator.getEstimatedPosition().getY();
+    // On pit setup day, take robot to corner of field and reset (set 0, 0)
+    public void resetGyro() {
+        gyro.reset();
+        resetOdometry(initialPose);
     }
 
     public double getRate() {
         return gyro.getRate();
     }
 
-    public double toRadians(float value) {
-        double radians = value * Math.PI / 180;
-        return radians;
-    }
+    
+    // public void updateGyroOdometry() {
+    //     // Check if on a slope
+    //     if (Math.abs(getRotation3d().getX()) > minimumAngle || Math.abs(getRotation3d().getY()) > minimumAngle) {
+    //         slopeCalc();
+    //     }
+    //     else {
+    //         estimator.update(getRotation2d(), swerve.getModulePositions());
+    //     }
+
+    //     latestXPose = getPose2d().getX();
+    // }
+
+    // public void slopeCalc() {
+    //     estimator.update(getRotation2d(), swerve.getModulePositions());
+    //     double pdX = getPose2d().getX() - latestXPose;
+    //     double adX = pdX * Math.cos(getHeading());
+    //     double aCurrentX = latestXPose + adX;
+    //     Pose2d updatedPose = new Pose2d(new Translation2d(aCurrentX, getHeading()), getRotation2d());
+
+    //     // Hope and pray that this sets the current position to the updatedPose and doesn't just break things
+    //     estimator.resetPosition(gyro.getRotation2d(), swerve.getModulePositions(), updatedPose);
+    // }
 }

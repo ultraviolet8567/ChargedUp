@@ -1,16 +1,22 @@
 package frc.robot;
 
+import static java.util.Map.entry;
+
+import java.util.List;
+import java.util.Map;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
+import edu.wpi.first.apriltag.AprilTag;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-
-import java.util.List;
-
-import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import frc.robot.util.LoggedTunableNumber;
@@ -18,56 +24,95 @@ import frc.robot.util.LoggedTunableNumber;
 public final class Constants {
     /** General info
      * Controller axis range: -1 to 1
-     * Motor max: 5676 rot/min = 14.5 ft/s = 4.4196 m/s
+     * Motor max: 5676 rot/min = 14.5 ft/s = 4.5 m/s
      * Speed cap: 5000 rot/min
      * 
      * Gyro:
      *  - Forward = y+
-     *  - Right = x+
+     *  - Left = x-
      *  - Counterclockwise = z-
+     * 
+     * Odometry
+     *  - Forward = x+
+     *  - Left = y+
+     *  - Counterclockwise = z+ 
      */
 
-    public static final Mode currentMode = Mode.TUNING;
+    public static final Mode currentMode = Mode.REAL;
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
+    public static final String logpath = "/media/sda1/";
+    
+    public static final Map<String, PathPlannerTrajectory> trajectories = Map.ofEntries(
+        entry("BalanceBlue", PathPlanner.loadPath("BalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("BalanceRed", PathPlanner.loadPath("BalanceRed", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceBalanceBlue", PathPlanner.loadPath("ConePlaceBalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceBalanceRed", PathPlanner.loadPath("ConePlaceBalanceRed", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceDriveOutBlue", PathPlanner.loadPath("ConePlaceDriveOutBlue", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("ConePlaceDriveOutRed",PathPlanner.loadPath("ConePlaceDriveOutRed", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceBalanceBlue", PathPlanner.loadPath("CubePlaceBalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceBalanceRed", PathPlanner.loadPath("CubePlaceBalanceRed", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceDriveOutBlue",PathPlanner.loadPath("CubePlaceDriveOutBlue", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("CubePlaceDriveOutRed",PathPlanner.loadPath("CubePlaceDriveOutRed", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("DriveOutBlue",PathPlanner.loadPath("DriveOutBlue", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
+        entry("DriveOutRed", PathPlanner.loadPath("DriveOutRed", new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared)))
+    );
 
     public static final class ArmConstants {
         public static final LoggedTunableNumber intakeSpeed = new LoggedTunableNumber("Max intake speed", 0.5);
-        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 0.4);
-        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.4);
-        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1.5);
-        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1.5);
 
-        // PID controllers
-        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 0.05);
-        public static final double kShoulderPidTolerance = 5 * Math.PI / 600;
-        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 0.05);
-        public static final double kElbowPidTolerance = 5 * Math.PI / 600;
-    
+        // Rotation boundaries for arm joints point
+        public static final double kShoulderFrontLimit = 2.693;
+        public static final double kShoulderFrontMechanicalStop = 2.968;
+        public static final double kShoulderBackLimit = -2.248;
+        public static final double kShoulderBackMechanicalStop = -2.487;
+        public static final double kElbowFrontLimit = 2.438;
+        public static final double kElbowFrontMechanicalStop = 2.647; 
+        public static final double kElbowBackLimit = -2.581;
+        public static final double kElbowBackMechanicalStop = -2.792;
+        
+        public static final double kMaxShoulderSpeedPercentage = 0.8;
+        public static final double kMaxElbowSpeedPercentage = 0.8;
+
+        // PID control constants
+        public static final LoggedTunableNumber kMaxShoulderSpeed = new LoggedTunableNumber("Max shoulder speed", 3.5);
+        public static final LoggedTunableNumber kMaxShoulderAcceleration = new LoggedTunableNumber("Max shoulder acceleration", 1);
+        public static final LoggedTunableNumber kPShoulder = new LoggedTunableNumber("Shoulder kP", 1);
+        public static final LoggedTunableNumber kIShoulder = new LoggedTunableNumber("Shoulder kI", 0);
+        public static final LoggedTunableNumber kDShoulder = new LoggedTunableNumber("Shoulder kD", 0);
+        public static final double kShoulderPidTolerance = (kShoulderFrontLimit - kShoulderBackLimit) / 50.0;
+        
+        public static final LoggedTunableNumber kMaxElbowSpeed = new LoggedTunableNumber("Max elbow speed", 0.8);
+        public static final LoggedTunableNumber kMaxElbowAcceleration = new LoggedTunableNumber("Max elbow acceleration", 1);
+        public static final LoggedTunableNumber kPElbow = new LoggedTunableNumber("Elbow kP", 1);
+        public static final LoggedTunableNumber kIElbow = new LoggedTunableNumber("Elbow kI", 0);
+        public static final LoggedTunableNumber kDElbow = new LoggedTunableNumber("Elbow kD", 0);
+        public static final double kElbowPidTolerance = (kElbowFrontLimit - kElbowBackLimit) / 150.0;
+
         // Arm absolute encoders
         public static final int kShoulderEncoderPort = 0;
         public static final int kElbowEncoderPort = 1;
-        public static final double kShoulderOffset = 0.753;
-        public static final double kElbowOffset = 0.658;
     
-        // Rotation boundaries for arm joints point
-        public static final double kShoulderFrontLimit = 0;
-        public static final double kShoulderBackLimit = 0;
-        public static final double kElbowFrontLimit = 0;
-        public static final double kElbowBackLimit = 0;
+        // Encoder offsets
+        public static final double kShoulderEncoderOffset = 0;
+        public static final double kElbowEncoderOffset = -1.705;
 
         // Arm to elbow gear ratio coefficient
-        public static final double kArmsToElbow = -296.0 / 322.0;
+        public static final double kArmsToElbow = -152.0 / 322.0;
 
-        //arm preset points TODO: find these points
-        public static final double[] kHighNodeSetpoints = new double[] { Math.PI / 2, Math.PI / 2};
-        public static final double[] kMidNodeSetpoints = new double[] { 0, 0 };
-        public static final double[] kHybridNodeSetpoints = new double[] { -Math.PI / 2, -Math.PI / 2 };
-        public static final double[] kGroundIntakeSetpoints = new double[] { 0, 0 };
-        public static final double[] kSubstationIntakeSetpoints = new double[] { 0, 0 };
-        public static final double[] kStartSetpoints = new double[] { 0, 0 };
-        public static final double[] kTaxiSetpoints = new double[] { 0, 0 };
-        public static final double[] kIdleSetPoints = new double[] { 0, 0 };
+        // TODO: find these points (Jackson and Aadi)
+        public static final double[] kHighNodeConeSetpoints = new double[] { 0.850, 0.454 };
+        public static final double[] kHighNodeCubeSetpoints = new double[] { 0.715, 0.608 };
+        public static final double[] kMidNodeConeSetpoints = new double[] { -0.233, 2.024 };
+        public static final double[] kMidNodeCubeSetpoints = new double[] { -0.380, 1.949 };
+        public static final double[] kHybridNodeConeSetpoints = new double[] { 2.796, -1.183 };
+        public static final double[] kHybridNodeCubeSetpoints = new double[] { 2.796, -1.183 };
+        public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.773, -1.114 };
+        public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.975, -1.032 };
+        public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.601, 2.041 };
+        public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
+        public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
+        public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
     }
 
     public static final class OIConstants {
@@ -77,7 +122,7 @@ public final class Constants {
         public static final int kDriveControllerPort = 0;
         public static final int kArmControllerPort = 1;
 
-        public static final double kDeadband = 0.15;
+        public static final double kDeadband = 0.1;
     }
 
     public static final class CAN {
@@ -107,17 +152,15 @@ public final class Constants {
         public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
         public static final double kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad / 60;
 
-        public static final LoggedTunableNumber kPTurning = new LoggedTunableNumber("Turning kP", 0.5);
-        public static final LoggedTunableNumber kITurning = new LoggedTunableNumber("Turning kI", 0);
-        public static final LoggedTunableNumber kDTurning = new LoggedTunableNumber("Turning kD", 0);
+        public static final double kPTurning = 0.5;
     }
 
     public static final class DriveConstants {
         // Have to change depending on our robot design
         // Distance between right and left wheels:
-        public static final double kTrackWidth = Units.inchesToMeters(26);
+        public static final double kTrackWidth = Units.inchesToMeters(34); // 0.8636 m
         // Distance between front and back wheels:
-        public static final double kWheelBase = Units.inchesToMeters(26);
+        public static final double kWheelBase = Units.inchesToMeters(32); // 0.8128 m
         public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
                 new Translation2d(kWheelBase / 2, kTrackWidth / 2), // Front left (+/+)
                 new Translation2d(kWheelBase / 2, -kTrackWidth / 2), // Front right (+/-)
@@ -130,6 +173,7 @@ public final class Constants {
         public static final boolean kBackLeftTurningEncoderReversed = true;
         public static final boolean kBackRightTurningEncoderReversed = true;
 
+        // Temporarily negate to make the video work (hot fix, don't forget to reverse)
         public static final boolean kFrontLeftDriveEncoderReversed = true;
         public static final boolean kFrontRightDriveEncoderReversed = false;
         public static final boolean kBackLeftDriveEncoderReversed = true;
@@ -146,33 +190,26 @@ public final class Constants {
         public static final boolean kBackLeftDriveAbsoluteEncoderReversed = false;
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -7.378 + 1.319 - 1.651 - 2.979 - 0.141 + 0.253 - 1.694 - 1.506 - 3.103;
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = -1.205 - 1.161 - 0.724 - 2.476 + 2.4375 + 0.032 - 0.242;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.114 - 1.206 + 1.262 - 3.772 - 0.634 - 1.889 + 0.0932 - 0.037;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -1.258 - 1.195 + 0.542 - 2.192 + 3.053 - 0.913 - 0.010 - 0.058;
-        public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5 / 2;
-        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 16.972 - 0.125 + 0.124;
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.2845 - 0.081 + 0.081 - 0.159;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 7.2058 - 0.7 + 0.75;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 1.883 - 0.402 + 0.485;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond / 2;
-        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond / 2 * 0.4;
+        public static final double kPhysicalMaxSpeedMetersPerSecond = 4.5;
+        public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 3 * Math.PI;
+
+        public static double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.9;
+        public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond * 0.4;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
         public static final double kTeleDriveMaxAngularAccelerationUnitsPerSecond = 3;
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond / 4;
-        public static final double kMaxAngularSpeedRadiansPerSecond = //
-                DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond / 10;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-        public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 4;
-        public static final double kPXController = 1.5;
-        public static final double kPYController = 1.5;
-        public static final double kPThetaController = 3;
-
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = //
-                new TrapezoidProfile.Constraints(
-                        kMaxAngularSpeedRadiansPerSecond,
-                        kMaxAngularAccelerationRadiansPerSecondSquared);
+        public static final double kMaxSpeedMetersPerSecond = 1;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 1.5;
+        public static final double kPXController = 0.25;
+        public static final double kPYController = 0.25;
+        public static final double kPThetaController = 0.25;
     }
 
     public static final class Camera {
@@ -183,12 +220,14 @@ public final class Constants {
             new Rotation3d(0, 0, Units.degreesToRadians(-46)), // right camera
             new Rotation3d(0, 0, 0) // left camera
         }; 
-        // height values are from the ground not from center of robot but others are from center of robot
+        // 1's are values we need to find
+        // TODO: somebody other than chaerin with a working mechanical brain think about this, please?
+        // please :(
         public static final Translation3d[] cameraDisplacements = new Translation3d[] { // camera mount position, from flat center
             new Translation3d(Units.inchesToMeters(6.5), Units.inchesToMeters(2.6875), Units.inchesToMeters(13.5)), // front camera
             new Translation3d(Units.inchesToMeters(9.75), Units.inchesToMeters(9.25), Units.inchesToMeters(5.35)), // right camera
             new Translation3d(1, 1, 0) // left camera
-        }; 
+        };
         public static final Transform3d[] cameraDistances = new Transform3d[] { 
             new Transform3d(cameraDisplacements[0], cameraDirections[0]), 
             new Transform3d(cameraDisplacements[1], cameraDirections[1]), 
@@ -499,6 +538,7 @@ public final class Constants {
         SUBSTATION_INTAKE,
         START,
         TAXI,
-        IDLE
+        IDLE,
+        MANUAL_OVERRIDE
     }
 }

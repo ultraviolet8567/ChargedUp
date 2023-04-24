@@ -61,26 +61,26 @@ public final class ControllerIO {
     public static int inversionY() {
         switch (controllerDrive) {
             case XBOX:
-                return 1;
-            case LOGITECH:
-                return 1;
-            case JOYSTICK:
                 return -1;
-            default:
+            case LOGITECH:
+                return -1;
+            case JOYSTICK:
                 return 1;
+            default:
+                return -1;
         }
     }
 
     public static int inversionX() {
         switch (controllerDrive) {
             case XBOX:
-                return 1;
-            case LOGITECH:
-                return 1;
-            case JOYSTICK:
                 return -1;
-            default:
+            case LOGITECH:
+                return -1;
+            case JOYSTICK:
                 return 1;
+            default:
+                return -1;
         }
     }
 
@@ -107,6 +107,41 @@ public final class ControllerIO {
                 return 1;
             default:
                 return 1;
+        }
+    }
+
+    public static int getLeftTrigger() {
+        switch (controllerDrive) {
+            case XBOX:
+                return 2;
+            case LOGITECH:
+                return 2;
+            case JOYSTICK:
+                return 2;
+            default:
+                return 2;
+        }
+    }
+
+    public static int getRightTrigger() {
+        switch (controllerDrive) {
+            case XBOX:
+                return 2;
+            case LOGITECH:
+                return 2;
+            case JOYSTICK:
+                return 2;
+            default:
+                return 2;
+        }
+    }
+
+    public static int getRightBumper() {
+        switch (controllerDrive) {
+            case XBOX:
+                return XboxController.Button.kRightBumper.value;
+            default:
+                return XboxController.Button.kRightBumper.value;
         }
     }
 }

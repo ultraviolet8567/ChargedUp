@@ -2,59 +2,65 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.CAN;
+import frc.robot.Constants.DriveConstants;
 
 public class Swerve extends SubsystemBase {
-    private final SwerveModule frontLeft = new SwerveModule(
-        CAN.kFrontLeftDriveMotorPort,
-        CAN.kFrontLeftTurningMotorPort,
-        DriveConstants.kFrontLeftDriveEncoderReversed,
-        DriveConstants.kFrontLeftTurningEncoderReversed,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
+    private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
-    private final SwerveModule frontRight = new SwerveModule(
-        CAN.kFrontRightDriveMotorPort,
-        CAN.kFrontRightTurningMotorPort,
-        DriveConstants.kFrontRightDriveEncoderReversed,
-        DriveConstants.kFrontRightTurningEncoderReversed,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
-    
-    private final SwerveModule backLeft = new SwerveModule(
-        CAN.kBackLeftDriveMotorPort,
-        CAN.kBackLeftTurningMotorPort,
-        DriveConstants.kBackLeftDriveEncoderReversed,
-        DriveConstants.kBackLeftTurningEncoderReversed,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
-    
-    private final SwerveModule backRight = new SwerveModule(
-        CAN.kBackRightDriveMotorPort,
-        CAN.kBackRightTurningMotorPort,
-        DriveConstants.kBackRightDriveEncoderReversed,
-        DriveConstants.kBackRightTurningEncoderReversed,
-        DriveConstants.kBackRightDriveAbsoluteEncoderPort,
-        DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
+    public Swerve() {
+        frontLeft = new SwerveModule(
+            CAN.kFrontLeftDriveMotorPort,
+            CAN.kFrontLeftTurningMotorPort,
+            DriveConstants.kFrontLeftDriveEncoderReversed,
+            DriveConstants.kFrontLeftTurningEncoderReversed,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
 
-    public Swerve() {}
+        frontRight = new SwerveModule(
+            CAN.kFrontRightDriveMotorPort,
+            CAN.kFrontRightTurningMotorPort,
+            DriveConstants.kFrontRightDriveEncoderReversed,
+            DriveConstants.kFrontRightTurningEncoderReversed,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
+        
+        backLeft = new SwerveModule(
+            CAN.kBackLeftDriveMotorPort,
+            CAN.kBackLeftTurningMotorPort,
+            DriveConstants.kBackLeftDriveEncoderReversed,
+            DriveConstants.kBackLeftTurningEncoderReversed,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
+        
+        backRight = new SwerveModule(
+            CAN.kBackRightDriveMotorPort,
+            CAN.kBackRightTurningMotorPort,
+            DriveConstants.kBackRightDriveEncoderReversed,
+            DriveConstants.kBackRightTurningEncoderReversed,
+            DriveConstants.kBackRightDriveAbsoluteEncoderPort,
+            DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
+    }
 
-    @Override
     public void periodic() {
         // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
         Logger.getInstance().recordOutput("Measured/SwerveModuleStates", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
 
+        // FL absolute encoder angle, FR absolute encoder angle, BL absolute encoder angle, BR absolute encoder angle
         Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
+    }
+
+    public SwerveModulePosition[] getModulePositions() {
+        return new SwerveModulePosition[] { frontLeft.getModulePosition(), frontRight.getModulePosition(), backLeft.getModulePosition(), backRight.getModulePosition() };
     }
     
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -67,13 +73,16 @@ public class Swerve extends SubsystemBase {
         Logger.getInstance().recordOutput("Setpoints/SwerveModuleStates", desiredStates);
     }
 
-    public SwerveModulePosition[] getModulePositions() {
-        return new SwerveModulePosition[] {
-            frontLeft.getModulePosition(), 
-            frontRight.getModulePosition(), 
-            backLeft.getModulePosition(), 
-            backRight.getModulePosition()
+    // Sets the wheels to 45 degree angles so it doesn't move
+    public void lockWheels() {
+        SwerveModuleState[] locked = new SwerveModuleState[] {
+            new SwerveModuleState(0, new Rotation2d(2.386)),
+            new SwerveModuleState(0, new Rotation2d(0.755)), 
+            new SwerveModuleState(0, new Rotation2d(-2.386)), 
+            new SwerveModuleState(0, new Rotation2d(-0.755))
         };
+
+        setModuleStates(locked);
     }
 
     public void resetEncoders() {
@@ -82,7 +91,7 @@ public class Swerve extends SubsystemBase {
         backLeft.resetEncoders();
         backRight.resetEncoders();
     }
-
+    
     public void stopModules() {
         frontLeft.stop();
         frontRight.stop();

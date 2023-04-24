@@ -1,54 +1,37 @@
-package frc.robot.commands;
+// package frc.robot.commands;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.subsystems.Arms;
+// import edu.wpi.first.wpilibj2.command.CommandBase;
+// import frc.robot.subsystems.Arms;
 
-public class MoveToPreset extends CommandBase {
-    private Arms arms;
-    private double shoulderSetpoint, elbowSetpoint;
-    private SlewRateLimiter shoulderLimiter, elbowLimiter;
+// public class MoveToPreset extends CommandBase {
+//     private Arms arms;
     
-    public MoveToPreset(Arms arms) {
-        this.arms = arms;
+//     public MoveToPreset(Arms arms) {
+//         this.arms = arms;
+//     }
+
+//     @Override 
+//     public void execute() {
+//         // TODO: Determine the optimal order of movement to prevent hitting edge of tensioner
+//         double[] setpoints = arms.getPreset();
+//         double[] speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
         
-        shoulderLimiter = new SlewRateLimiter(ArmConstants.kMaxShoulderAcceleration.get());
-        elbowLimiter = new SlewRateLimiter(ArmConstants.kMaxElbowAcceleration.get());
+//         double shoulderSpeed = speeds[0];
+//         double elbowSpeed = speeds[1];
 
-        addRequirements(arms);
-    }
+//         if (arms.shoulderMovable(shoulderSpeed))
+//             arms.runShoulder(shoulderSpeed);
+//         else
+//             arms.stopShoulder();
 
-    @Override 
-    public void initialize() {
-        double[] setpoints = arms.getPreset();
-        shoulderSetpoint = setpoints[0];
-        elbowSetpoint = setpoints[1];
-    }
+//         if (arms.elbowMovable(elbowSpeed) && arms.elbowPresetMovable(shoulderSpeed))
+//             arms.runElbow(elbowSpeed);
+//         else
+//             arms.stopElbow(); 
+//     }
 
-    @Override 
-    public void execute() {
-        // TODO: Determine the optimal order of movement to prevent hitting edge of tensioner
-        
-        if (arms.idle()) {
-            arms.stop();
-        }
-        else {
-            double[] speeds = arms.calculateMotorSpeeds(shoulderSetpoint, elbowSetpoint);
-
-            double shoulderSpeed = speeds[0];
-            double elbowSpeed = speeds[1];
-
-            shoulderSpeed = shoulderLimiter.calculate(shoulderSpeed) * ArmConstants.kMaxShoulderSpeed.get();
-            elbowSpeed = elbowLimiter.calculate(elbowSpeed) * ArmConstants.kMaxElbowSpeed.get();
-            
-            arms.runShoulder(speeds[0]);
-            arms.runElbow(speeds[1]);
-        }    
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        arms.stop();
-    }
-}
+//     @Override
+//     public void end(boolean interrupted) {
+//         arms.stop();
+//     }
+// }
