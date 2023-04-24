@@ -92,11 +92,6 @@ public class RobotContainer {
         new JoystickButton(armJoystick, XboxController.Button.kBack.value).onTrue(new SetPresetValue(arms, Preset.GROUND_INTAKE));
         new JoystickButton(armJoystick, XboxController.Button.kStart.value).onTrue(new SetPresetValue(arms, Preset.SUBSTATION_INTAKE));
         new JoystickButton(armJoystick, XboxController.Button.kB.value).onTrue(new SetPresetValue(arms, Preset.TAXI));
-
-        // new POVButton(armJoystick, 0).onTrue(new ChangeGamePiece(true));
-        // new POVButton(armJoystick, 90).onTrue(new ChangeGamePiece(true));
-        // new POVButton(armJoystick, 180).onTrue(new ChangeGamePiece(true));
-        // new POVButton(armJoystick, 270).onTrue(new ChangeGamePiece(true));
     }
 
     public Command getAutonomousCommand() {
