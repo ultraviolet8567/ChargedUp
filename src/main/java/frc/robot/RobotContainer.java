@@ -106,4 +106,8 @@ public class RobotContainer {
     public static Joystick getDriverJoystick() {
         return driverJoystick;
     }
+
+    public Swerve getSwerve() {
+        return swerve;
+    }
 }
