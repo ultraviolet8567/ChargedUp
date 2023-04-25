@@ -15,7 +15,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.GamePiece;
+import frc.robot.subsystems.Swerve;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
@@ -24,10 +26,12 @@ public class Robot extends LoggedRobot {
     private static GamePiece gamePiece;
     private static GenericEntry gamePieceBox, postTime;
     private static SendableChooser<GamePiece> initialGamePiece;
+    Logger logger;
+    long startTime;
 
     @Override
     public void robotInit() {
-        Logger logger = Logger.getInstance();
+        logger = Logger.getInstance();
 
         logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -102,7 +106,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         gamePieceBox.setBoolean(getGamePiece() == GamePiece.CONE);
-        postTime.setDouble(135 - Logger.getInstance().getRealTimestamp() / 1000000.0);
+        postTime.setDouble(135 - Logger.getInstance().getTimestamp() / 1000000.0);
     }
 
     @Override
@@ -122,10 +126,14 @@ public class Robot extends LoggedRobot {
         }
 
         gamePiece = initialGamePiece.getSelected();
+        startTime = logger.getTimestamp();
     }
 
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+        if (logger.getTimestamp() - startTime >= 15000000.0)
+            m_robotContainer.getSwerve().lockWheels();
+    }
 
     @Override
     public void teleopInit() {
@@ -135,7 +143,10 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+        if (logger.getTimestamp() - startTime >= 153000000.0)
+            m_robotContainer.getSwerve().lockWheels();
+    }
 
     @Override
     public void testInit() {
