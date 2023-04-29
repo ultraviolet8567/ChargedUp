@@ -25,6 +25,7 @@ import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.AutoChooser;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.ControllerIO;
 
@@ -35,6 +36,7 @@ public class RobotContainer {
     private static final Arms arms = new Arms();
     private static final GyroOdometry gyro = new GyroOdometry(swerve);
     private static final AutoChooser autoChooser = new AutoChooser(swerve, arms, intake, gyro);
+    private static final Lights lights = new Lights();
     // private final VisionOdometry vision = new VisionOdometry();
     // private final Odometry odometry = new Odometry(gyro, vision);
 
