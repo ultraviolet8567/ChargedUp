@@ -8,35 +8,35 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Lights extends SubsystemBase{
-    private AddressableLED m_led;
-    private AddressableLEDBuffer m_ledBuffer;
+    private AddressableLED leds;
+    private AddressableLEDBuffer buffer;
 
     private static final int length = 5;
 
     public Lights() {
         // PWM port 9
         // Must be a PWM header, not MXP or DIO
-        m_led = new AddressableLED(0);
+        leds = new AddressableLED(0);
 
         // Reuse buffer
         // Default to a length of 60, start empty output
         // Length is expensive to set, so only set it once, then just update data
-        m_ledBuffer = new AddressableLEDBuffer(length);
-        m_led.setLength(length);
-        m_led.setData(m_ledBuffer);
-        m_led.start();
+        buffer = new AddressableLEDBuffer(length);
+        leds.setLength(length);
+        leds.setData(buffer);
+        leds.start();
     }
 
     public void periodic() {
         Logger.getInstance().recordOutput("Lights/Color", "Red");
 
         // Set the data
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+        for (var i = 0; i < buffer.getLength(); i++) {
             // Sets the specified LED to the RGB values for red
-            m_ledBuffer.setLED(i, Color.kRed);
+            buffer.setLED(i, Color.kRed);
         }
 
-        m_led.setData(m_ledBuffer);
+        leds.setData(buffer);
         
         //Section section = Section.FULL;
 
