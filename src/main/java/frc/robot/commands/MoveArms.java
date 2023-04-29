@@ -32,59 +32,65 @@ public class MoveArms extends CommandBase {
             arms.stop();
         }
         else {
-            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || Math.abs(leftJoystickSupplier.get()) > 1.5 * OIConstants.kDeadband || Math.abs(rightJoystickSupplier.get()) > 1.5 * OIConstants.kDeadband) {
-                // Manual arm movement
-                arms.setPresetValue(Preset.MANUAL_OVERRIDE);
-
-                // Get real-time joystick inputs
-                double leftJoystick = leftJoystickSupplier.get();
-                double rightJoystick = rightJoystickSupplier.get();
-
-                // Apply deadband (drops to 0 if joystick value is less than the deadband)
-                leftJoystick = Math.abs(leftJoystick) > OIConstants.kDeadband ? leftJoystick : 0;
-                rightJoystick = Math.abs(rightJoystick) > OIConstants.kDeadband ? rightJoystick : 0;
-
-                // Make the driving smoother by using a slew rate limiter to minimize acceleration
-                // And scale joystick input to m/s
-                double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeedPercentage;
-                double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeedPercentage;
-
-                if (arms.shoulderMovable(shoulderSpeed)) {
-                    arms.runShoulder(shoulderSpeed);
-
-                    // Turn the speed a bit more to account for the shoulder rotation
-                    elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
-                }
-                else {
-                    arms.stopShoulder();
-                }
-                
-                if (arms.elbowMovable(elbowSpeed)) {
-                    arms.runElbow(elbowSpeed);
-                }
-                else {
-                    arms.stopElbow();
-                }
-            }
-            else {
-                // Preset automatic movement
-                double[] setpoints = arms.getPreset();
-                double[] speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
-                
-                double shoulderSpeed = speeds[0];
-                double elbowSpeed = speeds[1];
-
-                if (arms.shoulderMovable(shoulderSpeed))
-                    arms.runShoulder(shoulderSpeed);
-                else
-                    arms.stopShoulder();
-
-                if (arms.elbowMovable(elbowSpeed) && arms.elbowPresetMovable(shoulderSpeed))
-                    arms.runElbow(elbowSpeed);
-                else
-                    arms.stopElbow();
-            }
+            if (arms.getPresetValue() == Preset.MANUAL_OVERRIDE || Math.abs(leftJoystickSupplier.get()) > 1.5 * OIConstants.kDeadband || Math.abs(rightJoystickSupplier.get()) > 1.5 * OIConstants.kDeadband)
+                manual();
+            else
+                automatic();
         }
+    }
+
+    // Manual arm movement
+    private void manual() {
+        arms.setPresetValue(Preset.MANUAL_OVERRIDE);
+
+        // Get real-time joystick inputs
+        double leftJoystick = leftJoystickSupplier.get();
+        double rightJoystick = rightJoystickSupplier.get();
+
+        // Apply deadband (drops to 0 if joystick value is less than the deadband)
+        leftJoystick = Math.abs(leftJoystick) > OIConstants.kDeadband ? leftJoystick : 0;
+        rightJoystick = Math.abs(rightJoystick) > OIConstants.kDeadband ? rightJoystick : 0;
+
+        // Make the driving smoother by using a slew rate limiter to minimize acceleration
+        // And scale joystick input to m/s
+        double shoulderSpeed = shoulderLimiter.calculate(leftJoystick) * ArmConstants.kMaxShoulderSpeedPercentage;
+        double elbowSpeed = elbowLimiter.calculate(rightJoystick) * ArmConstants.kMaxElbowSpeedPercentage;
+
+        if (arms.shoulderMovable(shoulderSpeed)) {
+            arms.runShoulder(shoulderSpeed);
+
+            // Turn the speed a bit more to account for the shoulder rotation
+            elbowSpeed += ArmConstants.kArmsToElbow * shoulderSpeed;
+        }
+        else {
+            arms.stopShoulder();
+        }
+        
+        if (arms.elbowMovable(elbowSpeed)) {
+            arms.runElbow(elbowSpeed);
+        }
+        else {
+            arms.stopElbow();
+        }
+    }
+
+    // Preset automatic movement
+    private void automatic() {
+        double[] setpoints = arms.getPreset();
+        double[] speeds = arms.calculateMotorSpeeds(setpoints[0], setpoints[1]);
+        
+        double shoulderSpeed = speeds[0];
+        double elbowSpeed = speeds[1];
+
+        if (arms.shoulderMovable(shoulderSpeed))
+            arms.runShoulder(shoulderSpeed);
+        else
+            arms.stopShoulder();
+
+        if (arms.elbowMovable(elbowSpeed) && arms.elbowPresetMovable(shoulderSpeed))
+            arms.runElbow(elbowSpeed);
+        else
+            arms.stopElbow();
     }
 
     // Called once the command ends or is interrupted.

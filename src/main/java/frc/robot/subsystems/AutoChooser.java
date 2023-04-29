@@ -24,7 +24,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Robot;
 import frc.robot.commands.auto.AutoBalance;
-import frc.robot.commands.auto.AutoLock;
 import frc.robot.commands.auto.AutoPlace;
 import frc.robot.odometry.GyroOdometry;
 
