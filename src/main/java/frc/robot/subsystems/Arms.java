@@ -7,8 +7,14 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -20,6 +26,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.Preset;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class Arms extends SubsystemBase {
@@ -29,6 +36,25 @@ public class Arms extends SubsystemBase {
     private final ProfiledPIDController shoulderPidController, elbowPidController;
 
     private Preset presetValue;
+
+    // Motion profile stuff
+    private final Constraints shoulderConstraints;
+    private final Constraints elbowConstraints;
+    private State shoulderGoal;
+    private State elbowGoal;
+    private State shoulderNextPoint;
+    private State elbowNextPoint;
+
+    private TrapezoidProfile shoulderProfile;
+    private TrapezoidProfile elbowProfile;
+    
+    // Feedforward voltages
+    private Matrix<N2, N1> voltages;
+
+    // Feedforward vectors
+    private Vector<N2> positions;
+    private Vector<N2> velocities;
+    private Vector<N2> accelerations;
 
     // Simulator stuff
     private double shoulderSimEncoder, elbowSimEncoder;
@@ -52,15 +78,23 @@ public class Arms extends SubsystemBase {
         shoulderEncoder = new DutyCycleEncoder(ArmConstants.kShoulderEncoderPort);
         elbowEncoder = new DutyCycleEncoder(ArmConstants.kElbowEncoderPort);
 
+        // Trapezoidal Motion stuff
+        shoulderConstraints = new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get());
+        elbowConstraints = new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get());
+        shoulderGoal = new State(0, 0);
+        elbowGoal = new State(0, 0);
+        shoulderNextPoint = new State(0, 0);
+        elbowNextPoint = new State(0, 0);
+
         // Profiled PID controllers also limit the output to stay within the maximum speed and acceleration constraints
         // This is referred to as Trapezoidal Motion Profiling (because if you graph the velocity or acceleration
         // it creates a trapezoid as the PID controller goes steadily up to the maximum and stays there)
         shoulderPidController = new ProfiledPIDController(ArmConstants.kPShoulder.get(), ArmConstants.kIShoulder.get(), ArmConstants.kDShoulder.get(),
-            new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get()));
+            shoulderConstraints);
         shoulderPidController.setTolerance(ArmConstants.kShoulderPidTolerance);
 
         elbowPidController = new ProfiledPIDController(ArmConstants.kPElbow.get(), ArmConstants.kIElbow.get(), ArmConstants.kDElbow.get(),
-            new Constraints(ArmConstants.kMaxShoulderSpeed.get(), ArmConstants.kMaxShoulderAcceleration.get()));
+            elbowConstraints);
         elbowPidController.setTolerance(ArmConstants.kElbowPidTolerance);
         
         presetValue = Preset.TAXI;
@@ -143,6 +177,44 @@ public class Arms extends SubsystemBase {
         double shoulderSpeed = shoulderPidController.calculate(shoulderAngle(), shoulderSetpoint);
         double elbowSpeed = elbowPidController.calculate(elbowAngle(), elbowSetpoint);
 
+        // Trapezoidal motion stuff
+        shoulderGoal.position = shoulderSetpoint;
+        elbowGoal.position = elbowSetpoint;
+
+        // Getting previous velocites
+        double previousShoulderVel = shoulderNextPoint.velocity;
+        double previousElbowVel = elbowNextPoint.velocity;
+
+        // Create a motion profile with the given maximum velocity and maximum acceleration
+        // constraints for the NextPoint, the desired goal, and the current point.
+        shoulderProfile = new TrapezoidProfile(shoulderConstraints, shoulderGoal, shoulderNextPoint);
+        elbowProfile = new TrapezoidProfile(elbowConstraints, elbowGoal, elbowNextPoint);
+        
+        // Retrieve the profiled NextPoint for the next timestep. This NextPoint moves
+        // toward the goal while obeying the constraints.
+        shoulderNextPoint = shoulderProfile.calculate(Constants.periodicTime);
+        elbowNextPoint = elbowProfile.calculate(Constants.periodicTime);
+
+        velocities.set(0, 0, shoulderNextPoint.velocity);
+        velocities.set(0, 1, elbowNextPoint.velocity);
+
+        // Calculating acceleration for arms using the last point's velocity & next point's velocity
+        double shoulderAccel = (shoulderNextPoint.velocity - previousShoulderVel) / Constants.periodicTime; 
+        double elbowAccel = (elbowNextPoint.velocity - previousElbowVel) / Constants.periodicTime; 
+
+        accelerations.set(0, 0, shoulderAccel);
+        accelerations.set(0, 1, elbowAccel);
+
+        // Set positions
+        // TODO (FIX POSITIONS bc idk if the current positions based off the abs encoders works rn)
+        positions.set(0, 0, shoulderAngle());
+        positions.set(0, 1, elbowAngle());
+
+        // Use above values to find feedforward shoulder/elbow voltages
+        voltages = feedForward(positions, velocities, accelerations);
+
+        // TODO Combine PID & FeedForward Control 
+
         // Make sure the elbow turns with the shoulder
         // elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
         
@@ -158,6 +230,165 @@ public class Arms extends SubsystemBase {
         return new double[] {shoulderSpeed, elbowSpeed};
     }
     
+    // All the feed forward math to get arm voltages
+    public Matrix<N2, N1> feedForward(Vector<N2> position, Vector<N2> velocity, Vector<N2> acceleration) {
+        Matrix<N2,N1> torques = M(position).times(acceleration)
+            .plus(C(position, velocity).times(velocity))
+            .plus(Tg(position));
+
+        Matrix<N2, N1> voltages = torques;
+
+        // TODO need to add the below matrix math to the above calculations but there were problems
+        // with adding matrices of different sizes so i have left it out for now
+        // .plus(Kb()).times(velocity)
+        // inverseB().times(
+        
+        return voltages;
+    }
+
+    // Returns the values for the M (interia) matrix
+    public Matrix<N2, N2> M(Vector<N2> position) {
+        Matrix<N2, N2> M = new Matrix<>(N2.instance, N2.instance);
+        
+        M.set(0, 0, 
+            ArmConstants.kShoulderMass * Math.pow(ArmConstants.kShoulderRadius, 2.0)
+            + ArmConstants.kElbowMass * (Math.pow(ArmConstants.kShoulderLength, 2.0) + Math.pow(ArmConstants.kElbowRadius, 2.0))
+            + ArmConstants.kShoulderInertia
+            + ArmConstants.kElbowInertia
+            + 2 * ArmConstants.kElbowMass
+                * ArmConstants.kShoulderLength
+                * ArmConstants.kElbowRadius
+                * Math.cos(positions.get(0, 1))
+        );
+
+        M.set(1, 0, 
+            ArmConstants.kElbowMass * Math.pow(ArmConstants.kElbowRadius, 2.0)
+            + ArmConstants.kElbowInertia
+            + ArmConstants.kElbowMass
+                * ArmConstants.kShoulderLength
+                * ArmConstants.kElbowRadius
+                * Math.cos(positions.get(0, 1))
+        );
+
+        M.set(0, 1, 
+            ArmConstants.kElbowMass * Math.pow(ArmConstants.kElbowRadius, 2.0)
+            + ArmConstants.kElbowInertia
+            + ArmConstants.kElbowMass
+                * ArmConstants.kShoulderLength
+                * ArmConstants.kElbowRadius
+                * Math.cos(positions.get(0, 1))
+        );
+
+        M.set(1, 1,
+            ArmConstants.kElbowMass * Math.pow(ArmConstants.kElbowRadius, 2.0)
+            + ArmConstants.kElbowInertia
+        );
+
+        return M;
+    }
+
+    // Returns the values for the C (centrifugal & Coriolis) matrix
+    public Matrix<N2, N2> C(Vector<N2> position, Vector<N2> velocity) {
+        Matrix<N2, N2> C = new Matrix<>(N2.instance, N2.instance);
+        
+        C.set(0, 0, 
+            -ArmConstants.kElbowMass 
+            * ArmConstants.kShoulderLength
+            * ArmConstants.kElbowRadius
+            * Math.sin(positions.get(0, 1))
+            * velocities.get(0, 1)
+        ); 
+
+        C.set(0, 1,
+            ArmConstants.kElbowMass 
+            * ArmConstants.kShoulderLength
+            * ArmConstants.kElbowRadius
+            * Math.sin(positions.get(0, 1))
+            * velocities.get(0, 0)
+        );
+
+        C.set(1, 0,
+            -ArmConstants.kElbowMass 
+            * ArmConstants.kShoulderLength
+            * ArmConstants.kElbowRadius
+            * Math.sin(positions.get(0, 1))
+            * (velocities.get(0, 0) + velocities.get(0, 1))
+        );
+
+        return C;
+    }
+
+    // Returns the values for the Tg (torque applied due to gravity) matrix
+    public Matrix<N2, N1> Tg(Vector<N2> position) {
+        Matrix<N2, N1> Tg = new Matrix<>(N2.instance, N1.instance);
+        
+        Tg.set(0, 0, 
+            (ArmConstants.kShoulderMass * ArmConstants.kShoulderRadius
+                + ArmConstants.kElbowMass * ArmConstants.kShoulderLength)
+            * ArmConstants.kGravity * Math.cos(positions.get(0, 0))
+            + ArmConstants.kElbowMass
+            * ArmConstants.kElbowRadius
+            * ArmConstants.kGravity
+            * Math.cos(positions.get(0, 0) + positions.get(0, 1))
+        ); 
+
+        Tg.set(1, 0,
+            ArmConstants.kElbowMass
+            * ArmConstants.kElbowRadius
+            * ArmConstants.kGravity
+            * Math.cos(positions.get(0, 0) + positions.get(0, 1))
+        );
+
+        return Tg;
+    }
+
+    // Returns the values for the inverse of B (motor torque) matrix
+    public Matrix<N2, N2> inverseB() {
+        Matrix<N2, N2> B = new Matrix<>(N2.instance, N2.instance);
+        Matrix<N2, N2> inverseB = new Matrix<>(N2.instance, N2.instance);
+        
+        B.set(0, 0, 
+            ArmConstants.kShoulderGear
+            * (ArmConstants.kShoulderStallTorque / ArmConstants.kShoulderStallCurrent)
+            / (ArmConstants.kVoltage / ArmConstants.kShoulderStallCurrent)
+        );
+
+        B.set(1, 1,
+            ArmConstants.kElbowGear
+            * (ArmConstants.kElbowStallTorque / ArmConstants.kElbowStallCurrent)
+            / (ArmConstants.kVoltage / ArmConstants.kElbowStallCurrent)
+        );
+
+        // Find the inverse of B
+        inverseB.set(0, 0, B.get(1, 1));
+        inverseB.set(1, 1, B.get(0, 0));
+
+        inverseB.times(1 / (B.get(0, 0) * B.get(1, 1)));
+
+        return inverseB;
+    }
+
+    // Returns the values for the Kb (back-emf) matrix
+    public Matrix<N2, N2> Kb() {
+        Matrix<N2, N2> Kb = new Matrix<>(N2.instance, N2.instance);
+        
+        Kb.set(0, 0, 
+            ArmConstants.kShoulderGear
+            * (ArmConstants.kShoulderStallTorque / ArmConstants.kShoulderStallCurrent)
+            / (ArmConstants.kShoulderFreeSpeed / ArmConstants.kVoltage)
+            / (ArmConstants.kVoltage / ArmConstants.kShoulderStallCurrent)
+        );
+
+        Kb.set(1, 1, 
+            ArmConstants.kElbowGear
+            * (ArmConstants.kElbowStallTorque / ArmConstants.kElbowStallCurrent)
+            / (ArmConstants.kElbowFreeSpeed / ArmConstants.kVoltage)
+            / (ArmConstants.kVoltage / ArmConstants.kElbowStallCurrent)
+        );
+
+        return Kb;
+    }
+
     // Check if the shoulder can be moved
     public boolean shoulderMovable(double shoulderSpeed) {
         return !(shoulderPastBackLimit() && shoulderSpeed < 0) && !(shoulderPastFrontLimit() && shoulderSpeed > 0);

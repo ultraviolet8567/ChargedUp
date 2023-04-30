@@ -42,6 +42,8 @@ public final class Constants {
     public static final ModuleType powerDistributionType = ModuleType.kRev;
     public static final boolean fieldOriented = true;
     public static final String logpath = "/media/sda1/";
+
+    public static final double periodicTime = 0.02;
     
     public static final Map<String, PathPlannerTrajectory> trajectories = Map.ofEntries(
         entry("BalanceBlue", PathPlanner.loadPath("BalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
@@ -113,6 +115,32 @@ public final class Constants {
         public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
         public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
+
+        // Feedforward constants
+        // TODO find these values
+        public static final double kShoulderMass = 0.0;
+        public static final double kElbowMass = 0.0;
+        public static final double kShoulderLength = 0.0;
+        public static final double kElbowLength = 0.0;
+        public static final double kShoulderRadius = 0.0;
+        public static final double kElbowRadius = 0.0;
+
+        public static final double kShoulderInertia = kShoulderMass * Math.pow(kShoulderRadius, 2.0);
+        public static final double kElbowInertia = kElbowMass * Math.pow(kElbowRadius, 2.0);
+
+        public static final double kShoulderGear = 0.0;
+        public static final double kElbowGear = 0.0;
+        public static final double kShoulderStallTorque = 0.0;
+        public static final double kElbowStallTorque = 0.0;
+        public static final double kShoulderStallCurrent = 0.0;
+        public static final double kElbowStallCurrent = 0.0;
+        public static final double kShoulderFreeSpeed = 0.0;
+        public static final double kElbowFreeSpeed = 0.0;
+
+        public static final double kVoltage = 12.0;
+
+        // Gravity constant
+        public static final double kGravity = 9.80665;
     }
 
     public static final class OIConstants {
