@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.GamePiece;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Lights;
+import frc.robot.util.VirtualSubsystem;
 
 public class Robot extends LoggedRobot {
     private Command m_autonomousCommand;
@@ -26,12 +26,15 @@ public class Robot extends LoggedRobot {
     private static GamePiece gamePiece;
     private static GenericEntry gamePieceBox, postTime;
     private static SendableChooser<GamePiece> initialGamePiece;
-    Logger logger;
-    long startTime;
+    private static Logger logger;
+    private static long startTime;
 
     @Override
     public void robotInit() {
         logger = Logger.getInstance();
+        Lights.getInstance();
+
+        System.out.println("[Init] Starting AdvantageKit");
 
         switch (Constants.currentMode) {
             case TUNING:
@@ -76,19 +79,17 @@ public class Robot extends LoggedRobot {
             .withSize(2, 1)
             .getEntry();
 
-        Logger.getInstance().recordOutput("GamePiece", toString(gamePiece));
+        logger.recordOutput("GamePiece", toString(gamePiece));
     }
 
     @Override
     public void robotPeriodic() {
-        // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-        // commands, running already-scheduled commands, removing finished or interrupted commands,
-        // and running subsystem periodic() methods.  This must be called from the robot's periodic
-        // block in order for anything in the Command-based framework to work.
+        VirtualSubsystem.periodicAll();
         CommandScheduler.getInstance().run();
 
+        // Update Shuffleboard
         gamePieceBox.setBoolean(getGamePiece() == GamePiece.CONE);
-        postTime.setDouble(135 - Logger.getInstance().getTimestamp() / 1000000.0);
+        postTime.setDouble(135 - logger.getTimestamp() / 1000000.0);
     }
 
     @Override
