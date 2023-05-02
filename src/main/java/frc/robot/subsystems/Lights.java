@@ -11,7 +11,7 @@ public class Lights extends SubsystemBase{
     private AddressableLED leds;
     private AddressableLEDBuffer buffer;
 
-    private static final int length = 5;
+    private static final int length = 18;
 
     private static Color ledColor = Color.kViolet;
     private static boolean lowBattery = false;
@@ -25,6 +25,8 @@ public class Lights extends SubsystemBase{
         // Length is expensive to set, so only set it once, then just update data
         buffer = new AddressableLEDBuffer(length);
         leds.setLength(length);
+        leds.setData(buffer);
+        leds.start();
 
     }
 
@@ -39,7 +41,6 @@ public class Lights extends SubsystemBase{
           setBufferColor(Section.FULL.start(), Section.FULL.end(), ledColor);
         }
         leds.setData(buffer);
-        leds.start();
 
         //leds.setData(buffer);
         
