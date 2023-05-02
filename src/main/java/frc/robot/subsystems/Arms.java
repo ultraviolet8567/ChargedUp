@@ -233,10 +233,11 @@ public class Arms extends SubsystemBase {
     // All the feed forward math to get arm voltages
     public Matrix<N2, N1> feedForward(Vector<N2> position, Vector<N2> velocity, Vector<N2> acceleration) {
         Matrix<N2,N1> torques = Tg(position); 
-        // M(position);
-        //.times(acceleration)
-            // .plus(C(position, velocity).times(velocity))
-            // .plus(Tg(position));
+        // Matrix<N2,N1> voltages = inverseB().times(M(position).times(acceleration)
+        //     .plus(C(position, velocity).times(velocity))
+        //     .plus(Tg(position))
+        //     .plus((Kb()).times(velocity))
+        // );
 
         Matrix<N2, N1> voltages = torques;
 

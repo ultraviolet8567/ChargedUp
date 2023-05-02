@@ -33,24 +33,6 @@ public class Robot extends LoggedRobot {
     public void robotInit() {
         logger = Logger.getInstance();
 
-        logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-        logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-        logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-        logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-        logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-        switch (BuildConstants.DIRTY) {
-            case 0:
-                logger.recordMetadata("GitDirty", "All changes committed");
-                break;
-            case 1:
-                logger.recordMetadata("GitDirty", "Uncommitted changes");
-                break;
-            default:
-                logger.recordMetadata("GitDirty", "Unknown");
-                break;
-        }
-        
         switch (Constants.currentMode) {
             case TUNING:
             case REAL:
