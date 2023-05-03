@@ -27,6 +27,8 @@ public class Lights extends VirtualSubsystem {
     private static final int length = 18;
     private static final int bottomLength = 7; // Placeholder value
     private static final int minLoopCycleCount = 10;
+    private static final double shimmerExtremeness = 0.5;
+    private static final double shimmerSpeed = 1;
 
     private Lights() {
         System.out.println("[Init] Creating LEDs");
@@ -64,6 +66,22 @@ public class Lights extends VirtualSubsystem {
         for (int i = section.start(); i < section.end(); i++) {
             buffer.setLED(i, color);
         }
+    }
+    
+    private void shimmer(Section section, Color color) {
+      double brigthnessFactor;
+      for (int i = section.start(); i < section.end(); i++) {
+        brigthnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i) * shimmerSpeed);
+        buffer.setLED(i, new Color(color.red*brigthnessFactor, color.green*brigthnessFactor, color.blue*brigthnessFactor));
+      }
+    }
+
+    private void rainbow(Section section){
+      int hue;
+      for (int i = section.start(); i < section.end(); i++) {
+        hue = ((loopCycleCount * 3) % 180 + (i * 180 / buffer.getLength())) % 180;
+        buffer.setHSV(i, hue, 255, 128);
+      }
     }
 
     // private void setBufferColor(int start, int end, Color color){
@@ -124,4 +142,5 @@ public class Lights extends VirtualSubsystem {
             }
         }
     }
+
 }
