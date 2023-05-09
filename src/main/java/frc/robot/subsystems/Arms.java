@@ -107,8 +107,8 @@ public class Arms extends SubsystemBase {
         armsMech = new Mechanism2d(2, 2);   
         armsRoot = armsMech.getRoot("Arms", 1, 0);
         superstructureMech = armsRoot.append(new MechanismLigament2d("Superstructure", Units.inchesToMeters(25), 90));
-        shoulderMech = superstructureMech.append(new MechanismLigament2d("Bicep", Units.inchesToMeters(20), shoulderAngle(), 5, new Color8Bit(0, 0, 255)));
-        elbowMech = shoulderMech.append(new MechanismLigament2d("Forearm", Units.inchesToMeters(16), elbowAngle(), 3, new Color8Bit(0, 255, 0)));    
+        shoulderMech = superstructureMech.append(new MechanismLigament2d("Bicep", Units.inchesToMeters(20), shoulderSimEncoder, 5, new Color8Bit(0, 0, 255)));
+        elbowMech = shoulderMech.append(new MechanismLigament2d("Forearm", Units.inchesToMeters(16), elbowSimEncoder, 3, new Color8Bit(0, 255, 0)));    
     }
 
     @Override
@@ -195,20 +195,20 @@ public class Arms extends SubsystemBase {
         shoulderNextPoint = shoulderProfile.calculate(Constants.periodicTime);
         elbowNextPoint = elbowProfile.calculate(Constants.periodicTime);
 
-        // velocities.set(0, 0, shoulderNextPoint.velocity);
-        // velocities.set(0, 1, elbowNextPoint.velocity);
+        velocities.set(0, 0, shoulderNextPoint.velocity);
+        velocities.set(1, 0, elbowNextPoint.velocity);
 
         // Calculating acceleration for arms using the last point's velocity & next point's velocity
         double shoulderAccel = (shoulderNextPoint.velocity - previousShoulderVel) / Constants.periodicTime; 
         double elbowAccel = (elbowNextPoint.velocity - previousElbowVel) / Constants.periodicTime; 
 
-        // accelerations.set(0, 0, shoulderAccel);
-        // accelerations.set(0, 1, elbowAccel);
+        accelerations.set(0, 0, shoulderAccel);
+        accelerations.set(1, 0, elbowAccel);
 
         // Set positions
         // TODO (FIX POSITIONS bc idk if the current positions based off the abs encoders works rn)
-        // positions.set(0, 0, shoulderAngle());
-        // positions.set(0, 1, elbowAngle());
+        positions.set(0, 0, shoulderAngle());
+        positions.set(1, 0, elbowAngle());
 
         // Use above values to find feedforward shoulder/elbow voltages
         voltages = feedForward(positions, velocities, accelerations);
@@ -232,19 +232,11 @@ public class Arms extends SubsystemBase {
     
     // All the feed forward math to get arm voltages
     public Matrix<N2, N1> feedForward(Vector<N2> position, Vector<N2> velocity, Vector<N2> acceleration) {
-        Matrix<N2,N1> torques = Tg(position); 
-        // Matrix<N2,N1> voltages = inverseB().times(M(position).times(acceleration)
-        //     .plus(C(position, velocity).times(velocity))
-        //     .plus(Tg(position))
-        //     .plus((Kb()).times(velocity))
-        // );
-
-        Matrix<N2, N1> voltages = torques;
-
-        // TODO need to add the below matrix math to the above calculations but there were problems
-        // with adding matrices of different sizes so i have left it out for now
-        // .plus(Kb()).times(velocity)
-        // inverseB().times(
+        Matrix<N2,N1> voltages = inverseB().times(M(position).times(acceleration)
+            .plus(C(position, velocity).times(velocity))
+            .plus(Tg(position))
+            .plus((Kb()).times(velocity))
+        );
         
         return voltages;
     }
@@ -261,7 +253,7 @@ public class Arms extends SubsystemBase {
             + 2 * ArmConstants.kElbowMass
                 * ArmConstants.kShoulderLength
                 * ArmConstants.kElbowRadius
-                // * Math.cos(positions.get(0, 1))
+                * Math.cos(positions.get(1, 0))
         );
 
         M.set(1, 0, 
@@ -270,7 +262,7 @@ public class Arms extends SubsystemBase {
             + ArmConstants.kElbowMass
                 * ArmConstants.kShoulderLength
                 * ArmConstants.kElbowRadius
-                // * Math.cos(positions.get(0, 1))
+                * Math.cos(positions.get(1, 0))
         );
 
         M.set(0, 1, 
@@ -279,7 +271,7 @@ public class Arms extends SubsystemBase {
             + ArmConstants.kElbowMass
                 * ArmConstants.kShoulderLength
                 * ArmConstants.kElbowRadius
-                // * Math.cos(positions.get(0, 1))
+                * Math.cos(positions.get(1, 0))
         );
 
         M.set(1, 1,
@@ -298,24 +290,24 @@ public class Arms extends SubsystemBase {
             -ArmConstants.kElbowMass 
             * ArmConstants.kShoulderLength
             * ArmConstants.kElbowRadius
-            // * Math.sin(positions.get(0, 1))
-            // * velocities.get(0, 1)
+            * Math.sin(positions.get(1, 0))
+            * velocities.get(1, 0)
         ); 
 
         C.set(0, 1,
             ArmConstants.kElbowMass 
             * ArmConstants.kShoulderLength
             * ArmConstants.kElbowRadius
-            // * Math.sin(positions.get(0, 1))
-            // * velocities.get(0, 0)
+            * Math.sin(positions.get(1, 0))
+            * velocities.get(0, 0)
         );
 
         C.set(1, 0,
             -ArmConstants.kElbowMass 
             * ArmConstants.kShoulderLength
             * ArmConstants.kElbowRadius
-            // * Math.sin(positions.get(0, 1))
-            // * (velocities.get(0, 0) + velocities.get(0, 1))
+            * Math.sin(positions.get(1, 0))
+            * (velocities.get(0, 0) + velocities.get(1, 0))
         );
 
         return C;
@@ -328,18 +320,18 @@ public class Arms extends SubsystemBase {
         Tg.set(0, 0, 
             (ArmConstants.kShoulderMass * ArmConstants.kShoulderRadius
                 + ArmConstants.kElbowMass * ArmConstants.kShoulderLength)
-            // * ArmConstants.kGravity * Math.cos(positions.get(0, 0))
+            * ArmConstants.kGravity * Math.cos(positions.get(0, 0))
             + ArmConstants.kElbowMass
             * ArmConstants.kElbowRadius
             * ArmConstants.kGravity
-            // * Math.cos(positions.get(0, 0) + positions.get(0, 1))
+            * Math.cos(positions.get(0, 0) + positions.get(1, 0))
         ); 
 
         Tg.set(1, 0,
             ArmConstants.kElbowMass
             * ArmConstants.kElbowRadius
             * ArmConstants.kGravity
-            // * Math.cos(positions.get(0, 0) + positions.get(0, 1))
+            * Math.cos(positions.get(0, 0) + positions.get(1, 0))
         );
 
         return Tg;
