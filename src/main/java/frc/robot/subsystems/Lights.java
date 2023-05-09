@@ -29,6 +29,9 @@ public class Lights extends VirtualSubsystem {
     private static final int minLoopCycleCount = 10;
     private static final double shimmerExtremeness = 0.5;
     private static final double shimmerSpeed = 1;
+    private static final double strobeTickSkip = 30;
+    private static final double strobeTickDuration = 3;
+
 
     private Lights() {
         System.out.println("[Init] Creating LEDs");
@@ -71,7 +74,7 @@ public class Lights extends VirtualSubsystem {
     private void shimmer(Section section, Color color) {
       double brigthnessFactor;
       for (int i = section.start(); i < section.end(); i++) {
-        brigthnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i) * shimmerSpeed);
+        brigthnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * shimmerSpeed;
         buffer.setLED(i, new Color(color.red*brigthnessFactor, color.green*brigthnessFactor, color.blue*brigthnessFactor));
       }
     }
@@ -83,6 +86,30 @@ public class Lights extends VirtualSubsystem {
         buffer.setHSV(i, hue, 255, 128);
       }
     }
+
+    private void strobeRainbow(Section section){
+      int hue = ((loopCycleCount *  15) % 180 + (180 / buffer.getLength())) % 180;
+      for (int i = section.start(); i < section.end(); i++) {
+        if(loopCycleCount%(strobeTickSkip+1) == strobeTickDuration){
+            buffer.setHSV(i, hue, 255, 128);
+        }else{
+            buffer.setHSV(i, 0, 0, 0);
+        }
+      }
+    }
+
+    private void strobe(Section section, Color color){
+      int hue = ((loopCycleCount *  15) % 180 + (180 / buffer.getLength())) % 180;
+      for (int i = section.start(); i < section.end(); i++) {
+        if(loopCycleCount%(strobeTickSkip+1) == strobeTickDuration){
+            buffer.setLED(i, color);
+        }else{
+            buffer.setHSV(i, 0, 0, 0);
+        }
+      }
+    }
+
+
 
     // private void setBufferColor(int start, int end, Color color){
     //   for (var i = start; i < end; i++) {
