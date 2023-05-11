@@ -213,19 +213,29 @@ public class Arms extends SubsystemBase {
         // Use above values to find feedforward shoulder/elbow voltages
         voltages = feedForward(positions, velocities, accelerations);
 
-        // TODO Combine PID & FeedForward Control 
-
-        // Make sure the elbow turns with the shoulder
-        // elbowSpeed += shoulderSpeed * ArmConstants.kArmsToElbow;
+        // Combine PID & FeedForward Control 
+        // TODO apply static friction constant kS (the amount of volts needed to make motor barely turn) to voltages
+        double totalShoulderVoltage = shoulderSpeed + voltages.get(0, 0);
+        double totalElbowVoltage = elbowSpeed + voltages.get(1, 0);
         
         // Clamp the speeds between -80% and 80%
+        totalShoulderVoltage = MathUtil.clamp(totalShoulderVoltage, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
+        totalElbowVoltage = MathUtil.clamp(totalElbowVoltage, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
 
+
         if (shoulderPidController.atSetpoint())
+            totalShoulderVoltage = 0;
             shoulderSpeed = 0;
         if (elbowPidController.atSetpoint())
+            totalElbowVoltage = 0;
             elbowSpeed = 0;
+
+        Logger.getInstance().recordOutput("ArmSpeeds/ShoulderVoltage", totalShoulderVoltage);
+        Logger.getInstance().recordOutput("ArmSpeeds/ShoulderSpeed", shoulderSpeed);
+        Logger.getInstance().recordOutput("ArmSpeeds/ElbowVoltage", totalElbowVoltage);
+        Logger.getInstance().recordOutput("ArmSpeeds/ElbowSpeed", elbowSpeed);
 
         return new double[] {shoulderSpeed, elbowSpeed};
     }
