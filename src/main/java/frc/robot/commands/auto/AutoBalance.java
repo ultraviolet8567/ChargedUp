@@ -13,6 +13,8 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Swerve;
 
+// Improving the charge station balance to be more consistent and faster is on that list right?
+
 public class AutoBalance extends CommandBase {
     private final Swerve swerve;
     private final GyroOdometry gyro;
@@ -41,11 +43,23 @@ public class AutoBalance extends CommandBase {
 
     @Override
     public void execute() {
-        double speed = pid.calculate(gyro.getRotation3d().getX(), 0);
+        double speed;
+        double robotX = gyro.getRotation3d().getX();
 
-        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speed, 0, 0, gyro.getRotation2d());
-        SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
-        swerve.setModuleStates(moduleStates);
+        if (Math.abs(robotX) != 0) {
+            speed = pid.calculate(robotX, 0);
+        } else if (Math.abs(robotX) == 0 && timer.get() <= 5) {
+            speed = 0.85;
+        } else {
+            speed = 0.0;
+        }
+
+        // increase or decrease the angle (default 5) if this doesn't work as intended
+        if (Math.abs(0 - gyro.getRotation3d().getX()) <= 5) {
+            falter(speed);
+        } else {
+            run(speed);
+        }
         
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
         Logger.getInstance().recordOutput("Auto/Speed", speed);
@@ -61,4 +75,28 @@ public class AutoBalance extends CommandBase {
     public boolean isFinished() {
         return pid.atSetpoint();
     }
+
+    // change wait value after testing
+    public void falter(double speed) {
+        run(0.0);
+        wait(1);
+        run(speed);
+    }
+
+    // waits given time
+    public void wait(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+            System.out.println("there was an interrupted exception! what the");
+        }
+    }
+
+    // runs given speed
+    public void run(double speed) {
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speed, 0, 0, gyro.getRotation2d());
+        SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
+        swerve.setModuleStates(moduleStates);
+    }
+        
 }
