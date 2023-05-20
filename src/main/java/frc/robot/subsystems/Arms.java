@@ -6,11 +6,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -51,10 +54,14 @@ public class Arms extends SubsystemBase {
     // Feedforward voltages
     private Matrix<N2, N1> voltages;
 
-    // Feedforward vectors
+    // Feedforward matrices
     private Vector<N2> positions;
     private Vector<N2> velocities;
     private Vector<N2> accelerations;
+
+    // Motors
+    private DCMotor shoulderMotor;
+    private DCMotor elbowMotor;
 
     // Simulator stuff
     private double shoulderSimEncoder, elbowSimEncoder;
@@ -99,6 +106,16 @@ public class Arms extends SubsystemBase {
         
         presetValue = Preset.TAXI;
         resetPIDControllers();
+
+        // Vectors
+        positions = new Vector<N2>(Nat.N2());
+        velocities = new Vector<N2>(Nat.N2());
+        accelerations = new Vector<N2>(Nat.N2());
+        voltages = new Vector<N2>(Nat.N2());
+
+        // Motors
+        shoulderMotor = DCMotor.getNEO(1);
+        elbowMotor = DCMotor.getNEO(1);
 
         // Simulator stuff
         shoulderSimEncoder = 0;
@@ -206,7 +223,6 @@ public class Arms extends SubsystemBase {
         accelerations.set(1, 0, elbowAccel);
 
         // Set positions
-        // TODO (FIX POSITIONS bc idk if the current positions based off the abs encoders works rn)
         positions.set(0, 0, shoulderAngle());
         positions.set(1, 0, elbowAngle());
 
@@ -215,23 +231,25 @@ public class Arms extends SubsystemBase {
 
         // Combine PID & FeedForward Control 
         // TODO apply static friction constant kS (the amount of volts needed to make motor barely turn) to voltages
-        double totalShoulderVoltage = shoulderSpeed + voltages.get(0, 0);
-        double totalElbowVoltage = elbowSpeed + voltages.get(1, 0);
+        double totalShoulderVoltage = voltages.get(0, 0);
+        double totalElbowVoltage = voltages.get(1, 0);
         
         // Clamp the speeds between -80% and 80%
-        totalShoulderVoltage = MathUtil.clamp(totalShoulderVoltage, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
-        totalElbowVoltage = MathUtil.clamp(totalElbowVoltage, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
+        // totalShoulderVoltage = MathUtil.clamp(totalShoulderVoltage, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
+        // totalElbowVoltage = MathUtil.clamp(totalElbowVoltage, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
         shoulderSpeed = MathUtil.clamp(shoulderSpeed, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
         elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
 
-
-        if (shoulderPidController.atSetpoint())
+        if (shoulderPidController.atSetpoint()) {
             totalShoulderVoltage = 0;
             shoulderSpeed = 0;
-        if (elbowPidController.atSetpoint())
+        }
+        if (elbowPidController.atSetpoint()) {
             totalElbowVoltage = 0;
             elbowSpeed = 0;
+        }
 
+        // TODO figure out the difference between the pid & ff values
         Logger.getInstance().recordOutput("ArmSpeeds/ShoulderVoltage", totalShoulderVoltage);
         Logger.getInstance().recordOutput("ArmSpeeds/ShoulderSpeed", shoulderSpeed);
         Logger.getInstance().recordOutput("ArmSpeeds/ElbowVoltage", totalElbowVoltage);
@@ -242,11 +260,34 @@ public class Arms extends SubsystemBase {
     
     // All the feed forward math to get arm voltages
     public Matrix<N2, N1> feedForward(Vector<N2> position, Vector<N2> velocity, Vector<N2> acceleration) {
-        Matrix<N2,N1> voltages = inverseB().times(M(position).times(acceleration)
+        // This multiplied the torque by a huge value (so numbers were in the ten thousands)
+        // Matrix<N2,N1> voltages = inverseB().times(M(position).times(acceleration)
+        //     .plus(C(position, velocity).times(velocity))
+        //     .plus(Tg(position))
+        //     .plus((Kb()).times(velocity))
+        // );
+
+        // This is still pretty big with numbers like 36
+        Matrix<N2,N1> torques = M(position).times(acceleration)
             .plus(C(position, velocity).times(velocity))
-            .plus(Tg(position))
-            .plus((Kb()).times(velocity))
-        );
+            .plus(Tg(position));
+
+        double shoulderVelocity = shoulderMotor.getVoltage(torques.get(0, 0), velocity.get(0, 0));
+        double elbowVelocity = elbowMotor.getVoltage(torques.get(1, 0), velocity.get(1, 0));
+
+        // Logger.getInstance().recordOutput("FFMatrices/M[0,0]", M(position).get(0, 0));
+        // Logger.getInstance().recordOutput("FFMatrices/M[1,0]", M(position).get(1, 0));
+        // Logger.getInstance().recordOutput("FFMatrices/M[0,1]", M(position).get(0, 1));
+        // Logger.getInstance().recordOutput("FFMatrices/M[1,1]", M(position).get(1, 1));
+        // Logger.getInstance().recordOutput("FFMatrices/C[0,0]", C(position, velocity).get(0, 0));
+        // Logger.getInstance().recordOutput("FFMatrices/C[1,0]", C(position, velocity).get(1, 0));
+        // Logger.getInstance().recordOutput("FFMatrices/C[0,1]", C(position, velocity).get(0, 1));
+        // Logger.getInstance().recordOutput("FFMatrices/Tg[0,0]", Tg(position).get(0, 0));
+        // Logger.getInstance().recordOutput("FFMatrices/Tg[1,0]", Tg(position).get(1, 0));
+
+        voltages = new Vector<N2>(Nat.N2());
+        voltages.set(0, 0, shoulderVelocity);
+        voltages.set(1, 0, elbowVelocity);
         
         return voltages;
     }
@@ -370,6 +411,9 @@ public class Arms extends SubsystemBase {
 
         inverseB.times(1 / (B.get(0, 0) * B.get(1, 1)));
 
+        Logger.getInstance().recordOutput("FFMatrices/B[0,0]", inverseB.get(0, 0));
+        Logger.getInstance().recordOutput("FFMatrices/B[1,0]", inverseB.get(1, 0));
+
         return inverseB;
     }
 
@@ -377,19 +421,8 @@ public class Arms extends SubsystemBase {
     public Matrix<N2, N2> Kb() {
         Matrix<N2, N2> Kb = new Matrix<>(N2.instance, N2.instance);
         
-        Kb.set(0, 0, 
-            ArmConstants.kShoulderGear
-            * (ArmConstants.kShoulderStallTorque / ArmConstants.kShoulderStallCurrent)
-            / (ArmConstants.kShoulderFreeSpeed / ArmConstants.kVoltage)
-            / (ArmConstants.kVoltage / ArmConstants.kShoulderStallCurrent)
-        );
-
-        Kb.set(1, 1, 
-            ArmConstants.kElbowGear
-            * (ArmConstants.kElbowStallTorque / ArmConstants.kElbowStallCurrent)
-            / (ArmConstants.kElbowFreeSpeed / ArmConstants.kVoltage)
-            / (ArmConstants.kVoltage / ArmConstants.kElbowStallCurrent)
-        );
+        Kb.set(0, 0, ArmConstants.backEMFConstant);
+        Kb.set(1, 1, ArmConstants.backEMFConstant);
 
         return Kb;
     }

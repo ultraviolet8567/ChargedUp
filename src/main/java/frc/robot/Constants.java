@@ -117,25 +117,23 @@ public final class Constants {
         public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
 
         // Feedforward constants
-        // TODO find these values
-        public static final double kShoulderMass = 0.0;
-        public static final double kElbowMass = 0.0;
-        public static final double kShoulderLength = 0.0;
-        public static final double kElbowLength = 0.0;
-        public static final double kShoulderRadius = 0.0;
-        public static final double kElbowRadius = 0.0;
+        public static final double kShoulderMass = 7.8788995; // in kgs
+        public static final double kElbowMass = 7.25748;
+        public static final double kShoulderLength = 0.508; // in meters
+        public static final double kElbowLength = 0.8203184; 
+        public static final double kShoulderRadius = 0.44577;
+        public static final double kElbowRadius = 0.579628;
 
         public static final double kShoulderInertia = kShoulderMass * Math.pow(kShoulderRadius, 2.0);
         public static final double kElbowInertia = kElbowMass * Math.pow(kElbowRadius, 2.0);
 
-        public static final double kShoulderGear = 0.0;
-        public static final double kElbowGear = 0.0;
-        public static final double kShoulderStallTorque = 0.0;
-        public static final double kElbowStallTorque = 0.0;
-        public static final double kShoulderStallCurrent = 0.0;
-        public static final double kElbowStallCurrent = 0.0;
-        public static final double kShoulderFreeSpeed = 0.0;
-        public static final double kElbowFreeSpeed = 0.0;
+        public static final double kShoulderGear = 489.0;
+        public static final double kElbowGear = 296.0;
+        public static final double kShoulderStallTorque = 2.6;
+        public static final double kElbowStallTorque = 2.6;
+        public static final double kShoulderStallCurrent = 105.0;
+        public static final double kElbowStallCurrent = 105.0;
+        public static final double backEMFConstant = 473.0;
 
         public static final double kVoltage = 12.0;
 

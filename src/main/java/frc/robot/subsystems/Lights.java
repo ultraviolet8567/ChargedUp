@@ -24,7 +24,7 @@ public class Lights extends VirtualSubsystem {
     private final AddressableLEDBuffer buffer;
 
     // Constants
-    private static final int length = 18;
+    private static final int length = 41;
     private static final int bottomLength = 7; // Placeholder value
     private static final int minLoopCycleCount = 10;
     private static final double shimmerExtremeness = 0.5;
