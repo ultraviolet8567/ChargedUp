@@ -44,6 +44,7 @@ public final class Constants {
     public static final String logpath = "/media/sda1/";
 
     public static final double periodicTime = 0.02;
+    public static final double matchEndThreshold = 0.25;
     
     public static final Map<String, PathPlannerTrajectory> trajectories = Map.ofEntries(
         entry("BalanceBlue", PathPlanner.loadPath("BalanceBlue", new PathConstraints(1.5 * AutoConstants.kMaxSpeedMetersPerSecond, AutoConstants.kMaxAccelerationMetersPerSecondSquared))),
