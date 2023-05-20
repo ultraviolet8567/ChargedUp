@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -43,6 +44,12 @@ public class SwerveTeleOp extends CommandBase {
 
     @Override
     public void execute() {
+        // Lock the wheels at the end of the match to prevent slipping off the charge station
+        if (DriverStation.getMatchTime() >= 0.0 && DriverStation.getMatchTime() < Constants.matchEndThreshold) {
+            swerve.lockWheels();
+            return;
+        }
+
         // Get real-time joystick inputs
         double xSpeed = xSpdFunction.get();
         double ySpeed = ySpdFunction.get();

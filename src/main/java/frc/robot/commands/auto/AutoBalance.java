@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Swerve;
@@ -69,11 +70,12 @@ public class AutoBalance extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         timer.stop();
+        // Lock the wheels at the end of auto to prevent slipping off the charge station
         swerve.lockWheels();
     }
 
     public boolean isFinished() {
-        return pid.atSetpoint();
+        return pid.atSetpoint() || (DriverStation.getMatchTime() >= 0.0 && DriverStation.getMatchTime() < Constants.matchEndThreshold);
     }
 
     // change wait value after testing
