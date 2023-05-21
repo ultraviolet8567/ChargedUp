@@ -24,7 +24,9 @@ public class Lights extends VirtualSubsystem {
     private final AddressableLEDBuffer buffer;
 
     // Constants
-    private static final int length = 18;
+    private static final int rightLength = 21;
+    private static final int leftLength = 20;
+    private static final int length = rightLength + leftLength;
     private static final int bottomLength = 7; // Placeholder value
     private static final int minLoopCycleCount = 10;
     private static final double shimmerExtremeness = 0.5;
@@ -36,7 +38,7 @@ public class Lights extends VirtualSubsystem {
     private Lights() {
         System.out.println("[Init] Creating LEDs");
 
-        leds = new AddressableLED(0);
+        leds = new AddressableLED(1);
         buffer = new AddressableLEDBuffer(length);
 
         leds.setLength(length);
@@ -59,8 +61,9 @@ public class Lights extends VirtualSubsystem {
             return;
         }
 
-        solid(Section.FULL, Color.kViolet);
 
+        solid(Section.RIGHTFULL, Color.kViolet);
+        solid(Section.LEFTFULL, Color.kViolet);
         // Update LEDs
         leds.setData(buffer);
     }
@@ -137,18 +140,27 @@ public class Lights extends VirtualSubsystem {
     // }
 
     private static enum Section {
-        UPPER,
-        BOTTOM,
-        FULL;
+        LEFTUPPER,
+        LEFTBOTTOM,
+        LEFTFULL,
+        RIGHTUPPER,
+        RIGHTBOTTOM,
+        RIGHTFULL;
 
         private int start() {
             switch (this) {
-                case UPPER:
+                case LEFTUPPER:
                     return bottomLength;
-                case BOTTOM:
+                case LEFTBOTTOM:
                     return 0;
-                case FULL:
+                case LEFTFULL:
                     return 0;
+                case RIGHTUPPER:
+                    return bottomLength + leftLength;
+                case RIGHTBOTTOM:
+                    return 0 + leftLength;
+                case RIGHTFULL:
+                    return 0 + leftLength;
                 default:
                     return 0;
           }
@@ -156,16 +168,25 @@ public class Lights extends VirtualSubsystem {
 
         private int end() {
             switch (this) {
-                case UPPER:
-                    return length;
-                case BOTTOM:
+                case LEFTUPPER:
+                    return leftLength;
+                case LEFTBOTTOM:
                     return bottomLength;
-                case FULL:
+                case LEFTFULL:
+                    return leftLength;
+                case RIGHTUPPER:
+                    return length;
+                case RIGHTBOTTOM:
+                    return leftLength + bottomLength;
+                case RIGHTFULL:
                     return length;
                 default:
-                    return length;
+                    return 0;
             }
         }
+        
     }
+    
+    
 
 }
