@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Robot;
 import frc.robot.commands.auto.AutoBalance;
 import frc.robot.commands.auto.AutoPlace;
 import frc.robot.odometry.GyroOdometry;
@@ -159,7 +158,7 @@ public class AutoChooser extends SubsystemBase {
     }
 
     public Command getAutoCommand() {
-        String gamePiece = Robot.toString(Robot.getGamePiece());
+        String gamePiece = Lights.getInstance().gamePiece.toString();
 
         if (chargeStation.getSelected().equals("Balance")) {
             if (placeGamePiece.getSelected()) {

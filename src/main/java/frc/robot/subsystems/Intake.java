@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CAN;
-import frc.robot.Constants.GamePiece;
+import frc.robot.subsystems.Lights.GamePiece;
 
 public class Intake extends SubsystemBase {
     CANSparkMax intake;

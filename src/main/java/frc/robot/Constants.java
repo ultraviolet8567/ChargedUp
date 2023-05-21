@@ -551,11 +551,6 @@ public final class Constants {
         LOGITECH,
         JOYSTICK
     }
-    
-    public static enum GamePiece {
-        CONE,
-        CUBE
-    }
 
     public static enum Preset {
         HIGH_NODE,

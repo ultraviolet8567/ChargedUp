@@ -5,9 +5,9 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.Preset;
-import frc.robot.Robot;
 import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lights;
 
 public class AutoPlace extends CommandBase {
     private Arms arms;
@@ -32,7 +32,7 @@ public class AutoPlace extends CommandBase {
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
 
         if (timeEquals(4)) {
-            intake.drop(Robot.getGamePiece());
+            intake.drop(Lights.getInstance().gamePiece);
         }
         if (timeEquals(4.25)) {
             arms.setPresetValue(Preset.TAXI);

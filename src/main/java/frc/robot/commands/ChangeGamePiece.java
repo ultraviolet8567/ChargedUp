@@ -3,8 +3,8 @@ package frc.robot.commands;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
-import frc.robot.Constants.GamePiece;
+import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Lights.GamePiece;
 
 public class ChangeGamePiece extends CommandBase {
     private GamePiece gamePiece;
@@ -22,13 +22,12 @@ public class ChangeGamePiece extends CommandBase {
 
     @Override 
     public void initialize() { 
-        if (toggle)
+        if (toggle) {
             gamePiece = gamePiece == GamePiece.CONE ? GamePiece.CUBE : GamePiece.CONE;
+        }
 
-        Robot.setGamePiece(gamePiece);
-
-        String gamePieceString = gamePiece == GamePiece.CONE ? "Cone" : "Cube";
-        Logger.getInstance().recordOutput("GamePiece", gamePieceString);
+        Lights.getInstance().gamePiece = gamePiece;
+        Logger.getInstance().recordOutput("GamePiece", gamePiece.toString());
     }
 
     @Override
