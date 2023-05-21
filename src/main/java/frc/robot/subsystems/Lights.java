@@ -9,23 +9,25 @@ public class Lights extends VirtualSubsystem {
     private static Lights instance;
 
     public static Lights getInstance() {
-        if (instance == null) {
+        if (instance == null)
             instance = new Lights();
-        }
         return instance;
     }
     
     // Robot state tracking
     public int loopCycleCount = 0;
     public boolean lowBattery = false;
+    public GamePiece gamePiece = GamePiece.CONE;
+    public boolean pickUp = false;
+    public RobotState state = RobotState.DISABLED;
 
     // LED IO
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
 
     // Constants
-    private static final int rightLength = 21;
     private static final int leftLength = 20;
+    private static final int rightLength = 21;
     private static final int length = rightLength + leftLength;
     private static final int bottomLength = 7; // Placeholder value
     private static final int minLoopCycleCount = 10;
@@ -47,99 +49,120 @@ public class Lights extends VirtualSubsystem {
     }
 
     public void periodic() {
-        // if (lowBattery) {
-        //     setBufferColor(Section.BOTTOM.start(), Section.BOTTOM.end(), Color.kOrangeRed);
-        //     setBufferColor(Section.BOTTOM.start(), Section.BOTTOM.end(), ledColor);
-        // }
-        // else {
-        //     setBufferColor(Section.FULL.start(), Section.FULL.end(), ledColor);
-        // }
-
         // Exit during initial cycles
         loopCycleCount++;
         if (loopCycleCount < minLoopCycleCount) {
             return;
         }
+        
+        // First branch off depending on what part of the match the robot is in
 
+        // Disabled
+        if (state == RobotState.DISABLED) {
+            // Purple shimmer
+        }
 
-        solid(Section.RIGHTFULL, Color.kViolet);
-        solid(Section.LEFTFULL, Color.kViolet);
+        // Autonomous
+        else if (state == RobotState.AUTO) {
+            // Rainbow
+        }
+
+        // Teleop
+        else {
+            // Game piece color
+            
+            // Pickup indicator
+        }
+
+        // Indicate low battery in every case
+        
         // Update LEDs
         leds.setData(buffer);
     }
 
     private void solid(Section section, Color color) {
-        for (int i = section.start(); i < section.end(); i++) {
-            buffer.setLED(i, color);
+        if (section == Section.FULL) {
+            solid(Section.LEFTFULL, color);
+            solid(Section.RIGHTFULL, color);
+        }
+        else if (section == Section.BOTTOM) {
+            solid(Section.LEFTBOTTOM, color);
+            solid(Section.RIGHTBOTTOM, color);
+        }
+        else {
+            for (int i = section.start(); i < section.end(); i++) {
+                buffer.setLED(i, color);
+            }
         }
     }
     
     private void shimmer(Section section, Color color) {
-        for (int i = section.start(); i < section.end(); i++) {
-            double brightnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * shimmerSpeed;
-            buffer.setLED(i, new Color(color.red * brightnessFactor, color.green * brightnessFactor, color.blue * brightnessFactor));
+        if (section == Section.FULL) {
+            shimmer(Section.LEFTFULL, color);
+            shimmer(Section.RIGHTFULL, color);
+        }
+        else if (section == Section.BOTTOM) {
+            shimmer(Section.LEFTBOTTOM, color);
+            shimmer(Section.RIGHTBOTTOM, color);
+        }
+        else {
+            for (int i = section.start(); i < section.end(); i++) {
+                double brightnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * shimmerSpeed;
+                buffer.setLED(i, new Color(color.red * brightnessFactor, color.green * brightnessFactor, color.blue * brightnessFactor));
+            }
         }
     }
 
     private void rainbow(Section section) {
-        for (int i = section.start(); i < section.end(); i++) {
-            int hue = ((loopCycleCount * 3) % 180 + (i * 180 / buffer.getLength())) % 180;
-            buffer.setHSV(i, hue, 255, 128);
+        if (section == Section.FULL) {
+            rainbow(Section.LEFTFULL);
+            rainbow(Section.RIGHTFULL);
+        }
+        else if (section == Section.BOTTOM) {
+            rainbow(Section.LEFTBOTTOM);
+            rainbow(Section.RIGHTBOTTOM);
+        }
+        else {
+            for (int i = section.start(); i < section.end(); i++) {
+                int hue = ((loopCycleCount * 3) % 180 + (i * 180 / buffer.getLength())) % 180;
+                buffer.setHSV(i, hue, 255, 128);
+            }
+        }
+    }
+
+    private void strobe(Section section, Color color){
+        if (section == Section.FULL) {
+            strobe(Section.LEFTFULL, color);
+            strobe(Section.RIGHTFULL, color);
+        }
+        else if (section == Section.BOTTOM) {
+            strobe(Section.LEFTBOTTOM, color);
+            strobe(Section.RIGHTBOTTOM, color);
+        }
+        else {
+            for (int i = section.start(); i < section.end(); i++) {
+                if (loopCycleCount % (strobeTickSkip + 1) == strobeTickDuration) {
+                    buffer.setLED(i, color);
+                }
+                else {
+                    buffer.setHSV(i, 0, 0, 0);
+                }
+            }
         }
     }
 
     private void strobeRainbow(Section section){
-      int hue = ((loopCycleCount *  15) % 180 + (180 / buffer.getLength())) % 180;
-      for (int i = section.start(); i < section.end(); i++) {
-        if(loopCycleCount%(strobeTickSkip+1) == strobeTickDuration){
-            buffer.setHSV(i, hue, 255, 128);
-        }else{
-            buffer.setHSV(i, 0, 0, 0);
+        if (loopCycleCount % (strobeTickSkip + 1) == strobeTickDuration) {
+            rainbow(section);
         }
-      }
-    }
-
-    private void strobe(Section section, Color color){
-      int hue = ((loopCycleCount *  15) % 180 + (180 / buffer.getLength())) % 180;
-      for (int i = section.start(); i < section.end(); i++) {
-        if(loopCycleCount%(strobeTickSkip+1) == strobeTickDuration){
-            buffer.setLED(i, color);
-        }else{
-            buffer.setHSV(i, 0, 0, 0);
+        else {
+            solid(section, Color.kBlack);
         }
-      }
     }
-
-
-
-    // private void setBufferColor(int start, int end, Color color){
-    //   for (var i = start; i < end; i++) {
-    //     // Sets the specified LED to the RGB values for red
-    //     buffer.setLED(i, color);
-    //   }
-    // }
-
-    // private void setLowBattery(boolean lowBat) {
-    //     lowBattery = lowBat;
-    // }
-
-    // private void disabled() {
-    //     ledColor = Color.kViolet;
-    // }
-
-    // private void auto() {
-    //     ledColor = Color.kOrange;
-    // }
-
-    // private void cube() {
-    //     ledColor = Color.kPurple;
-    // }
-
-    // private void objectPicked() {
-    //     ledColor = Color.kGreen;
-    // }
 
     private static enum Section {
+        FULL,
+        BOTTOM,
         LEFTUPPER,
         LEFTBOTTOM,
         LEFTFULL,
@@ -149,6 +172,8 @@ public class Lights extends VirtualSubsystem {
 
         private int start() {
             switch (this) {
+                case FULL:
+                    return 0;
                 case LEFTUPPER:
                     return bottomLength;
                 case LEFTBOTTOM:
@@ -163,11 +188,13 @@ public class Lights extends VirtualSubsystem {
                     return 0 + leftLength;
                 default:
                     return 0;
-          }
+            }
         }
 
         private int end() {
             switch (this) {
+                case FULL:
+                    return length;
                 case LEFTUPPER:
                     return leftLength;
                 case LEFTBOTTOM:
@@ -184,9 +211,20 @@ public class Lights extends VirtualSubsystem {
                     return 0;
             }
         }
-        
     }
     
-    
+    public static enum GamePiece {
+        CONE,
+        CUBE;
 
+        public String toString() {
+            return this == GamePiece.CONE ? "Cone" : "Cube";
+        }
+    }
+
+    public static enum RobotState {
+        DISABLED,
+        AUTO,
+        TELEOP
+    }
 }
