@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,7 +28,6 @@ public class Robot extends LoggedRobot {
     private static GenericEntry gamePieceBox, postTime;
     private static SendableChooser<GamePiece> initialGamePiece;
     private static Logger logger;
-    private static long startTime;
 
     @Override
     public void robotInit() {
@@ -89,7 +89,7 @@ public class Robot extends LoggedRobot {
 
         // Update Shuffleboard
         gamePieceBox.setBoolean(getGamePiece() == GamePiece.CONE);
-        postTime.setDouble(135 - logger.getTimestamp() / 1000000.0);
+        postTime.setDouble(DriverStation.getMatchTime());
     }
 
     @Override
@@ -109,14 +109,10 @@ public class Robot extends LoggedRobot {
         }
 
         gamePiece = initialGamePiece.getSelected();
-        startTime = logger.getTimestamp();
     }
 
     @Override
-    public void autonomousPeriodic() {
-        if (logger.getTimestamp() - startTime >= 15000000.0)
-            m_robotContainer.getSwerve().lockWheels();
-    }
+    public void autonomousPeriodic() {}
 
     @Override
     public void teleopInit() {
@@ -126,10 +122,7 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void teleopPeriodic() {
-        if (logger.getTimestamp() - startTime >= 153000000.0)
-            m_robotContainer.getSwerve().lockWheels();
-    }
+    public void teleopPeriodic() {}
 
     @Override
     public void testInit() {
