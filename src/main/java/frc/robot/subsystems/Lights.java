@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.VirtualSubsystem;
+import edu.wpi.first.wpilibj.RobotController;
 
 public class Lights extends VirtualSubsystem {
     private static Lights instance;
@@ -16,8 +17,8 @@ public class Lights extends VirtualSubsystem {
     
     // Robot state tracking
     public int loopCycleCount = 0;
-    public boolean lowBattery = false;
-    public GamePiece gamePiece = GamePiece.CONE;
+    public boolean lowBattery;
+    public GamePiece gamePiece = GamePiece.NOTHING;
     public boolean pickUp = false;
     public RobotState state = RobotState.DISABLED;
 
@@ -35,6 +36,10 @@ public class Lights extends VirtualSubsystem {
     private static final double shimmerSpeed = 1;
     private static final double strobeTickSkip = 30;
     private static final double strobeTickDuration = 3;
+    private static final double lowBatteryVoltage = 10.0;
+    private static final int lowBatteryFlashWait = 50;
+    private static final int lowBatteryFlashDuration = 10;
+
 
 
     private Lights() {
@@ -56,15 +61,18 @@ public class Lights extends VirtualSubsystem {
         }
         
         // First branch off depending on what part of the match the robot is in
-
+        
         // Disabled
+
         if (state == RobotState.DISABLED) {
             // Purple shimmer
+            solid(Section.FULL, Color.kViolet);
         }
 
         // Autonomous
         else if (state == RobotState.AUTO) {
             // Rainbow
+            rainbow(Section.FULL);
         }
 
         // Teleop
@@ -72,11 +80,17 @@ public class Lights extends VirtualSubsystem {
             // Game piece color
             
             // Pickup indicator
+            solid(Section.FULL, gamePiece.color());
         }
 
         // Indicate low battery in every case
-        
+        lowBattery = (RobotController.getBatteryVoltage() < lowBatteryVoltage);
+        //I don't know if it will let me change the bottom part if it's already been changed 
+        if(lowBattery && loopCycleCount%lowBatteryFlashWait <= lowBatteryFlashWait-lowBatteryFlashDuration){
+            solid(Section.BOTTOM, Color.kRed);
+        }
         // Update LEDs
+        
         leds.setData(buffer);
     }
 
@@ -163,6 +177,7 @@ public class Lights extends VirtualSubsystem {
     private static enum Section {
         FULL,
         BOTTOM,
+        UPPER,
         LEFTUPPER,
         LEFTBOTTOM,
         LEFTFULL,
@@ -214,17 +229,33 @@ public class Lights extends VirtualSubsystem {
     }
     
     public static enum GamePiece {
-        CONE,
-        CUBE;
+        REQCONE,
+        REQCUBE,
+        PICKEDUP,
+        NOTHING;
+
+        private Color color(){
+            switch(this){
+                case REQCONE: return Color.kPurple;
+                case REQCUBE: return Color.kYellow;
+                case PICKEDUP: return Color.kGreen;
+                default: return Color.kBlue;
+            }
+        }
 
         public String toString() {
-            return this == GamePiece.CONE ? "Cone" : "Cube";
+            switch(this){
+                case REQCONE: return "Cone request";
+                case REQCUBE: return "Cube request";
+                case PICKEDUP: return "Picked up";
+                default: return "Nothing Picked up or requested";
+            }
         }
     }
 
     public static enum RobotState {
         DISABLED,
         AUTO,
-        TELEOP
+        TELEOP;
     }
 }

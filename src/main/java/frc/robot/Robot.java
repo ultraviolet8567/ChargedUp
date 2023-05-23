@@ -59,8 +59,8 @@ public class Robot extends LoggedRobot {
         m_robotContainer = new RobotContainer();
 
         initialGamePiece = new SendableChooser<>();
-        initialGamePiece.setDefaultOption("Cone", GamePiece.CONE);
-        initialGamePiece.addOption("Cube", GamePiece.CUBE);
+        initialGamePiece.setDefaultOption("Cone", GamePiece.REQCONE);
+        initialGamePiece.addOption("Cube", GamePiece.REQCUBE);
         gamePiece = initialGamePiece.getSelected();
 
         Shuffleboard.getTab("Main").add("Initial game piece", initialGamePiece).withWidget(BuiltInWidgets.kComboBoxChooser)
@@ -88,7 +88,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         // Update Shuffleboard
-        gamePieceBox.setBoolean(Lights.getInstance().gamePiece == GamePiece.CONE);
+        gamePieceBox.setBoolean(Lights.getInstance().gamePiece == GamePiece.REQCONE);
         postTime.setDouble(DriverStation.getMatchTime());
     }
 

@@ -16,14 +16,14 @@ public class ChangeGamePiece extends CommandBase {
     }
 
     public ChangeGamePiece(boolean toggle) {
-        this.gamePiece = GamePiece.CONE;
+        this.gamePiece = GamePiece.REQCONE;
         this.toggle = toggle;
     }
 
     @Override 
     public void initialize() { 
         if (toggle) {
-            gamePiece = gamePiece == GamePiece.CONE ? GamePiece.CUBE : GamePiece.CONE;
+            gamePiece = gamePiece == GamePiece.REQCONE ? GamePiece.REQCUBE : GamePiece.REQCONE;
         }
 
         Lights.getInstance().gamePiece = gamePiece;
