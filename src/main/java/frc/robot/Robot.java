@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.Constants.GamePiece;
+import frc.robot.subsystems.Lights.GamePiece;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.VirtualSubsystem;
 
@@ -59,8 +59,8 @@ public class Robot extends LoggedRobot {
         m_robotContainer = new RobotContainer();
 
         initialGamePiece = new SendableChooser<>();
-        initialGamePiece.setDefaultOption("Cone", GamePiece.CONE);
-        initialGamePiece.addOption("Cube", GamePiece.CUBE);
+        initialGamePiece.setDefaultOption("Cone", GamePiece.REQCONE);
+        initialGamePiece.addOption("Cube", GamePiece.REQCUBE);
         gamePiece = initialGamePiece.getSelected();
 
         Shuffleboard.getTab("Main").add("Initial game piece", initialGamePiece).withWidget(BuiltInWidgets.kComboBoxChooser)
@@ -79,7 +79,7 @@ public class Robot extends LoggedRobot {
             .withSize(2, 1)
             .getEntry();
 
-        logger.recordOutput("GamePiece", toString(gamePiece));
+        logger.recordOutput("GamePiece", gamePiece.toString());
     }
 
     @Override
@@ -88,7 +88,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         // Update Shuffleboard
-        gamePieceBox.setBoolean(getGamePiece() == GamePiece.CONE);
+        gamePieceBox.setBoolean(Lights.getInstance().gamePiece == GamePiece.REQCONE);
         postTime.setDouble(DriverStation.getMatchTime());
     }
 
@@ -137,17 +137,4 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void simulationPeriodic() {}
-
-    // Global gamepiece switch
-    public static GamePiece getGamePiece() {
-        return gamePiece;
-    }
-
-    public static void setGamePiece(GamePiece gp) {
-        gamePiece = gp;
-    }
-
-    public static String toString(GamePiece gp) {
-        return gp == GamePiece.CONE ? "Cone" : "Cube";
-    }
 }

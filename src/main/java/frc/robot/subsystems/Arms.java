@@ -6,18 +6,17 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -25,12 +24,11 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CAN;
-import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.Preset;
-import frc.robot.Constants;
-import frc.robot.Robot;
+import frc.robot.subsystems.Lights.GamePiece;
 
 public class Arms extends SubsystemBase {
     public final CANSparkMax shoulder, elbow;
@@ -473,15 +471,15 @@ public class Arms extends SubsystemBase {
     public double[] getPreset() {
         switch (presetValue) {
             case HIGH_NODE:
-                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kHighNodeConeSetpoints : ArmConstants.kHighNodeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kHighNodeConeSetpoints : ArmConstants.kHighNodeCubeSetpoints;
             case MID_NODE:
-                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kMidNodeConeSetpoints : ArmConstants.kMidNodeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kMidNodeConeSetpoints : ArmConstants.kMidNodeCubeSetpoints;
             case HYBRID_NODE:
-                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kHybridNodeConeSetpoints : ArmConstants.kHybridNodeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kHybridNodeConeSetpoints : ArmConstants.kHybridNodeCubeSetpoints;
             case SUBSTATION_INTAKE:
-                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kSubstationIntakeConeSetpoints : ArmConstants.kSubstationIntakeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kSubstationIntakeConeSetpoints : ArmConstants.kSubstationIntakeCubeSetpoints;
             case GROUND_INTAKE:
-                return Robot.getGamePiece().equals(GamePiece.CONE) ? ArmConstants.kGroundIntakeConeSetpoints : ArmConstants.kGroundIntakeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kGroundIntakeConeSetpoints : ArmConstants.kGroundIntakeCubeSetpoints;
             case START:
                 return ArmConstants.kStartSetpoints;
             case TAXI:

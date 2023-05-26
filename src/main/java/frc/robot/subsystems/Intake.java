@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.CAN;
-import frc.robot.Constants.GamePiece;
+import frc.robot.subsystems.Lights.GamePiece;
 
 public class Intake extends SubsystemBase {
     CANSparkMax intake;
@@ -29,10 +29,10 @@ public class Intake extends SubsystemBase {
 
     public void pickup(GamePiece gamePiece) {
         switch (gamePiece) {
-            case CONE:
+            case REQCONE:
                 intake.set(-ArmConstants.intakeSpeed.get());
                 break;
-            case CUBE:
+            case REQCUBE:
                 intake.set(ArmConstants.intakeSpeed.get());
                 break;
             default:
@@ -42,10 +42,10 @@ public class Intake extends SubsystemBase {
 
     public void drop(GamePiece gamePiece) {
         switch (gamePiece) {
-            case CONE:
+            case REQCONE:
                 intake.set(ArmConstants.intakeSpeed.get());
                 break;
-            case CUBE:
+            case REQCUBE:
                 intake.set(-ArmConstants.intakeSpeed.get());
                 break;
             default:

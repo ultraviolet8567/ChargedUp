@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ControllerType;
-import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
 import frc.robot.commands.ChangeGamePiece;
@@ -26,6 +25,7 @@ import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.AutoChooser;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Lights.GamePiece;
 import frc.robot.util.ControllerIO;
 
 public class RobotContainer {
@@ -79,8 +79,8 @@ public class RobotContainer {
         new JoystickButton(armJoystick, XboxController.Button.kLeftBumper.value).whileTrue(new Drop(intake));
 
         // Commands to change the global game piece value
-        new JoystickButton(armJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(GamePiece.CONE));
-        new JoystickButton(armJoystick , XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(GamePiece.CUBE));
+        new JoystickButton(armJoystick, XboxController.Button.kRightStick.value).onTrue(new ChangeGamePiece(GamePiece.REQCONE));
+        new JoystickButton(armJoystick , XboxController.Button.kLeftStick.value).onTrue(new ChangeGamePiece(GamePiece.REQCUBE));
 
         // Temporary command to allow for software arm loosening if we lock the chains
         // new JoystickButton(armJoystick , XboxController.Button.kStart.value).onTrue(new ToggleArmIdleMode(arms));
