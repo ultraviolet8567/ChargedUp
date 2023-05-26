@@ -59,7 +59,7 @@ public class Lights extends VirtualSubsystem {
             return;
         }
 
-        solid(Section.FULL, Color.kViolet);
+        rainbow(Section.FULL);
 
         // Update LEDs
         leds.setData(buffer);
