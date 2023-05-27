@@ -265,24 +265,22 @@ public class Arms extends SubsystemBase {
         //     .plus((Kb()).times(velocity))
         // );
 
-        // This is still pretty big with numbers like 36
+        // This is still pretty big with numbers in the hundreds
         Matrix<N2,N1> torques = M(position).times(acceleration)
             .plus(C(position, velocity).times(velocity))
             .plus(Tg(position));
 
+        Logger.getInstance().recordOutput("FeedForward/ShoulderTorque", torques.get(0, 0));
+        Logger.getInstance().recordOutput("FeedForward/ElbowTorque", torques.get(1, 0));
+
         double shoulderVelocity = shoulderMotor.getVoltage(torques.get(0, 0), velocity.get(0, 0));
         double elbowVelocity = elbowMotor.getVoltage(torques.get(1, 0), velocity.get(1, 0));
 
-        // Logger.getInstance().recordOutput("FFMatrices/M[0,0]", M(position).get(0, 0));
-        // Logger.getInstance().recordOutput("FFMatrices/M[1,0]", M(position).get(1, 0));
-        // Logger.getInstance().recordOutput("FFMatrices/M[0,1]", M(position).get(0, 1));
-        // Logger.getInstance().recordOutput("FFMatrices/M[1,1]", M(position).get(1, 1));
-        // Logger.getInstance().recordOutput("FFMatrices/C[0,0]", C(position, velocity).get(0, 0));
-        // Logger.getInstance().recordOutput("FFMatrices/C[1,0]", C(position, velocity).get(1, 0));
-        // Logger.getInstance().recordOutput("FFMatrices/C[0,1]", C(position, velocity).get(0, 1));
-        // Logger.getInstance().recordOutput("FFMatrices/Tg[0,0]", Tg(position).get(0, 0));
-        // Logger.getInstance().recordOutput("FFMatrices/Tg[1,0]", Tg(position).get(1, 0));
+        double shoulderFFSpeed = shoulderMotor.getSpeed(torques.get(0, 0), shoulderVelocity);
+        double elbowFFSpeed = elbowMotor.getSpeed(torques.get(0, 0), elbowVelocity);
 
+        Logger.getInstance().recordOutput("ArmSpeeds/ShoulderSpeedFF", shoulderFFSpeed);
+        Logger.getInstance().recordOutput("ArmSpeeds/ElbowSpeedFF", elbowFFSpeed);
         voltages = new Vector<N2>(Nat.N2());
         voltages.set(0, 0, shoulderVelocity);
         voltages.set(1, 0, elbowVelocity);
