@@ -1,11 +1,13 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.VirtualSubsystem;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Constants.LightConstants;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Lights extends VirtualSubsystem {
     private static Lights instance;
@@ -19,7 +21,7 @@ public class Lights extends VirtualSubsystem {
     // Robot state tracking
     public int loopCycleCount = 0;
     public boolean lowBattery = false;
-    public GamePiece gamePiece = GamePiece.REQCONE;
+    public GamePiece gamePiece = GamePiece.CONE;
     public boolean pickUp = false;
     public static RobotState state = RobotState.DISABLED;
 
@@ -27,13 +29,40 @@ public class Lights extends VirtualSubsystem {
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
 
+    // Constants
+    private static final int leftLength = 20;
+    private static final int rightLength = 21;
+    private static final int backLength = 0; // back left //back right
+    private static final int length = rightLength + leftLength;
+    private static final int bottomLength = 4; // Placeholder value
+    private static final int minLoopCycleCount = 10;
+    private static final double shimmerExtremeness = 0.5;
+    private static final double shimmerSpeed = 1;
+    private static final double strobeTickSkip = 30;
+    private static  final double lowBatteryVoltage = 10.0;
+    private static final int lowBatteryFlashWait = 50;
+    private static final int lowBatteryFlashDuration = 25;
+    private static final double strobeFastDuration = 0.1;
+    private static final double strobeSlowDuration = 0.2;
+    private static final double breathDuration = 1.0;
+    private static final double rainbowCycleLength = 25.0;
+    private static final double rainbowDuration = 0.25;
+    private static final double waveExponent = 0.4;
+    private static final double waveFastCycleLength = 25.0;
+    private static final double waveFastDuration = 0.25;
+    private static final double waveSlowCycleLength = 25.0;
+    private static final double waveSlowDuration = 3.0;
+    private static final double waveAllianceCycleLength = 15.0;
+    private static final double waveAllianceDuration = 2.0;
+
+
     private Lights() {
         System.out.println("[Init] Creating LEDs");
 
         leds = new AddressableLED(1);
-        buffer = new AddressableLEDBuffer(LightConstants.length);
+        buffer = new AddressableLEDBuffer(length);
 
-        leds.setLength(LightConstants.length);
+        leds.setLength(length);
         leds.setData(buffer);
         leds.start();
     }
@@ -41,17 +70,16 @@ public class Lights extends VirtualSubsystem {
     public void periodic() {
         // Exit during initial cycles
         loopCycleCount++;
-        if (loopCycleCount < LightConstants.minLoopCycleCount) {
+        if (loopCycleCount < minLoopCycleCount) {
             return;
         }
         
         // First branch off depending on what part of the match the robot is in
         
         // Disabled
-
         if (state == RobotState.DISABLED) {
             // Purple shimmer
-            //solid(Section.FULL, Color.kViolet);
+            // shimmer(Section.FULL, Color.kViolet);
             rainbow(Section.FULL);
         }
 
@@ -64,20 +92,21 @@ public class Lights extends VirtualSubsystem {
         // Teleop
         else {
             // Game piece color
+            solid(Section.FULL, gamePiece.color());
             
             // Pickup indicator
-            solid(Section.FULL, gamePiece.color());
+            if (pickUp) {
+                solid(Section.FULL, Color.kGreen);
+            }
         }
 
         // Indicate low battery in every case
-        lowBattery = (RobotController.getBatteryVoltage() < LightConstants.lowBatteryVoltage);
-        lowBattery = true;
-        //I don't know if it will let me change the bottom part if it's already been changed 
-        if (lowBattery && loopCycleCount % LightConstants.lowBatteryFlashWait <= LightConstants.lowBatteryFlashWait - LightConstants.lowBatteryFlashDuration) {
-            solid(Section.BOTTOM, Color.kRed);
+        lowBattery = (RobotController.getBatteryVoltage() < lowBatteryVoltage);
+        if (lowBattery) {
+            breath(Section.BOTTOM, Color.kRed, Color.kBlack, breathDuration);
         }
+
         // Update LEDs
-        
         leds.setData(buffer);
     }
 
@@ -108,7 +137,7 @@ public class Lights extends VirtualSubsystem {
         }
         else {
             for (int i = section.start(); i < section.end(); i++) {
-                double brightnessFactor = LightConstants.shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * LightConstants.shimmerSpeed;
+                double brightnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * shimmerSpeed;
                 buffer.setLED(i, new Color(color.red * brightnessFactor, color.green * brightnessFactor, color.blue * brightnessFactor));
             }
         }
@@ -143,7 +172,7 @@ public class Lights extends VirtualSubsystem {
         }
         else {
             for (int i = section.start(); i < section.end(); i++) {
-                if (loopCycleCount % (LightConstants.strobeTickSkip + 1) == LightConstants.strobeTickDuration) {
+                if (loopCycleCount % (strobeTickSkip + 1) == strobeSlowDuration) {
                     buffer.setLED(i, color);
                 }
                 else {
@@ -153,13 +182,47 @@ public class Lights extends VirtualSubsystem {
         }
     }
 
-    private void strobeRainbow(Section section){
-        if (loopCycleCount % (LightConstants.strobeTickSkip + 1) == LightConstants.strobeTickDuration) {
-            rainbow(section);
+    private void wave(Section section, Color c1, Color c2, double cycleLength, double duration) {
+        double x = (1 - ((Timer.getFPGATimestamp() % duration) / duration)) * 2.0 * Math.PI;
+        double xDiffPerLed = (2.0 * Math.PI) / cycleLength;
+        for (int i = 0; i < section.end(); i++) {
+            x += xDiffPerLed;
+            if (i >= section.start()) {
+                double ratio = (Math.pow(Math.sin(x), waveExponent) + 1.0) / 2.0;
+                if (Double.isNaN(ratio)) {
+                    ratio = (-Math.pow(Math.sin(x + Math.PI), waveExponent) + 1.0) / 2.0;
+                }
+                if (Double.isNaN(ratio)) {
+                    ratio = 0.5;
+                }
+                double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
+                double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
+                double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
+                buffer.setLED(i, new Color(red, green, blue));
+            }
         }
-        else {
-            solid(section, Color.kBlack);
+      }
+    
+    private void stripes(Section section, List<Color> colors, int length, double duration) {
+        int offset = (int) (Timer.getFPGATimestamp() % duration / duration * length * colors.size());
+        for (int i = section.start(); i < section.end(); i++) {
+            int colorIndex = (int) (Math.floor((double) (i - offset) / length) + colors.size()) % colors.size();
+            colorIndex = colors.size() - 1 - colorIndex;
+            buffer.setLED(i, colors.get(colorIndex));
         }
+    }
+
+    private void breath(Section section, Color c1, Color c2, double duration) {
+        breath(section, c1, c2, duration, Timer.getFPGATimestamp());
+    }
+
+    private void breath(Section section, Color c1, Color c2, double duration, double timestamp) {
+        double x = ((timestamp % breathDuration) / breathDuration) * 2.0 * Math.PI;
+        double ratio = (Math.sin(x) + 1.0) / 2.0;
+        double red = (c1.red * (1 - ratio)) + (c2.red * ratio);
+        double green = (c1.green * (1 - ratio)) + (c2.green * ratio);
+        double blue = (c1.blue * (1 - ratio)) + (c2.blue * ratio);
+        solid(section, new Color(red, green, blue));
     }
 
     private static enum Section {
@@ -178,17 +241,17 @@ public class Lights extends VirtualSubsystem {
                 case FULL:
                     return 0;
                 case LEFTUPPER:
-                    return LightConstants.bottomLength;
+                    return bottomLength;
                 case LEFTBOTTOM:
                     return 0;
                 case LEFTFULL:
                     return 0;
                 case RIGHTUPPER:
-                    return LightConstants.bottomLength + LightConstants.leftLength;
+                    return bottomLength + leftLength;
                 case RIGHTBOTTOM:
-                    return 1 + LightConstants.leftLength;
+                    return 1 + leftLength;
                 case RIGHTFULL:
-                    return 0 + LightConstants.leftLength;
+                    return 0 + leftLength;
                 default:
                     return 0;
             }
@@ -197,19 +260,19 @@ public class Lights extends VirtualSubsystem {
         private int end() {
             switch (this) {
                 case FULL:
-                    return LightConstants.length;
+                    return length;
                 case LEFTUPPER:
-                    return LightConstants.leftLength;
+                    return leftLength;
                 case LEFTBOTTOM:
-                    return LightConstants.bottomLength;
+                    return bottomLength;
                 case LEFTFULL:
-                    return LightConstants.leftLength;
+                    return leftLength;
                 case RIGHTUPPER:
-                    return LightConstants.length;
+                    return length;
                 case RIGHTBOTTOM:
-                    return LightConstants.leftLength + LightConstants.bottomLength + 1;
+                    return leftLength + bottomLength + 1;
                 case RIGHTFULL:
-                    return LightConstants.length;
+                    return length;
                 default:
                     return 0;
             }
@@ -217,23 +280,15 @@ public class Lights extends VirtualSubsystem {
     }
     
     public static enum GamePiece {
-        REQCONE,
-        REQCUBE;
+        CONE,
+        CUBE;
 
         private Color color(){
-            switch(this){
-                case REQCONE: return Color.kYellow;
-                case REQCUBE: return Color.kPurple;
-                default: return Color.kYellow;
-            }
+            return this == CONE ? Color.kYellow : Color.kPurple;
         }
 
         public String toString() {
-            switch(this){
-                case REQCONE: return "Cone request";
-                case REQCUBE: return "Cube request";
-                default: return "Nothing Picked up or requested";
-            }
+            return this == CONE ? "Cone" : "Cube";
         }
     }
 
