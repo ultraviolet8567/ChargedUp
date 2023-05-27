@@ -2,16 +2,25 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.odometry.GyroOdometry;
 
 public class Swerve extends SubsystemBase {
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
+
+    private int desiredAngle;
+
+    public boolean atCardinalDirection;
+
+    private PIDController cardnalPidController;
 
     public Swerve() {
         frontLeft = new SwerveModule(
@@ -49,6 +58,9 @@ public class Swerve extends SubsystemBase {
             DriveConstants.kBackRightDriveAbsoluteEncoderPort,
             DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
+
+        cardnalPidController = new PIDController(0, 0, 0);
+        atCardinalDirection = true;
     }
 
     public void periodic() {
@@ -83,6 +95,20 @@ public class Swerve extends SubsystemBase {
         };
 
         setModuleStates(locked);
+    }
+
+    public void setCardinalDirection(int desiredAngle) {
+        this.desiredAngle = desiredAngle;
+        atCardinalDirection = false;
+    }
+
+    public double getTurningSpeed() {
+        if(cardnalPidController.atSetpoint()){
+            atCardinalDirection = true;
+            return 0.0;
+        }
+
+        return cardnalPidController.calculate(GyroOdometry.getHeading(), desiredAngle);
     }
 
     public void resetEncoders() {

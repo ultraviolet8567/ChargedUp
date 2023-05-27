@@ -55,6 +55,10 @@ public class SwerveTeleOp extends CommandBase {
         double ySpeed = ySpdFunction.get();
         double turningSpeed = rotationOnFunction.get() ? turningSpdFunction.get() : 0;
 
+        if(!swerve.atCardinalDirection){
+            turningSpeed = swerve.getTurningSpeed();
+        }
+
         // Apply deadband (drops to 0 if joystick value is less than the deadband)
         xSpeed = Math.abs(xSpeed) > OIConstants.kDeadband ? xSpeed : 0;
         ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0;

@@ -15,7 +15,7 @@ import frc.robot.subsystems.Swerve;
 
 public class GyroOdometry extends SubsystemBase {
     private Swerve swerve;
-    private AHRS gyro;
+    private static AHRS gyro;
     private SwerveDriveOdometry odometer;
 
     // TODO: The initial position estimate of the robot; may vary match to match
@@ -68,7 +68,7 @@ public class GyroOdometry extends SubsystemBase {
         return Rotation2d.fromDegrees(getHeading());
     }
 
-    public double getHeading() {
+    public static double getHeading() {
         // Negate the reading because the navX has CCW- and we need CCW+
         return -gyro.getAngle();
     }

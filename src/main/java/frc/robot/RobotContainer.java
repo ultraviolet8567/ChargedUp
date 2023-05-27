@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ControllerType;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
+import frc.robot.commands.setCardinalDirection;
 import frc.robot.commands.ChangeGamePiece;
 import frc.robot.commands.Drop;
 import frc.robot.commands.MoveArms;
@@ -73,6 +74,12 @@ public class RobotContainer {
     public void configureButtonBindings() {
         // new JoystickButton(driverJoystick, XboxController.Button.kBack.value).onTrue(new InstantCommand(() -> swerve.resetEncoders()));
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new InstantCommand(() -> gyro.resetGyro()));
+
+        // Commands for Cardinal Directions
+        new JoystickButton(driverJoystick, XboxController.Button.kY.value).onTrue(new setCardinalDirection(swerve, "Y"));
+        new JoystickButton(driverJoystick, XboxController.Button.kB.value).onTrue(new setCardinalDirection(swerve, "B"));
+        new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new setCardinalDirection(swerve, "A"));
+        new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new setCardinalDirection(swerve, "X"));
 
         // Commands to pickup and drop game pieces
         new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));

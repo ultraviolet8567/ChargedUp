@@ -239,22 +239,6 @@ public final class Constants {
         public static final double kPThetaController = 0.25;
     }
 
-    public static final class LightConstants {
-        public static final int leftLength = 20;
-        public static final int rightLength = 21;
-        public static final int backLength = 0;// back left
-        //back right
-        public static final int length = rightLength + leftLength;
-        public static final int bottomLength = 4; // Placeholder value
-        public static final int minLoopCycleCount = 10;
-        public static final double shimmerExtremeness = 0.5;
-        public static final double shimmerSpeed = 1;
-        public static final double strobeTickSkip = 30;
-        public static final double strobeTickDuration = 3;
-        public static final double lowBatteryVoltage = 10.0;
-        public static final int lowBatteryFlashWait = 50;
-        public static final int lowBatteryFlashDuration = 25;
-    }
 
     public static final class Camera {
         // Update these constants when cameras are mounted
