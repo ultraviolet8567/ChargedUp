@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.util.VirtualSubsystem;
 import edu.wpi.first.wpilibj.RobotController;
+import frc.robot.Constants.LightConstants;
 
 public class Lights extends VirtualSubsystem {
     private static Lights instance;
@@ -17,38 +18,22 @@ public class Lights extends VirtualSubsystem {
     
     // Robot state tracking
     public int loopCycleCount = 0;
-    public boolean lowBattery;
-    public GamePiece gamePiece = GamePiece.NOTHING;
+    public boolean lowBattery = false;
+    public GamePiece gamePiece = GamePiece.REQCONE;
     public boolean pickUp = false;
-    public RobotState state = RobotState.DISABLED;
+    public static RobotState state = RobotState.DISABLED;
 
     // LED IO
     private final AddressableLED leds;
     private final AddressableLEDBuffer buffer;
 
-    // Constants
-    private static final int leftLength = 20;
-    private static final int rightLength = 21;
-    private static final int length = rightLength + leftLength;
-    private static final int bottomLength = 7; // Placeholder value
-    private static final int minLoopCycleCount = 10;
-    private static final double shimmerExtremeness = 0.5;
-    private static final double shimmerSpeed = 1;
-    private static final double strobeTickSkip = 30;
-    private static final double strobeTickDuration = 3;
-    private static final double lowBatteryVoltage = 10.0;
-    private static final int lowBatteryFlashWait = 50;
-    private static final int lowBatteryFlashDuration = 10;
-
-
-
     private Lights() {
         System.out.println("[Init] Creating LEDs");
 
         leds = new AddressableLED(1);
-        buffer = new AddressableLEDBuffer(length);
+        buffer = new AddressableLEDBuffer(LightConstants.length);
 
-        leds.setLength(length);
+        leds.setLength(LightConstants.length);
         leds.setData(buffer);
         leds.start();
     }
@@ -56,7 +41,7 @@ public class Lights extends VirtualSubsystem {
     public void periodic() {
         // Exit during initial cycles
         loopCycleCount++;
-        if (loopCycleCount < minLoopCycleCount) {
+        if (loopCycleCount < LightConstants.minLoopCycleCount) {
             return;
         }
         
@@ -66,7 +51,8 @@ public class Lights extends VirtualSubsystem {
 
         if (state == RobotState.DISABLED) {
             // Purple shimmer
-            solid(Section.FULL, Color.kViolet);
+            //solid(Section.FULL, Color.kViolet);
+            rainbow(Section.FULL);
         }
 
         // Autonomous
@@ -84,9 +70,10 @@ public class Lights extends VirtualSubsystem {
         }
 
         // Indicate low battery in every case
-        lowBattery = (RobotController.getBatteryVoltage() < lowBatteryVoltage);
+        lowBattery = (RobotController.getBatteryVoltage() < LightConstants.lowBatteryVoltage);
+        lowBattery = true;
         //I don't know if it will let me change the bottom part if it's already been changed 
-        if(lowBattery && loopCycleCount%lowBatteryFlashWait <= lowBatteryFlashWait-lowBatteryFlashDuration){
+        if (lowBattery && loopCycleCount % LightConstants.lowBatteryFlashWait <= LightConstants.lowBatteryFlashWait - LightConstants.lowBatteryFlashDuration) {
             solid(Section.BOTTOM, Color.kRed);
         }
         // Update LEDs
@@ -121,7 +108,7 @@ public class Lights extends VirtualSubsystem {
         }
         else {
             for (int i = section.start(); i < section.end(); i++) {
-                double brightnessFactor = shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * shimmerSpeed;
+                double brightnessFactor = LightConstants.shimmerExtremeness + Math.sin((loopCycleCount + i)*0.01) * LightConstants.shimmerSpeed;
                 buffer.setLED(i, new Color(color.red * brightnessFactor, color.green * brightnessFactor, color.blue * brightnessFactor));
             }
         }
@@ -139,6 +126,7 @@ public class Lights extends VirtualSubsystem {
         else {
             for (int i = section.start(); i < section.end(); i++) {
                 int hue = ((loopCycleCount * 3) % 180 + (i * 180 / buffer.getLength())) % 180;
+                System.out.println(hue);
                 buffer.setHSV(i, hue, 255, 128);
             }
         }
@@ -155,7 +143,7 @@ public class Lights extends VirtualSubsystem {
         }
         else {
             for (int i = section.start(); i < section.end(); i++) {
-                if (loopCycleCount % (strobeTickSkip + 1) == strobeTickDuration) {
+                if (loopCycleCount % (LightConstants.strobeTickSkip + 1) == LightConstants.strobeTickDuration) {
                     buffer.setLED(i, color);
                 }
                 else {
@@ -166,7 +154,7 @@ public class Lights extends VirtualSubsystem {
     }
 
     private void strobeRainbow(Section section){
-        if (loopCycleCount % (strobeTickSkip + 1) == strobeTickDuration) {
+        if (loopCycleCount % (LightConstants.strobeTickSkip + 1) == LightConstants.strobeTickDuration) {
             rainbow(section);
         }
         else {
@@ -190,17 +178,17 @@ public class Lights extends VirtualSubsystem {
                 case FULL:
                     return 0;
                 case LEFTUPPER:
-                    return bottomLength;
+                    return LightConstants.bottomLength;
                 case LEFTBOTTOM:
                     return 0;
                 case LEFTFULL:
                     return 0;
                 case RIGHTUPPER:
-                    return bottomLength + leftLength;
+                    return LightConstants.bottomLength + LightConstants.leftLength;
                 case RIGHTBOTTOM:
-                    return 0 + leftLength;
+                    return 1 + LightConstants.leftLength;
                 case RIGHTFULL:
-                    return 0 + leftLength;
+                    return 0 + LightConstants.leftLength;
                 default:
                     return 0;
             }
@@ -209,19 +197,19 @@ public class Lights extends VirtualSubsystem {
         private int end() {
             switch (this) {
                 case FULL:
-                    return length;
+                    return LightConstants.length;
                 case LEFTUPPER:
-                    return leftLength;
+                    return LightConstants.leftLength;
                 case LEFTBOTTOM:
-                    return bottomLength;
+                    return LightConstants.bottomLength;
                 case LEFTFULL:
-                    return leftLength;
+                    return LightConstants.leftLength;
                 case RIGHTUPPER:
-                    return length;
+                    return LightConstants.length;
                 case RIGHTBOTTOM:
-                    return leftLength + bottomLength;
+                    return LightConstants.leftLength + LightConstants.bottomLength + 1;
                 case RIGHTFULL:
-                    return length;
+                    return LightConstants.length;
                 default:
                     return 0;
             }
@@ -230,16 +218,13 @@ public class Lights extends VirtualSubsystem {
     
     public static enum GamePiece {
         REQCONE,
-        REQCUBE,
-        PICKEDUP,
-        NOTHING;
+        REQCUBE;
 
         private Color color(){
             switch(this){
-                case REQCONE: return Color.kPurple;
-                case REQCUBE: return Color.kYellow;
-                case PICKEDUP: return Color.kGreen;
-                default: return Color.kBlue;
+                case REQCONE: return Color.kYellow;
+                case REQCUBE: return Color.kPurple;
+                default: return Color.kYellow;
             }
         }
 
@@ -247,7 +232,6 @@ public class Lights extends VirtualSubsystem {
             switch(this){
                 case REQCONE: return "Cone request";
                 case REQCUBE: return "Cube request";
-                case PICKEDUP: return "Picked up";
                 default: return "Nothing Picked up or requested";
             }
         }
