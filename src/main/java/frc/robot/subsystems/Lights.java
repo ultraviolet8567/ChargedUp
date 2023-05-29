@@ -4,10 +4,10 @@ import java.util.List;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.util.Color;
-import frc.robot.util.VirtualSubsystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.util.VirtualSubsystem;
 
 public class Lights extends VirtualSubsystem {
     private static Lights instance;
@@ -32,7 +32,7 @@ public class Lights extends VirtualSubsystem {
     // Constants
     private static final int leftLength = 20;
     private static final int rightLength = 21;
-    private static final int backLength = 0; // back left //back right
+    private static final int backLength = 13; // back left //back right
     private static final int length = rightLength + leftLength;
     private static final int bottomLength = 4; // Placeholder value
     private static final int minLoopCycleCount = 10;
@@ -60,9 +60,10 @@ public class Lights extends VirtualSubsystem {
         System.out.println("[Init] Creating LEDs");
 
         leds = new AddressableLED(1);
-        buffer = new AddressableLEDBuffer(length);
+        buffer = new AddressableLEDBuffer(length + (backLength * 2));
 
-        leds.setLength(length);
+        leds.setLength(length + (backLength * 2));
+
         leds.setData(buffer);
         leds.start();
     }
@@ -73,6 +74,7 @@ public class Lights extends VirtualSubsystem {
         if (loopCycleCount < minLoopCycleCount) {
             return;
         }
+        System.out.println(buffer.getLength());
         
         // First branch off depending on what part of the match the robot is in
         
@@ -80,7 +82,7 @@ public class Lights extends VirtualSubsystem {
         if (state == RobotState.DISABLED) {
             // Purple shimmer
             // shimmer(Section.FULL, Color.kViolet);
-            rainbow(Section.FULL);
+            solid(Section.FULL, Color.kRed);
         }
 
         // Autonomous
@@ -114,6 +116,7 @@ public class Lights extends VirtualSubsystem {
         if (section == Section.FULL) {
             solid(Section.LEFTFULL, color);
             solid(Section.RIGHTFULL, color);
+            solid(Section.LEFTBACK, color);
         }
         else if (section == Section.BOTTOM) {
             solid(Section.LEFTBOTTOM, color);
@@ -130,6 +133,8 @@ public class Lights extends VirtualSubsystem {
         if (section == Section.FULL) {
             shimmer(Section.LEFTFULL, color);
             shimmer(Section.RIGHTFULL, color);
+            shimmer(Section.LEFTBACK, color);
+            shimmer(Section.RIGHTBACK, color);
         }
         else if (section == Section.BOTTOM) {
             shimmer(Section.LEFTBOTTOM, color);
@@ -236,7 +241,9 @@ public class Lights extends VirtualSubsystem {
         RIGHTBOTTOM,
         RIGHTFULL,
         LEFTSMALL,
-        RIGHTSMALL;
+        RIGHTSMALL,
+        LEFTBACK,
+        RIGHTBACK;
 
         private int start() {
             switch (this) {
@@ -254,6 +261,10 @@ public class Lights extends VirtualSubsystem {
                     return 1 + leftLength;
                 case RIGHTFULL:
                     return 0 + leftLength;
+                case LEFTBACK:
+                    return 1 + length;
+                case RIGHTBACK:
+                    return 1 + length + backLength;
                 default:
                     return 0;
             }
@@ -275,6 +286,10 @@ public class Lights extends VirtualSubsystem {
                     return leftLength + bottomLength + 1;
                 case RIGHTFULL:
                     return length;
+                case LEFTBACK:
+                    return length + backLength;
+                case RIGHTBACK:
+                    return length + backLength + backLength;
                 default:
                     return 0;
             }
