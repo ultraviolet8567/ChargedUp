@@ -479,15 +479,15 @@ public class Arms extends SubsystemBase {
     public double[] getPreset() {
         switch (presetValue) {
             case HIGH_NODE:
-                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kHighNodeConeSetpoints : ArmConstants.kHighNodeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.CONE) ? ArmConstants.kHighNodeConeSetpoints : ArmConstants.kHighNodeCubeSetpoints;
             case MID_NODE:
-                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kMidNodeConeSetpoints : ArmConstants.kMidNodeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.CONE) ? ArmConstants.kMidNodeConeSetpoints : ArmConstants.kMidNodeCubeSetpoints;
             case HYBRID_NODE:
-                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kHybridNodeConeSetpoints : ArmConstants.kHybridNodeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.CONE) ? ArmConstants.kHybridNodeConeSetpoints : ArmConstants.kHybridNodeCubeSetpoints;
             case SUBSTATION_INTAKE:
-                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kSubstationIntakeConeSetpoints : ArmConstants.kSubstationIntakeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.CONE) ? ArmConstants.kSubstationIntakeConeSetpoints : ArmConstants.kSubstationIntakeCubeSetpoints;
             case GROUND_INTAKE:
-                return Lights.getInstance().gamePiece.equals(GamePiece.REQCONE) ? ArmConstants.kGroundIntakeConeSetpoints : ArmConstants.kGroundIntakeCubeSetpoints;
+                return Lights.getInstance().gamePiece.equals(GamePiece.CONE) ? ArmConstants.kGroundIntakeConeSetpoints : ArmConstants.kGroundIntakeCubeSetpoints;
             case START:
                 return ArmConstants.kStartSetpoints;
             case TAXI:

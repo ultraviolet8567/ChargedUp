@@ -16,8 +16,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.Lights.GamePiece;
 import frc.robot.subsystems.Lights;
+import frc.robot.subsystems.Lights.GamePiece;
+import frc.robot.subsystems.Lights.RobotState;
 import frc.robot.util.VirtualSubsystem;
 
 public class Robot extends LoggedRobot {
@@ -31,6 +32,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
+        Lights.state = RobotState.DISABLED;
         logger = Logger.getInstance();
         Lights.getInstance();
 
@@ -59,8 +61,8 @@ public class Robot extends LoggedRobot {
         m_robotContainer = new RobotContainer();
 
         initialGamePiece = new SendableChooser<>();
-        initialGamePiece.setDefaultOption("Cone", GamePiece.REQCONE);
-        initialGamePiece.addOption("Cube", GamePiece.REQCUBE);
+        initialGamePiece.setDefaultOption("Cone", GamePiece.CONE);
+        initialGamePiece.addOption("Cube", GamePiece.CUBE);
         gamePiece = initialGamePiece.getSelected();
 
         Shuffleboard.getTab("Main").add("Initial game piece", initialGamePiece).withWidget(BuiltInWidgets.kComboBoxChooser)
@@ -88,12 +90,14 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run();
 
         // Update Shuffleboard
-        gamePieceBox.setBoolean(Lights.getInstance().gamePiece == GamePiece.REQCONE);
+        gamePieceBox.setBoolean(Lights.getInstance().gamePiece == GamePiece.CONE);
         postTime.setDouble(DriverStation.getMatchTime());
     }
 
     @Override
-    public void disabledInit() {}
+    public void disabledInit() {
+        Lights.state = RobotState.DISABLED;
+    }
 
     @Override
     public void disabledPeriodic() {
@@ -109,6 +113,10 @@ public class Robot extends LoggedRobot {
         }
 
         gamePiece = initialGamePiece.getSelected();
+
+        // set state to auto
+        Lights.state = RobotState.AUTO;
+
     }
 
     @Override
@@ -119,6 +127,10 @@ public class Robot extends LoggedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
+        // set state to teleop
+        Lights.state = RobotState.TELEOP;
+
     }
 
     @Override
