@@ -221,11 +221,18 @@ public class Arms extends SubsystemBase {
         accelerations.set(1, 0, elbowAccel);
 
         // Set positions
-        positions.set(0, 0, shoulderAngle());
-        positions.set(1, 0, elbowAngle());
+        positions.set(0, 0, shoulderNextPoint.position);
+        positions.set(1, 0, elbowNextPoint.position);
 
         // Use above values to find feedforward shoulder/elbow voltages
         voltages = feedForward(positions, velocities, accelerations);
+
+        Logger.getInstance().recordOutput("FeedForward/ShoulderPosition", positions.get(0, 0));
+        Logger.getInstance().recordOutput("FeedForward/ELbowPosition", positions.get(1, 0));
+        Logger.getInstance().recordOutput("FeedForward/ShoulderVelocity", velocities.get(0, 0));
+        Logger.getInstance().recordOutput("FeedForward/ELbowVelocity", velocities.get(1, 0));
+        Logger.getInstance().recordOutput("FeedForward/ShoulderAcceleration", accelerations.get(0, 0));
+        Logger.getInstance().recordOutput("FeedForward/ElbowAcceleration", accelerations.get(1, 0));
 
         // Combine PID & FeedForward Control 
         // TODO apply static friction constant kS (the amount of volts needed to make motor barely turn) to voltages
@@ -281,6 +288,7 @@ public class Arms extends SubsystemBase {
 
         Logger.getInstance().recordOutput("ArmSpeeds/ShoulderSpeedFF", shoulderFFSpeed);
         Logger.getInstance().recordOutput("ArmSpeeds/ElbowSpeedFF", elbowFFSpeed);
+
         voltages = new Vector<N2>(Nat.N2());
         voltages.set(0, 0, shoulderVelocity);
         voltages.set(1, 0, elbowVelocity);
