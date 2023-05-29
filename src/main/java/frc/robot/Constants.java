@@ -239,7 +239,6 @@ public final class Constants {
         public static final double kPThetaController = 0.25;
     }
 
-
     public static final class Camera {
         // Update these constants when cameras are mounted
 

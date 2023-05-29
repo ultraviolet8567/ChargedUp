@@ -29,10 +29,10 @@ public class Intake extends SubsystemBase {
 
     public void pickup(GamePiece gamePiece) {
         switch (gamePiece) {
-            case REQCONE:
+            case CONE:
                 intake.set(-ArmConstants.intakeSpeed.get());
                 break;
-            case REQCUBE:
+            case CUBE:
                 intake.set(ArmConstants.intakeSpeed.get());
                 break;
             default:
@@ -42,10 +42,10 @@ public class Intake extends SubsystemBase {
 
     public void drop(GamePiece gamePiece) {
         switch (gamePiece) {
-            case REQCONE:
+            case CONE:
                 intake.set(ArmConstants.intakeSpeed.get());
                 break;
-            case REQCUBE:
+            case CUBE:
                 intake.set(-ArmConstants.intakeSpeed.get());
                 break;
             default:
