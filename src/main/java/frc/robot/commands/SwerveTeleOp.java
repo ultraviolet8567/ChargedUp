@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import java.util.function.Supplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -55,14 +57,20 @@ public class SwerveTeleOp extends CommandBase {
         double ySpeed = ySpdFunction.get();
         double turningSpeed = rotationOnFunction.get() ? turningSpdFunction.get() : 0;
 
-        if(!swerve.atCardinalDirection){
-            turningSpeed = swerve.getTurningSpeed();
-        }
-
         // Apply deadband (drops to 0 if joystick value is less than the deadband)
         xSpeed = Math.abs(xSpeed) > OIConstants.kDeadband ? xSpeed : 0;
         ySpeed = Math.abs(ySpeed) > OIConstants.kDeadband ? ySpeed : 0;
         turningSpeed = Math.abs(turningSpeed) > OIConstants.kDeadband ? turningSpeed : 0;
+
+        Logger.getInstance().recordOutput("TurningSpeed", turningSpeed);
+
+        // If the driver isn't moving the turning joystick
+        if (turningSpeed == 0 && !swerve.atCardinalDirection) {
+            turningSpeed = swerve.getTurningSpeed();
+            Logger.getInstance().recordOutput("CDTurningSpeed", turningSpeed);
+        } else {
+            swerve.atCardinalDirection = true;
+        }
 
         if (leftBumper.get()) {
             RobotContainer.getDriverJoystick().setRumble(RumbleType.kLeftRumble, 0.025);

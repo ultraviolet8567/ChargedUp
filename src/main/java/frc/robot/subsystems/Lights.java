@@ -74,7 +74,6 @@ public class Lights extends VirtualSubsystem {
         if (loopCycleCount < minLoopCycleCount) {
             return;
         }
-        System.out.println(buffer.getLength());
         
         // First branch off depending on what part of the match the robot is in
         

@@ -16,11 +16,9 @@ import frc.robot.odometry.GyroOdometry;
 public class Swerve extends SubsystemBase {
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
-    private int desiredAngle;
-
+    private double desiredAngle;
     public boolean atCardinalDirection;
-
-    private PIDController cardnalPidController;
+    private PIDController cardinalPidController;
 
     public Swerve() {
         frontLeft = new SwerveModule(
@@ -59,7 +57,9 @@ public class Swerve extends SubsystemBase {
             DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
-        cardnalPidController = new PIDController(0, 0, 0);
+        cardinalPidController = new PIDController(0.01, 0, 0);
+        cardinalPidController.setTolerance(0.05);
+        cardinalPidController.enableContinuousInput(-Math.PI, Math.PI);
         atCardinalDirection = true;
     }
 
@@ -69,6 +69,9 @@ public class Swerve extends SubsystemBase {
 
         // FL absolute encoder angle, FR absolute encoder angle, BL absolute encoder angle, BR absolute encoder angle
         Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
+
+        Logger.getInstance().recordOutput("atCardinalDirection", atCardinalDirection);
+        Logger.getInstance().recordOutput("CDDesiredAngle", desiredAngle);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -97,18 +100,18 @@ public class Swerve extends SubsystemBase {
         setModuleStates(locked);
     }
 
-    public void setCardinalDirection(int desiredAngle) {
+    public void setCardinalDirection(double desiredAngle) {
         this.desiredAngle = desiredAngle;
         atCardinalDirection = false;
     }
 
     public double getTurningSpeed() {
-        if(cardnalPidController.atSetpoint()){
+        if (cardinalPidController.atSetpoint()) {
             atCardinalDirection = true;
             return 0.0;
         }
 
-        return cardnalPidController.calculate(GyroOdometry.getHeading(), desiredAngle);
+        return cardinalPidController.calculate(GyroOdometry.getHeading(), desiredAngle);
     }
 
     public void resetEncoders() {
