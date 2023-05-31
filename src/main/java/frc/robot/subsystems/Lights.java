@@ -83,7 +83,7 @@ public class Lights extends VirtualSubsystem {
         // Disabled
         if (state == RobotState.DISABLED) {
             // Purple shimmer
-            stripes(Section.FULL, List.of(Color.kPurple, Color.kGoldenrod), stripeLength, stripeDuration);
+            stripes(Section.FULL, List.of(Color.kPurple, Color.kDarkGoldenrod), stripeLength, stripeDuration);
         }
 
         // Autonomous
@@ -281,7 +281,7 @@ public class Lights extends VirtualSubsystem {
         CUBE;
 
         private Color getColor() {
-            return this == CONE ? Color.kYellow : Color.kPurple;
+            return this == CONE ? Color.kDarkGoldenrod : Color.kPurple;
         }
 
         public String toString() {

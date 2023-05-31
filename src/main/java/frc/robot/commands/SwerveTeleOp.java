@@ -66,7 +66,7 @@ public class SwerveTeleOp extends CommandBase {
 
         // If the driver isn't moving the turning joystick
         if (turningSpeed == 0 && swerve.cardinalDirectionEnabled()) {
-            turningSpeed = swerve.getTurningSpeed();
+            turningSpeed = swerve.getTurningSpeed(gyro.getRotation2d().getRadians());
             Logger.getInstance().recordOutput("CDTurningSpeed", turningSpeed);
         }
 

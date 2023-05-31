@@ -14,16 +14,11 @@ public class SetCardinalDirection extends CommandBase {
 
     @Override
     public void initialize() {
-        swerve.cardinalDirection(desiredAngle);
+        swerve.setCardinalDirection(desiredAngle);
     }
 
     @Override
     public void end(boolean interuppted) {
         swerve.disableCardinalDirection();
-    }
-
-    @Override
-    public boolean isFinished() {
-        return true;
     }
 }
