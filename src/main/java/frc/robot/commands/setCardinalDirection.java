@@ -11,9 +11,10 @@ public class SetCardinalDirection extends CommandBase {
         this.desiredAngle = desiredAngle;
         this.swerve = swerve;
     }
+
     @Override
     public void initialize() {
-        swerve.setCardinalDirection(desiredAngle);
+        swerve.cardinalDirection(desiredAngle);
     }
 
     @Override
