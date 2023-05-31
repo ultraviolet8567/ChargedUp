@@ -23,7 +23,7 @@ public class Lights extends VirtualSubsystem {
     public boolean lowBattery = false;
     public GamePiece gamePiece = GamePiece.CONE;
     public boolean pickUp = false;
-    public static RobotState state = RobotState.DISABLED;
+    public RobotState state = RobotState.DISABLED;
 
     // LED IO
     private final AddressableLED leds;
@@ -80,8 +80,7 @@ public class Lights extends VirtualSubsystem {
         // Disabled
         if (state == RobotState.DISABLED) {
             // Purple shimmer
-            // shimmer(Section.FULL, Color.kViolet);
-            solid(Section.FULL, Color.kRed);
+            shimmer(Section.FULL, Color.kViolet);
         }
 
         // Autonomous
@@ -93,7 +92,7 @@ public class Lights extends VirtualSubsystem {
         // Teleop
         else {
             // Game piece color
-            solid(Section.FULL, gamePiece.color());
+            solid(Section.FULL, gamePiece.getColor());
             
             // Pickup indicator
             if (pickUp) {
@@ -103,9 +102,7 @@ public class Lights extends VirtualSubsystem {
 
         // Indicate low battery in every case
         lowBattery = (RobotController.getBatteryVoltage() < lowBatteryVoltage);
-        if (lowBattery) {
-            breath(Section.BOTTOM, Color.kRed, Color.kBlack, breathDuration);
-        }
+        if (lowBattery) breath(Section.BOTTOM, Color.kRed, Color.kBlack, breathDuration);
 
         // Update LEDs
         leds.setData(buffer);
@@ -205,7 +202,7 @@ public class Lights extends VirtualSubsystem {
                 buffer.setLED(i, new Color(red, green, blue));
             }
         }
-      }
+    }
     
     private void stripes(Section section, List<Color> colors, int length, double duration) {
         int offset = (int) (Timer.getFPGATimestamp() % duration / duration * length * colors.size());
@@ -299,7 +296,7 @@ public class Lights extends VirtualSubsystem {
         CONE,
         CUBE;
 
-        private Color color(){
+        private Color getColor() {
             return this == CONE ? Color.kYellow : Color.kPurple;
         }
 

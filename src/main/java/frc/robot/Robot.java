@@ -32,7 +32,6 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
-        Lights.state = RobotState.DISABLED;
         logger = Logger.getInstance();
         Lights.getInstance();
 
@@ -96,7 +95,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void disabledInit() {
-        Lights.state = RobotState.DISABLED;
+        Lights.getInstance().state = RobotState.DISABLED;
     }
 
     @Override
@@ -114,8 +113,8 @@ public class Robot extends LoggedRobot {
 
         gamePiece = initialGamePiece.getSelected();
 
-        // set state to auto
-        Lights.state = RobotState.AUTO;
+        // Set state to auto
+        Lights.getInstance().state = RobotState.AUTO;
 
     }
 
@@ -129,7 +128,7 @@ public class Robot extends LoggedRobot {
         }
 
         // set state to teleop
-        Lights.state = RobotState.TELEOP;
+        Lights.getInstance().state = RobotState.TELEOP;
 
     }
 
