@@ -102,7 +102,7 @@ public class Swerve extends SubsystemBase {
         return cardinalDirectionEnabled;
     }
 
-    public void setCardinalDirection(double desiredAngle) {
+    public void cardinalDirection(double desiredAngle) {
         desiredCardinalAngle = desiredAngle;
         cardinalDirectionEnabled = true;
     }
