@@ -32,18 +32,19 @@ public class Lights extends VirtualSubsystem {
     // Constants
     private static final int leftLength = 20;
     private static final int rightLength = 21;
-    private static final int backLength = 13; // back left //back right
-    private static final int length = rightLength + leftLength;
-    private static final int bottomLength = 4; // Placeholder value
+    private static final int backLength = 13;
+    private static final int frontLength = rightLength + leftLength;
+    private static final int length = frontLength + 2 * backLength;
+    private static final int bottomLength = 8; // Placeholder value
     private static final int minLoopCycleCount = 10;
     private static final double shimmerExtremeness = 0.5;
     private static final double shimmerSpeed = 1;
-    private static final double strobeTickSkip = 30;
+    private static final double strobeTickSkip = 15;
     private static  final double lowBatteryVoltage = 10.0;
     private static final int lowBatteryFlashWait = 50;
     private static final int lowBatteryFlashDuration = 25;
-    private static final double strobeFastDuration = 0.1;
-    private static final double strobeSlowDuration = 0.2;
+    private static final int strobeFastDuration = 2;
+    private static final int strobeSlowDuration = 5;
     private static final double breathDuration = 1.0;
     private static final double rainbowCycleLength = 25.0;
     private static final double rainbowDuration = 0.25;
@@ -54,15 +55,17 @@ public class Lights extends VirtualSubsystem {
     private static final double waveSlowDuration = 3.0;
     private static final double waveAllianceCycleLength = 15.0;
     private static final double waveAllianceDuration = 2.0;
+    private static final double stripeDuration = 1.0;
+    private static final int stripeLength = 5;
 
 
     private Lights() {
         System.out.println("[Init] Creating LEDs");
 
         leds = new AddressableLED(1);
-        buffer = new AddressableLEDBuffer(length + (backLength * 2));
+        buffer = new AddressableLEDBuffer(length);
 
-        leds.setLength(length + (backLength * 2));
+        leds.setLength(length);
 
         leds.setData(buffer);
         leds.start();
@@ -80,7 +83,7 @@ public class Lights extends VirtualSubsystem {
         // Disabled
         if (state == RobotState.DISABLED) {
             // Purple shimmer
-            shimmer(Section.FULL, Color.kViolet);
+            stripes(Section.FULL, List.of(Color.kPurple, Color.kGoldenrod), stripeLength, stripeDuration);
         }
 
         // Autonomous
@@ -102,37 +105,20 @@ public class Lights extends VirtualSubsystem {
 
         // Indicate low battery in every case
         lowBattery = (RobotController.getBatteryVoltage() < lowBatteryVoltage);
-        if (lowBattery) breath(Section.BOTTOM, Color.kRed, Color.kBlack, breathDuration);
+        if (lowBattery) strobe(Section.BOTTOM, Color.kRed);
 
         // Update LEDs
         leds.setData(buffer);
     }
 
     private void solid(Section section, Color color) {
-        if (section == Section.FULL) {
-            solid(Section.LEFTFULL, color);
-            solid(Section.RIGHTFULL, color);
-            solid(Section.LEFTBACK, color);
-        }
-        else if (section == Section.BOTTOM) {
-            solid(Section.LEFTBOTTOM, color);
-            solid(Section.RIGHTBOTTOM, color);
-        }
-        else {
-            for (int i = section.start(); i < section.end(); i++) {
-                buffer.setLED(i, color);
-            }
+        for (int i = section.start(); i < section.end(); i++) {
+            buffer.setLED(i, color);
         }
     }
     
     private void shimmer(Section section, Color color) {
-        if (section == Section.FULL) {
-            shimmer(Section.LEFTFULL, color);
-            shimmer(Section.RIGHTFULL, color);
-            shimmer(Section.LEFTBACK, color);
-            shimmer(Section.RIGHTBACK, color);
-        }
-        else if (section == Section.BOTTOM) {
+        if (section == Section.BOTTOM) {
             shimmer(Section.LEFTBOTTOM, color);
             shimmer(Section.RIGHTBOTTOM, color);
         }
@@ -148,6 +134,8 @@ public class Lights extends VirtualSubsystem {
         if (section == Section.FULL) {
             rainbow(Section.LEFTFULL);
             rainbow(Section.RIGHTFULL);
+            rainbow(Section.LEFTBACK);
+            rainbow(Section.RIGHTBACK);
         }
         else if (section == Section.BOTTOM) {
             rainbow(Section.LEFTBOTTOM);
@@ -163,17 +151,13 @@ public class Lights extends VirtualSubsystem {
     }
 
     private void strobe(Section section, Color color){
-        if (section == Section.FULL) {
-            strobe(Section.LEFTFULL, color);
-            strobe(Section.RIGHTFULL, color);
-        }
-        else if (section == Section.BOTTOM) {
+        if (section == Section.BOTTOM) {
             strobe(Section.LEFTBOTTOM, color);
             strobe(Section.RIGHTBOTTOM, color);
         }
         else {
             for (int i = section.start(); i < section.end(); i++) {
-                if (loopCycleCount % (strobeTickSkip + 1) == strobeSlowDuration) {
+                if (loopCycleCount % (strobeTickSkip) < strobeSlowDuration) {
                     buffer.setLED(i, color);
                 }
                 else {
@@ -204,10 +188,10 @@ public class Lights extends VirtualSubsystem {
         }
     }
     
-    private void stripes(Section section, List<Color> colors, int length, double duration) {
-        int offset = (int) (Timer.getFPGATimestamp() % duration / duration * length * colors.size());
+    private void stripes(Section section, List<Color> colors, int frontLength, double duration) {
+        int offset = (int) (Timer.getFPGATimestamp() % duration / duration * frontLength * colors.size());
         for (int i = section.start(); i < section.end(); i++) {
-            int colorIndex = (int) (Math.floor((double) (i - offset) / length) + colors.size()) % colors.size();
+            int colorIndex = (int) (Math.floor((double) (i - offset) / frontLength) + colors.size()) % colors.size();
             colorIndex = colors.size() - 1 - colorIndex;
             buffer.setLED(i, colors.get(colorIndex));
         }
@@ -258,9 +242,9 @@ public class Lights extends VirtualSubsystem {
                 case RIGHTFULL:
                     return 0 + leftLength;
                 case LEFTBACK:
-                    return 1 + length;
+                    return 1 + frontLength;
                 case RIGHTBACK:
-                    return 1 + length + backLength;
+                    return 1 + frontLength + backLength;
                 default:
                     return 0;
             }
@@ -277,15 +261,15 @@ public class Lights extends VirtualSubsystem {
                 case LEFTFULL:
                     return leftLength;
                 case RIGHTUPPER:
-                    return length;
+                    return frontLength;
                 case RIGHTBOTTOM:
                     return leftLength + bottomLength + 1;
                 case RIGHTFULL:
-                    return length;
+                    return frontLength;
                 case LEFTBACK:
-                    return length + backLength;
+                    return frontLength + backLength;
                 case RIGHTBACK:
-                    return length + backLength + backLength;
+                    return frontLength + backLength + backLength;
                 default:
                     return 0;
             }
