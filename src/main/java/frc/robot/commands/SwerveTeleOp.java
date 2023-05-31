@@ -65,11 +65,9 @@ public class SwerveTeleOp extends CommandBase {
         Logger.getInstance().recordOutput("TurningSpeed", turningSpeed);
 
         // If the driver isn't moving the turning joystick
-        if (turningSpeed == 0 && !swerve.atCardinalDirection) {
+        if (turningSpeed == 0 && swerve.cardinalDirectionEnabled()) {
             turningSpeed = swerve.getTurningSpeed();
             Logger.getInstance().recordOutput("CDTurningSpeed", turningSpeed);
-        } else {
-            swerve.atCardinalDirection = true;
         }
 
         if (leftBumper.get()) {

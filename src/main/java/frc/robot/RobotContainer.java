@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ControllerType;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
-import frc.robot.commands.setCardinalDirection;
+import frc.robot.commands.SetCardinalDirection;
 import frc.robot.commands.ChangeGamePiece;
 import frc.robot.commands.Drop;
 import frc.robot.commands.MoveArms;
@@ -36,8 +36,6 @@ public class RobotContainer {
     private static final Arms arms = new Arms();
     private static final GyroOdometry gyro = new GyroOdometry(swerve);
     private static final AutoChooser autoChooser = new AutoChooser(swerve, arms, intake, gyro);
-    // private final VisionOdometry vision = new VisionOdometry();
-    // private final Odometry odometry = new Odometry(gyro, vision);
 
     // Joysticks
     private static final Joystick driverJoystick = new Joystick(OIConstants.kDriveControllerPort);
@@ -76,10 +74,10 @@ public class RobotContainer {
         new JoystickButton(driverJoystick, XboxController.Button.kStart.value).onTrue(new InstantCommand(() -> gyro.resetGyro()));
 
         // Commands for Cardinal Directions
-        new JoystickButton(driverJoystick, XboxController.Button.kY.value).onTrue(new setCardinalDirection(swerve, 0));
-        new JoystickButton(driverJoystick, XboxController.Button.kB.value).onTrue(new setCardinalDirection(swerve, Math.PI / 2));
-        new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new setCardinalDirection(swerve, Math.PI));
-        new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new setCardinalDirection(swerve, -Math.PI / 2));
+        new JoystickButton(driverJoystick, XboxController.Button.kY.value).onTrue(new SetCardinalDirection(swerve, 0));
+        new JoystickButton(driverJoystick, XboxController.Button.kB.value).onTrue(new SetCardinalDirection(swerve, Math.PI / 2));
+        new JoystickButton(driverJoystick, XboxController.Button.kA.value).onTrue(new SetCardinalDirection(swerve, Math.PI));
+        new JoystickButton(driverJoystick, XboxController.Button.kX.value).onTrue(new SetCardinalDirection(swerve, -Math.PI / 2));
 
         // Commands to pickup and drop game pieces
         new JoystickButton(armJoystick, XboxController.Button.kRightBumper.value).whileTrue(new Pickup(intake));

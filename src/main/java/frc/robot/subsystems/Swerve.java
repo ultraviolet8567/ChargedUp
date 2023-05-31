@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveConstants;
@@ -16,8 +15,8 @@ import frc.robot.odometry.GyroOdometry;
 public class Swerve extends SubsystemBase {
     private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
-    private double desiredAngle;
-    public boolean atCardinalDirection;
+    private double desiredCardinalAngle;
+    private boolean cardinalDirectionEnabled;
     private PIDController cardinalPidController;
 
     public Swerve() {
@@ -60,7 +59,6 @@ public class Swerve extends SubsystemBase {
         cardinalPidController = new PIDController(0.01, 0, 0);
         cardinalPidController.setTolerance(0.05);
         cardinalPidController.enableContinuousInput(-Math.PI, Math.PI);
-        atCardinalDirection = true;
     }
 
     public void periodic() {
@@ -70,8 +68,8 @@ public class Swerve extends SubsystemBase {
         // FL absolute encoder angle, FR absolute encoder angle, BL absolute encoder angle, BR absolute encoder angle
         Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
 
-        Logger.getInstance().recordOutput("atCardinalDirection", atCardinalDirection);
-        Logger.getInstance().recordOutput("CDDesiredAngle", desiredAngle);
+        Logger.getInstance().recordOutput("AtCardinalDirection", cardinalPidController.atSetpoint());
+        Logger.getInstance().recordOutput("DesiredCardinalAngle", desiredCardinalAngle);
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -100,18 +98,25 @@ public class Swerve extends SubsystemBase {
         setModuleStates(locked);
     }
 
+    public boolean cardinalDirectionEnabled() {
+        return cardinalDirectionEnabled;
+    }
+
     public void setCardinalDirection(double desiredAngle) {
-        this.desiredAngle = desiredAngle;
-        atCardinalDirection = false;
+        desiredCardinalAngle = desiredAngle;
+        cardinalDirectionEnabled = true;
+    }
+
+    public void disableCardinalDirection() {
+        cardinalDirectionEnabled = false;
     }
 
     public double getTurningSpeed() {
         if (cardinalPidController.atSetpoint()) {
-            atCardinalDirection = true;
             return 0.0;
         }
 
-        return cardinalPidController.calculate(GyroOdometry.getHeading(), desiredAngle);
+        return cardinalPidController.calculate(GyroOdometry.getHeading(), desiredCardinalAngle);
     }
 
     public void resetEncoders() {
