@@ -76,7 +76,7 @@ public class RobotContainer {
         // Commands for Cardinal Directions
         new JoystickButton(driverJoystick, XboxController.Button.kY.value).whileTrue(new SetCardinalDirection(swerve, 0));
         new JoystickButton(driverJoystick, XboxController.Button.kB.value).whileTrue(new SetCardinalDirection(swerve, Math.PI / 2));
-        new JoystickButton(driverJoystick, XboxController.Button.kA.value).whileTrue(new SetCardinalDirection(swerve, Math.PI));
+        new JoystickButton(driverJoystick, XboxController.Button.kA.value).whileTrue(new SetCardinalDirection(swerve, Math.PI - 0.01));
         new JoystickButton(driverJoystick, XboxController.Button.kX.value).whileTrue(new SetCardinalDirection(swerve, -Math.PI / 2));
 
         // Commands to pickup and drop game pieces
