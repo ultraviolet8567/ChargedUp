@@ -111,7 +111,7 @@ public class Robot extends LoggedRobot {
             m_autonomousCommand.schedule();
         }
 
-        gamePiece = initialGamePiece.getSelected();
+        Lights.getInstance().gamePiece = initialGamePiece.getSelected();
 
         // Set state to auto
         Lights.getInstance().state = RobotState.AUTO;

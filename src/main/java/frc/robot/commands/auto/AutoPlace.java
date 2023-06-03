@@ -31,10 +31,10 @@ public class AutoPlace extends CommandBase {
     public void execute() {
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
 
-        if (timeEquals(4)) {
+        if (timeEquals(4.5)) {
             intake.drop(Lights.getInstance().gamePiece);
         }
-        if (timeEquals(4.25)) {
+        if (timeEquals(4.75)) {
             arms.setPresetValue(Preset.TAXI);
         }
     }

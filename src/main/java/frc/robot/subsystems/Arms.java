@@ -192,52 +192,52 @@ public class Arms extends SubsystemBase {
         double shoulderSpeed = shoulderPidController.calculate(shoulderAngle(), shoulderSetpoint);
         double elbowSpeed = elbowPidController.calculate(elbowAngle(), elbowSetpoint);
 
-        // Trapezoidal motion stuff
-        shoulderGoal.position = shoulderSetpoint;
-        elbowGoal.position = elbowSetpoint;
+        // // Trapezoidal motion stuff
+        // shoulderGoal.position = shoulderSetpoint;
+        // elbowGoal.position = elbowSetpoint;
 
-        // Getting previous velocites
-        double previousShoulderVel = shoulderNextPoint.velocity;
-        double previousElbowVel = elbowNextPoint.velocity;
+        // // Getting previous velocites
+        // double previousShoulderVel = shoulderNextPoint.velocity;
+        // double previousElbowVel = elbowNextPoint.velocity;
 
-        // Create a motion profile with the given maximum velocity and maximum acceleration
-        // constraints for the NextPoint, the desired goal, and the current point.
-        shoulderProfile = new TrapezoidProfile(shoulderConstraints, shoulderGoal, shoulderNextPoint);
-        elbowProfile = new TrapezoidProfile(elbowConstraints, elbowGoal, elbowNextPoint);
+        // // Create a motion profile with the given maximum velocity and maximum acceleration
+        // // constraints for the NextPoint, the desired goal, and the current point.
+        // shoulderProfile = new TrapezoidProfile(shoulderConstraints, shoulderGoal, shoulderNextPoint);
+        // elbowProfile = new TrapezoidProfile(elbowConstraints, elbowGoal, elbowNextPoint);
         
-        // Retrieve the profiled NextPoint for the next timestep. This NextPoint moves
-        // toward the goal while obeying the constraints.
-        shoulderNextPoint = shoulderProfile.calculate(Constants.periodicTime);
-        elbowNextPoint = elbowProfile.calculate(Constants.periodicTime);
+        // // Retrieve the profiled NextPoint for the next timestep. This NextPoint moves
+        // // toward the goal while obeying the constraints.
+        // shoulderNextPoint = shoulderProfile.calculate(Constants.periodicTime);
+        // elbowNextPoint = elbowProfile.calculate(Constants.periodicTime);
 
-        velocities.set(0, 0, shoulderNextPoint.velocity);
-        velocities.set(1, 0, elbowNextPoint.velocity);
+        // velocities.set(0, 0, shoulderNextPoint.velocity);
+        // velocities.set(1, 0, elbowNextPoint.velocity);
 
-        // Calculating acceleration for arms using the last point's velocity & next point's velocity
-        double shoulderAccel = (shoulderNextPoint.velocity - previousShoulderVel) / Constants.periodicTime; 
-        double elbowAccel = (elbowNextPoint.velocity - previousElbowVel) / Constants.periodicTime; 
+        // // Calculating acceleration for arms using the last point's velocity & next point's velocity
+        // double shoulderAccel = (shoulderNextPoint.velocity - previousShoulderVel) / Constants.periodicTime; 
+        // double elbowAccel = (elbowNextPoint.velocity - previousElbowVel) / Constants.periodicTime; 
 
-        accelerations.set(0, 0, shoulderAccel);
-        accelerations.set(1, 0, elbowAccel);
+        // accelerations.set(0, 0, shoulderAccel);
+        // accelerations.set(1, 0, elbowAccel);
 
-        // Set positions
-        positions.set(0, 0, shoulderNextPoint.position);
-        positions.set(1, 0, elbowNextPoint.position);
+        // // Set positions
+        // positions.set(0, 0, shoulderNextPoint.position);
+        // positions.set(1, 0, elbowNextPoint.position);
 
-        // Use above values to find feedforward shoulder/elbow voltages
-        voltages = feedForward(positions, velocities, accelerations);
+        // // Use above values to find feedforward shoulder/elbow voltages
+        // voltages = feedForward(positions, velocities, accelerations);
 
-        Logger.getInstance().recordOutput("FeedForward/ShoulderPosition", positions.get(0, 0));
-        Logger.getInstance().recordOutput("FeedForward/ELbowPosition", positions.get(1, 0));
-        Logger.getInstance().recordOutput("FeedForward/ShoulderVelocity", velocities.get(0, 0));
-        Logger.getInstance().recordOutput("FeedForward/ELbowVelocity", velocities.get(1, 0));
-        Logger.getInstance().recordOutput("FeedForward/ShoulderAcceleration", accelerations.get(0, 0));
-        Logger.getInstance().recordOutput("FeedForward/ElbowAcceleration", accelerations.get(1, 0));
+        // Logger.getInstance().recordOutput("FeedForward/ShoulderPosition", positions.get(0, 0));
+        // Logger.getInstance().recordOutput("FeedForward/ELbowPosition", positions.get(1, 0));
+        // Logger.getInstance().recordOutput("FeedForward/ShoulderVelocity", velocities.get(0, 0));
+        // Logger.getInstance().recordOutput("FeedForward/ELbowVelocity", velocities.get(1, 0));
+        // Logger.getInstance().recordOutput("FeedForward/ShoulderAcceleration", accelerations.get(0, 0));
+        // Logger.getInstance().recordOutput("FeedForward/ElbowAcceleration", accelerations.get(1, 0));
 
-        // Combine PID & FeedForward Control 
-        // TODO apply static friction constant kS (the amount of volts needed to make motor barely turn) to voltages
-        double totalShoulderVoltage = voltages.get(0, 0);
-        double totalElbowVoltage = voltages.get(1, 0);
+        // // Combine PID & FeedForward Control 
+        // // TODO apply static friction constant kS (the amount of volts needed to make motor barely turn) to voltages
+        // double totalShoulderVoltage = voltages.get(0, 0);
+        // double totalElbowVoltage = voltages.get(1, 0);
         
         // Clamp the speeds between -80% and 80%
         // totalShoulderVoltage = MathUtil.clamp(totalShoulderVoltage, -ArmConstants.kMaxShoulderSpeedPercentage, ArmConstants.kMaxShoulderSpeedPercentage);
@@ -246,18 +246,18 @@ public class Arms extends SubsystemBase {
         elbowSpeed = MathUtil.clamp(elbowSpeed, -ArmConstants.kMaxElbowSpeedPercentage, ArmConstants.kMaxElbowSpeedPercentage);
 
         if (shoulderPidController.atSetpoint()) {
-            totalShoulderVoltage = 0;
+            // totalShoulderVoltage = 0;
             shoulderSpeed = 0;
         }
         if (elbowPidController.atSetpoint()) {
-            totalElbowVoltage = 0;
+            // totalElbowVoltage = 0;
             elbowSpeed = 0;
         }
 
         // TODO figure out the difference between the pid & ff values
-        Logger.getInstance().recordOutput("ArmSpeeds/ShoulderVoltage", totalShoulderVoltage);
+        // Logger.getInstance().recordOutput("ArmSpeeds/ShoulderVoltage", totalShoulderVoltage);
         Logger.getInstance().recordOutput("ArmSpeeds/ShoulderSpeed", shoulderSpeed);
-        Logger.getInstance().recordOutput("ArmSpeeds/ElbowVoltage", totalElbowVoltage);
+        // Logger.getInstance().recordOutput("ArmSpeeds/ElbowVoltage", totalElbowVoltage);
         Logger.getInstance().recordOutput("ArmSpeeds/ElbowSpeed", elbowSpeed);
 
         return new double[] {shoulderSpeed, elbowSpeed};

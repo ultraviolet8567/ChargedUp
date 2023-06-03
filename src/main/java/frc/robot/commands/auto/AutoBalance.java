@@ -45,22 +45,22 @@ public class AutoBalance extends CommandBase {
     @Override
     public void execute() {
         double speed;
-        double robotX = gyro.getRotation3d().getX();
 
-        if (Math.abs(robotX) != 0) {
-            speed = pid.calculate(robotX, 0);
-        } else if (Math.abs(robotX) == 0 && timer.get() <= 5) {
-            speed = 0.85;
-        } else {
+        if (gyro.getRotation3d().getX() == 0) {
             speed = 0.0;
         }
-
-        // increase or decrease the angle (default 5) if this doesn't work as intended
-        if (Math.abs(0 - gyro.getRotation3d().getX()) <= 5) {
-            falter(speed);
-        } else {
-            run(speed);
+        else {
+            speed = pid.calculate(gyro.getRotation3d().getX(), 0);
         }
+        
+        run(speed);
+
+        // Increase or decrease the angle (default 5) if this doesn't work as intended
+        // if (Math.abs(gyro.getRotation3d().getX()) <= 0.4) {
+        //     falter(speed);
+        // } else {
+        //     run(speed);
+        // }
         
         Logger.getInstance().recordOutput("Auto/Timer", timer.get());
         Logger.getInstance().recordOutput("Auto/Speed", speed);
@@ -99,6 +99,5 @@ public class AutoBalance extends CommandBase {
         ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speed, 0, 0, gyro.getRotation2d());
         SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisSpeeds);
         swerve.setModuleStates(moduleStates);
-    }
-        
+    }  
 }

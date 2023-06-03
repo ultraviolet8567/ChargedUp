@@ -170,7 +170,7 @@ public class AutoChooser extends SubsystemBase {
                 return routines.get("Balance on charge station");
             }
         }
-        else if (chargeStation.getSelected().equals("DriveOut")) {
+        else if (chargeStation.getSelected().equals("Drive out")) {
             if (placeGamePiece.getSelected()) {
                 Logger.getInstance().recordOutput("Auto/Routine", gamePiece + " place on high node and drive out");
                 return routines.get(gamePiece + " place on high node and drive out");
@@ -182,8 +182,8 @@ public class AutoChooser extends SubsystemBase {
         }
         else {
             if (placeGamePiece.getSelected()) {
-                Logger.getInstance().recordOutput("Auto/Routine", gamePiece + " place on high node and do nothing");
-                return routines.get(gamePiece + " place on high node and do not move");
+                Logger.getInstance().recordOutput("Auto/Routine", "Place on high node and do nothing");
+                return routines.get("Place on high node and do not move");
             }
             else {
                 Logger.getInstance().recordOutput("Auto/Routine", "Do nothing");
