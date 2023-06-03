@@ -55,8 +55,8 @@ public class Swerve extends SubsystemBase {
             DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
-        cardinalPidController = new PIDController(0.1, 0, 0);
-        cardinalPidController.setTolerance(0.1);
+        cardinalPidController = new PIDController(0.01, 0.02, 0.0);
+        cardinalPidController.setTolerance(0.05);
         cardinalPidController.enableContinuousInput(-Math.PI, Math.PI);
         cardinalDirectionEnabled = false;
     }
@@ -71,6 +71,7 @@ public class Swerve extends SubsystemBase {
         Logger.getInstance().recordOutput("AtCardinalDirection", cardinalPidController.atSetpoint());
         Logger.getInstance().recordOutput("OnCardinal", cardinalDirectionEnabled);
         Logger.getInstance().recordOutput("DesiredCardinalAngle", desiredCardinalAngle);
+        Logger.getInstance().recordOutput("CardinalDirectionPIDError", cardinalPidController.getPositionError());
     }
 
     public SwerveModulePosition[] getModulePositions() {
@@ -113,7 +114,15 @@ public class Swerve extends SubsystemBase {
     }
 
     public double getTurningSpeed(double angle) {
-        return cardinalPidController.calculate(angle, desiredCardinalAngle);
+        // return cardinalPidController.calculate(angle, desiredCardinalAngle);
+        if (Math.abs(angle - desiredCardinalAngle) > 0.25) {
+            return 0.25;
+        } else if (Math.abs(angle - desiredCardinalAngle) > 0.1) {
+            return 0.1;
+        } else if (Math.abs(angle - desiredCardinalAngle) > 0.01) {
+            return 0.01;
+        }
+        return 0.0;
     }
 
     public void resetEncoders() {
