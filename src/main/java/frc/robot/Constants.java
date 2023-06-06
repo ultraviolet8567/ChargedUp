@@ -113,7 +113,7 @@ public final class Constants {
         public static final double[] kGroundIntakeConeSetpoints = new double[] { 2.773, -1.114 };
         public static final double[] kGroundIntakeCubeSetpoints = new double[] { 2.975, -1.032 };
         public static final double[] kSubstationIntakeConeSetpoints = new double[] { -0.601, 2.041 };
-        public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.998 };
+        public static final double[] kSubstationIntakeCubeSetpoints = new double[] { -0.474, 1.901 };
         public static final double[] kStartSetpoints = new double[] { -2.278, 2.427 };
         public static final double[] kTaxiSetpoints = new double[] { -2.049, 2.35 };
 

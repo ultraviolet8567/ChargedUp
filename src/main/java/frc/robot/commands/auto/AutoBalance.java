@@ -7,7 +7,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -29,11 +28,7 @@ public class AutoBalance extends CommandBase {
 
         timer = new Timer();
 
-        if (DriverStation.getAlliance() == Alliance.Red) {
-            pid = new PIDController(2.75, 0, 0);
-        } else {
-            pid = new PIDController(2.25, 0, 0);
-        }
+        pid = new PIDController(2.25, 0, 0);
         pid.setTolerance(0.1);
     }
 
@@ -45,7 +40,7 @@ public class AutoBalance extends CommandBase {
     @Override
     public void execute() {
         double speed;
-
+        
         if (gyro.getRotation3d().getX() == 0) {
             speed = 0.0;
         }
@@ -90,7 +85,7 @@ public class AutoBalance extends CommandBase {
         try {
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {
-            System.out.println("there was an interrupted exception! what the");
+            System.out.println("There was an interrupted exception!");
         }
     }
 

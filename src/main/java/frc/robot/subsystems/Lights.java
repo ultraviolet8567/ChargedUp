@@ -30,33 +30,33 @@ public class Lights extends VirtualSubsystem {
     private final AddressableLEDBuffer buffer;
 
     // Constants
-    private static final int leftLength = 20;
+    private static final int leftLength = 18;
     private static final int rightLength = 21;
     private static final int backLength = 13;
     private static final int frontLength = rightLength + leftLength;
     private static final int length = frontLength + 2 * backLength;
-    private static final int bottomLength = 8; // Placeholder value
+    private static final int bottomLength = 8;
     private static final int minLoopCycleCount = 10;
+    private static  final double lowBatteryVoltage = 10.0;
     private static final double shimmerExtremeness = 0.5;
     private static final double shimmerSpeed = 1;
     private static final double strobeTickSkip = 15;
-    private static  final double lowBatteryVoltage = 10.0;
+    private static final int strobeSlowDuration = 5;
+    private static final double stripeDuration = 1.0;
+    private static final int stripeLength = 5;
+    private static final double breathDuration = 1.0;
+    private static final double waveExponent = 0.4;
     private static final int lowBatteryFlashWait = 50;
     private static final int lowBatteryFlashDuration = 25;
     private static final int strobeFastDuration = 2;
-    private static final int strobeSlowDuration = 5;
-    private static final double breathDuration = 1.0;
     private static final double rainbowCycleLength = 25.0;
     private static final double rainbowDuration = 0.25;
-    private static final double waveExponent = 0.4;
     private static final double waveFastCycleLength = 25.0;
     private static final double waveFastDuration = 0.25;
     private static final double waveSlowCycleLength = 25.0;
     private static final double waveSlowDuration = 3.0;
     private static final double waveAllianceCycleLength = 15.0;
     private static final double waveAllianceDuration = 2.0;
-    private static final double stripeDuration = 1.0;
-    private static final int stripeLength = 5;
 
 
     private Lights() {
@@ -82,7 +82,7 @@ public class Lights extends VirtualSubsystem {
         
         // Disabled
         if (state == RobotState.DISABLED) {
-            // Purple shimmer
+            // Purple and yellow stripes
             stripes(Section.FULL, List.of(Color.kPurple, Color.kDarkGoldenrod), stripeLength, stripeDuration);
         }
 
@@ -105,7 +105,9 @@ public class Lights extends VirtualSubsystem {
 
         // Indicate low battery in every case
         lowBattery = (RobotController.getBatteryVoltage() < lowBatteryVoltage);
-        if (lowBattery) strobe(Section.BOTTOM, Color.kRed);
+        if (lowBattery) {
+            strobe(Section.BOTTOM, Color.kRed);
+        }
 
         // Update LEDs
         leds.setData(buffer);
@@ -144,7 +146,6 @@ public class Lights extends VirtualSubsystem {
         else {
             for (int i = section.start(); i < section.end(); i++) {
                 int hue = ((loopCycleCount * 3) % 180 + (i * 180 / leftLength)) % 180;
-
                 buffer.setHSV(i, hue, 255, 128);
             }
         }

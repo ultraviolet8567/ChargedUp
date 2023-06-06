@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ControllerType;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.Preset;
-import frc.robot.commands.SetCardinalDirection;
 import frc.robot.commands.ChangeGamePiece;
 import frc.robot.commands.Drop;
 import frc.robot.commands.MoveArms;
@@ -25,8 +24,8 @@ import frc.robot.odometry.GyroOdometry;
 import frc.robot.subsystems.Arms;
 import frc.robot.subsystems.AutoChooser;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Lights.GamePiece;
+import frc.robot.subsystems.Swerve;
 import frc.robot.util.ControllerIO;
 
 public class RobotContainer {
