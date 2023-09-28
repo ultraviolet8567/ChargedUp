@@ -94,8 +94,11 @@ public class Lights extends VirtualSubsystem {
 
         // Teleop
         else {
+            // Club fair rainbow
+            rainbow(Section.FULL);
+
             // Game piece color
-            solid(Section.FULL, gamePiece.getColor());
+            // solid(Section.FULL, gamePiece.getColor());
             
             // Pickup indicator
             if (pickUp) {
