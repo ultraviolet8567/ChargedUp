@@ -2,85 +2,80 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.kauailabs.navx.frc.AHRS;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CAN;
 import frc.robot.Constants.DriveConstants;
 
 public class Swerve extends SubsystemBase {
-    private final SwerveModule frontLeft = new SwerveModule(
-        DriveConstants.kFrontLeftDriveMotorPort,
-        DriveConstants.kFrontLeftTurningMotorPort,
-        DriveConstants.kFrontLeftDriveEncoderReversed,
-        DriveConstants.kFrontLeftTurningEncoderReversed,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
+    private final SwerveModule frontLeft, frontRight, backLeft, backRight;
 
-    private final SwerveModule frontRight = new SwerveModule(
-        DriveConstants.kFrontRightDriveMotorPort,
-        DriveConstants.kFrontRightTurningMotorPort,
-        DriveConstants.kFrontRightDriveEncoderReversed,
-        DriveConstants.kFrontRightTurningEncoderReversed,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
-    
-    private final SwerveModule backLeft = new SwerveModule(
-        DriveConstants.kBackLeftDriveMotorPort,
-        DriveConstants.kBackLeftTurningMotorPort,
-        DriveConstants.kBackLeftDriveEncoderReversed,
-        DriveConstants.kBackLeftTurningEncoderReversed,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
-    
-    private final SwerveModule backRight = new SwerveModule(
-        DriveConstants.kBackRightDriveMotorPort,
-        DriveConstants.kBackRightTurningMotorPort,
-        DriveConstants.kBackRightDriveEncoderReversed,
-        DriveConstants.kBackRightTurningEncoderReversed,
-        DriveConstants.kBackRightDriveAbsoluteEncoderPort,
-        DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
-        DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
-
-    private AHRS gyro = new AHRS(SPI.Port.kMXP);
-
+    private double desiredCardinalAngle;
+    private boolean cardinalDirectionEnabled;
+    private PIDController cardinalPidController;
 
     public Swerve() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                gyro.calibrate();
-                resetGyro();
-            } catch (Exception e) {
-            }
-        });
-    }
+        frontLeft = new SwerveModule(
+            CAN.kFrontLeftDriveMotorPort,
+            CAN.kFrontLeftTurningMotorPort,
+            DriveConstants.kFrontLeftDriveEncoderReversed,
+            DriveConstants.kFrontLeftTurningEncoderReversed,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderPort,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kFrontLeftDriveAbsoluteEncoderReversed);
 
-    public void resetGyro() {
-        gyro.reset();
-    }
+        frontRight = new SwerveModule(
+            CAN.kFrontRightDriveMotorPort,
+            CAN.kFrontRightTurningMotorPort,
+            DriveConstants.kFrontRightDriveEncoderReversed,
+            DriveConstants.kFrontRightTurningEncoderReversed,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderPort,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kFrontRightDriveAbsoluteEncoderReversed);
+        
+        backLeft = new SwerveModule(
+            CAN.kBackLeftDriveMotorPort,
+            CAN.kBackLeftTurningMotorPort,
+            DriveConstants.kBackLeftDriveEncoderReversed,
+            DriveConstants.kBackLeftTurningEncoderReversed,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderPort,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kBackLeftDriveAbsoluteEncoderReversed);
+        
+        backRight = new SwerveModule(
+            CAN.kBackRightDriveMotorPort,
+            CAN.kBackRightTurningMotorPort,
+            DriveConstants.kBackRightDriveEncoderReversed,
+            DriveConstants.kBackRightTurningEncoderReversed,
+            DriveConstants.kBackRightDriveAbsoluteEncoderPort,
+            DriveConstants.kBackRightDriveAbsoluteEncoderOffsetRad,
+            DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
-    public double getHeading() {
-        // Negate the reading because the navX has CCW- and we need CCW+
-        return Math.IEEEremainder(-gyro.getAngle(), 360);
-    }
-
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getHeading());
+        cardinalPidController = new PIDController(0.01, 0.02, 0.0);
+        cardinalPidController.setTolerance(0.05);
+        cardinalPidController.enableContinuousInput(-Math.PI, Math.PI);
+        cardinalDirectionEnabled = false;
     }
 
     public void periodic() {
-        // CCW+
-        Logger.getInstance().recordOutput("Odometry/Heading", getRotation2d().getRadians());
-
         // FL angle, FL speed, FR angle, FR speed, BL angle, BL speed, BR angle, BR speed
-        Logger.getInstance().recordOutput("SwerveModuleStates/Measured", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
+        Logger.getInstance().recordOutput("Measured/SwerveModuleStates", new SwerveModuleState[] { frontLeft.getState(), frontRight.getState(), backLeft.getState(), backRight.getState() });
+
+        // FL absolute encoder angle, FR absolute encoder angle, BL absolute encoder angle, BR absolute encoder angle
+        Logger.getInstance().recordOutput("AbsoluteEncoders/Swerve", new double[] { frontLeft.getAbsoluteEncoderAngle(), frontRight.getAbsoluteEncoderAngle(), backLeft.getAbsoluteEncoderAngle(), backRight.getAbsoluteEncoderAngle() });
+
+        Logger.getInstance().recordOutput("AtCardinalDirection", cardinalPidController.atSetpoint());
+        Logger.getInstance().recordOutput("OnCardinal", cardinalDirectionEnabled);
+        Logger.getInstance().recordOutput("DesiredCardinalAngle", desiredCardinalAngle);
+        Logger.getInstance().recordOutput("CardinalDirectionPIDError", cardinalPidController.getPositionError());
+    }
+
+    public SwerveModulePosition[] getModulePositions() {
+        return new SwerveModulePosition[] { frontLeft.getModulePosition(), frontRight.getModulePosition(), backLeft.getModulePosition(), backRight.getModulePosition() };
     }
     
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -90,7 +85,44 @@ public class Swerve extends SubsystemBase {
         backLeft.setDesiredState(desiredStates[2]);
         backRight.setDesiredState(desiredStates[3]);
 
-        Logger.getInstance().recordOutput("SwerveModuleStates/Setpoints", desiredStates);
+        Logger.getInstance().recordOutput("Setpoints/SwerveModuleStates", desiredStates);
+    }
+
+    // Sets the wheels to 45 degree angles so it doesn't move
+    public void lockWheels() {
+        SwerveModuleState[] locked = new SwerveModuleState[] {
+            new SwerveModuleState(0, new Rotation2d(2.386)),
+            new SwerveModuleState(0, new Rotation2d(0.755)), 
+            new SwerveModuleState(0, new Rotation2d(-2.386)), 
+            new SwerveModuleState(0, new Rotation2d(-0.755))
+        };
+
+        setModuleStates(locked);
+    }
+
+    public boolean cardinalDirectionEnabled() {
+        return cardinalDirectionEnabled;
+    }
+
+    public void setCardinalDirection(double desiredAngle) {
+        desiredCardinalAngle = desiredAngle;
+        cardinalDirectionEnabled = true;
+    }
+
+    public void disableCardinalDirection() {
+        cardinalDirectionEnabled = false;
+    }
+
+    public double getTurningSpeed(double angle) {
+        // return cardinalPidController.calculate(angle, desiredCardinalAngle);
+        if (Math.abs(angle - desiredCardinalAngle) > 0.25) {
+            return 0.25;
+        } else if (Math.abs(angle - desiredCardinalAngle) > 0.1) {
+            return 0.1;
+        } else if (Math.abs(angle - desiredCardinalAngle) > 0.01) {
+            return 0.01;
+        }
+        return 0.0;
     }
 
     public void resetEncoders() {

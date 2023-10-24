@@ -1,31 +1,56 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
-import frc.robot.Constants;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.CAN;
+import frc.robot.subsystems.Lights.GamePiece;
 
 public class Intake extends SubsystemBase {
-    
     CANSparkMax intake;
 
     public Intake() {
-        // TODO: find ID
-        intake = new CANSparkMax(98, MotorType.kBrushless);
+        intake = new CANSparkMax(CAN.kIntakePort, MotorType.kBrushless);
+        intake.enableVoltageCompensation(12.0);
+        intake.setSmartCurrentLimit(40);
+        intake.setIdleMode(IdleMode.kBrake);
     }
 
     @Override
-    public void periodic() { 
+    public void periodic() {
+        Logger.getInstance().recordOutput("Setpoints/Intake", intake.get());
+        Logger.getInstance().recordOutput("Measured/Intake", intake.getEncoder().getVelocity());
     }
 
-    public void pickupCone() {
-        intake.set(Constants.intakeSpeed);
+    public void pickup(GamePiece gamePiece) {
+        switch (gamePiece) {
+            case CONE:
+                intake.set(-ArmConstants.intakeSpeed.get());
+                break;
+            case CUBE:
+                intake.set(ArmConstants.intakeSpeed.get());
+                break;
+            default:
+                break;
+        }
     }
 
-    public void pickupCube() {
-        //TODO: Find out which motor is negative
-        intake.set(-1 * Constants.intakeSpeed);
+    public void drop(GamePiece gamePiece) {
+        switch (gamePiece) {
+            case CONE:
+                intake.set(ArmConstants.intakeSpeed.get());
+                break;
+            case CUBE:
+                intake.set(-ArmConstants.intakeSpeed.get());
+                break;
+            default:
+                break;
+        }
     }
 
     public void stop() {
