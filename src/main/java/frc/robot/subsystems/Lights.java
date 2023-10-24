@@ -30,8 +30,8 @@ public class Lights extends VirtualSubsystem {
     private final AddressableLEDBuffer buffer;
 
     // Constants
-    private static final int leftLength = 18;
-    private static final int rightLength = 21;
+    private static final int leftLength = 19;
+    private static final int rightLength = 19;
     private static final int backLength = 13;
     private static final int frontLength = rightLength + leftLength;
     private static final int length = frontLength + 2 * backLength;
